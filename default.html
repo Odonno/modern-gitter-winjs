@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html ng-app="modern-gitter">
+<head>
+    <meta charset="utf-8" />
+    <title>Modern Gitter</title>
+
+    <!-- WinJS references -->
+    <link href="node_modules/winjs/css/ui-dark.css" rel="stylesheet" />
+    <script src="node_modules/winjs/js/base.js"></script>
+    <script src="node_modules/winjs/js/ui.js"></script>
+
+    <!-- Angular WinJS references -->
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-winjs/js/angular-winjs.js"></script>
+
+    <!-- App references -->
+    <link href="/css/default.css" rel="stylesheet" />
+    <script src="/js/default.js"></script>
+</head>
+<body class="win-type-body">
+    <div ng-controller="RoomsCtrl">
+        {{ rooms }}
+    </div>
+    <p>Content goes here</p>
+</body>
+</html>

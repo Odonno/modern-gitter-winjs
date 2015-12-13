@@ -1,0 +1,10 @@
+{
+  "name": "modern-gitter-winjs",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Odonno",
+  "dependencies": {
+    "angular-winjs": "^4.4.0",
+    "winjs": "^4.4.0"
+  }
+}
