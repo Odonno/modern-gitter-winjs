@@ -156,16 +156,35 @@
 
             return oauthService;
         })
-        .controller('AppCtrl', function ($scope, OAuthService) {
+        .service('ApiService', function (ConfigService, OAuthService) {
+            var apiService = this;
+
+            apiService.getRooms = function () {
+                return new Promise((done, error) => {
+                    WinJS
+                        .xhr({
+                            url: ConfigService.baseUrl + "rooms",
+                            headers: { "Content-type": "application/json", "Authorization": "Bearer " + OAuthService.refreshToken }
+                        })
+                        .then(function (success) {
+                            done(success.responseText);
+                        });
+                });
+            };
+
+            return apiService;
+        })
+        .controller('AppCtrl', function ($scope, OAuthService, ApiService) {
             // properties
-            $scope.rooms = [{
-                name: "Modern-Gitter"
-            }]
+            $scope.rooms = [];
 
             // initialize controller
             OAuthService.initialize();
             OAuthService.connect().then(t => {
                 console.log('Sucessfully logged to Gitter API');
+                ApiService.getRooms().then(rooms => {
+                    $scope.rooms = rooms;
+                });
             });
         });
 })();
