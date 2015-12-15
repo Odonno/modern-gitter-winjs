@@ -21,6 +21,12 @@
         // TODO : This application is about to be suspended, save any state that needs to persist across suspensions here
     };
 
+    WinJS.UI.processAll().then(function () {
+        // makes the splitView adaptable to screen size
+        var splitView = document.querySelector(".splitView").winControl;
+        new WinJS.UI._WinKeyboard(splitView.paneElement);
+    });
+
     app.start();
 
     angular.module('modern-gitter', ['winjs'])

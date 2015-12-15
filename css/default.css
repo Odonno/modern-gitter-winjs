@@ -1,2 +1,43 @@
 ﻿body {
 }
+
+.win-splitviewpanetoggle {
+    float: left;
+}
+
+.header {
+    white-space: nowrap;
+}
+
+.title {
+    font-size: 25px;
+    left: 50px;
+    margin-top: 6px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.nav-commands {
+    margin-top: 20px;
+}
+
+.win-navbarcommand-button {
+    background-color: transparent;
+}
+
+.win-splitview-pane-hidden .win-navbarcommand-button {
+    width: 46px;
+}
+
+.win-splitview-pane-hidden .win-navbarcommand-label {
+    visibility: hidden;
+}
+
+.win-splitview-content {
+    background-color: rgba(241, 240, 237, 0.2);
+}
+
+.content-area {
+    margin-left: 20px;
+    margin-top: 6px;
+}

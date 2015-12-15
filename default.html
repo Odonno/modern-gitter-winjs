@@ -5,7 +5,7 @@
     <title>Modern Gitter</title>
 
     <!-- WinJS references -->
-    <link href="node_modules/winjs/css/ui-dark.css" rel="stylesheet" />
+    <link href="node_modules/winjs/css/ui-light.css" rel="stylesheet" />
     <script src="node_modules/winjs/js/base.js"></script>
     <script src="node_modules/winjs/js/ui.js"></script>
 
@@ -18,10 +18,28 @@
     <link href="/css/default.css" rel="stylesheet" />
     <script src="/js/default.js"></script>
 </head>
-<body class="win-type-body">
-    <div ng-controller="AppCtrl">
-        {{ rooms }}
+<body class="win-type-body" ng-controller="AppCtrl">
+    <div class="splitView" data-win-control="WinJS.UI.SplitView">
+        <!-- Pane area -->
+        <div>
+            <div class="header">
+                <button class="win-splitviewpanetoggle"
+                        data-win-control="WinJS.UI.SplitViewPaneToggle"
+                        data-win-options="{ splitView: select('.splitView') }"></button>
+                <div class="title">Modern Gitter</div>
+            </div>
+
+            <div class="nav-commands">
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
+            </div>
+        </div>
+
+        <!-- Content area -->
+        <div class="content-area">
+            <h2 class="win-h2">Odonno/Modern-Gitter</h2>
+        </div>
     </div>
-    <p>Content goes here</p>
 </body>
 </html>
