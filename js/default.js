@@ -182,6 +182,7 @@
             OAuthService.initialize();
             OAuthService.connect().then(t => {
                 console.log('Sucessfully logged to Gitter API');
+
                 ApiService.getRooms().then(rooms => {
                     $scope.rooms = rooms;
 

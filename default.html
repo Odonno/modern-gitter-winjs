@@ -19,9 +19,9 @@
     <script src="/js/default.js"></script>
 </head>
 <body class="win-type-body" ng-controller="AppCtrl">
-    <div class="splitView" data-win-control="WinJS.UI.SplitView">
+    <win-split-view win-control="splitViewWinControl" class="splitView">
         <!-- Pane area -->
-        <div>
+        <win-split-view-pane>
             <div class="header">
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
@@ -32,15 +32,15 @@
             <div class="nav-commands">
                 <win-split-view-command class="room-tile" ng-repeat="room in rooms">
                     <img class="room-tile-icon" ng-src="{{ room.image }}" />
-                    <div class="room-tile-text">{{ room.name }}</div>
+                    <div ng-show="splitViewWinControl.paneOpened" class="room-tile-text">{{ room.name }}</div>
                 </win-split-view-command>
             </div>
-        </div>
+        </win-split-view-pane>
 
         <!-- Content area -->
-        <div class="content-area">
+        <win-split-view-content class="content-area">
             <h2 class="win-h2">Odonno/Modern-Gitter</h2>
-        </div>
-    </div>
+        </win-split-view-content>
+    </win-split-view>
 </body>
 </html>
