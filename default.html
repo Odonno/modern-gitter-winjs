@@ -30,9 +30,10 @@
             </div>
 
             <div class="nav-commands">
-                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
-                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
-                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
+                <win-split-view-command class="room-tile" ng-repeat="room in rooms">
+                    <img class="room-tile-icon" ng-src="{{ room.image }}" />
+                    <div class="room-tile-text">{{ room.name }}</div>
+                </win-split-view-command>
             </div>
         </div>
 

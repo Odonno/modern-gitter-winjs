@@ -167,7 +167,7 @@
                             headers: { "Content-type": "application/json", "Authorization": "Bearer " + OAuthService.refreshToken }
                         })
                         .then(function (success) {
-                            done(success.responseText);
+                            done(JSON.parse(success.response));
                         });
                 });
             };
@@ -184,6 +184,17 @@
                 console.log('Sucessfully logged to Gitter API');
                 ApiService.getRooms().then(rooms => {
                     $scope.rooms = rooms;
+
+                    // compute room image
+                    for (var i = 0; i < $scope.rooms.length; i++) {
+                        if ($scope.rooms[i].user) {
+                            $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
+                        } else {
+                            $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
+                        }
+                    }
+
+                    $scope.$apply();
                 });
             });
         });

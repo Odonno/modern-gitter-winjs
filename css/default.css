@@ -41,3 +41,22 @@
     margin-left: 20px;
     margin-top: 6px;
 }
+
+.room-tile {
+    max-height: 40px;
+}
+
+.room-tile-icon {
+    display: inline-block;
+    max-height: 24px;
+    max-width: 24px;
+    margin-left: 12px;
+    margin-top: 6px;
+}
+
+.room-tile-text {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 10px;
+    margin-top: 8px;
+}
