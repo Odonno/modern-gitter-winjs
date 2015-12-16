@@ -30,7 +30,7 @@
             </div>
 
             <div class="nav-commands">
-                <win-split-view-command class="room-tile" ng-repeat="room in rooms">
+                <win-split-view-command class="room-tile" ng-repeat="room in rooms" ng-click="selectRoom(room)">
                     <img class="room-tile-icon" ng-src="{{ room.image }}" />
                     <div ng-show="splitViewWinControl.paneOpened" class="room-tile-text">{{ room.name }}</div>
                 </win-split-view-command>
@@ -39,7 +39,8 @@
 
         <!-- Content area -->
         <win-split-view-content class="content-area">
-            <h2 class="win-h2">Odonno/Modern-Gitter</h2>
+            <h2 class="win-h2">{{ currentRoom.name }}</h2>
+            <h6 class="win-h6 room-topic">{{ currentRoom.topic }}</h6>
         </win-split-view-content>
     </win-split-view>
 </body>

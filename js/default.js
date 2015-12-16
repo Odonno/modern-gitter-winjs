@@ -177,6 +177,12 @@
         .controller('AppCtrl', function ($scope, OAuthService, ApiService) {
             // properties
             $scope.rooms = [];
+            $scope.currentRoom = {};
+
+            // methods
+            $scope.selectRoom = function (room) {
+                $scope.currentRoom = room;
+            };
 
             // initialize controller
             OAuthService.initialize();
