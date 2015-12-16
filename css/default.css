@@ -38,7 +38,6 @@
 }
 
 .content-area {
-    margin-left: 20px;
     margin-top: 6px;
 }
 
@@ -63,4 +62,26 @@
 
 .room-topic {
     padding-top: 6px;
+}
+
+.content {
+    margin: 0 20px;
+}
+
+.fit-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-room-text {
+    font-size: 2em;
 }

@@ -14,13 +14,12 @@
     <script src="node_modules/angular-winjs/js/angular-winjs.js"></script>
 
     <!-- App references -->
-
     <link href="/css/default.css" rel="stylesheet" />
     <script src="/js/default.js"></script>
 </head>
 <body class="win-type-body" ng-controller="AppCtrl">
     <win-split-view win-control="splitViewWinControl" class="splitView">
-        <!-- Pane area -->
+        <!-- pane area -->
         <win-split-view-pane>
             <div class="header">
                 <button class="win-splitviewpanetoggle"
@@ -37,10 +36,20 @@
             </div>
         </win-split-view-pane>
 
-        <!-- Content area -->
+        <!-- content area -->
         <win-split-view-content class="content-area">
-            <h2 class="win-h2">{{ currentRoom.name }}</h2>
-            <h6 class="win-h6 room-topic">{{ currentRoom.topic }}</h6>
+            <!-- showed when no room selected -->
+            <div class="content" ng-hide="currentRoom">
+                <div class="fit-view flex">
+                    <div class="no-room-text">Select a room</div>
+                </div>
+            </div>
+
+            <!-- show room -->
+            <div class="content" ng-show="currentRoom">
+                <h2 class="win-h2">{{ currentRoom.name }}</h2>
+                <h6 class="win-h6 room-topic">{{ currentRoom.topic }}</h6>
+            </div>
         </win-split-view-content>
     </win-split-view>
 </body>
