@@ -4,6 +4,7 @@
   "description": "",
   "author": "Odonno",
   "dependencies": {
+    "angular-sanitize": "^1.4.8",
     "angular-winjs": "^4.4.0",
     "winjs": "^4.4.0"
   }

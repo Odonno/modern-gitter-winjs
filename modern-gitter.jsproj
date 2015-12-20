@@ -68,6 +68,13 @@
     <Content Include="images\Wide310x150Logo.scale-200.png" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
+    <Content Include="node_modules\angular-sanitize\angular-sanitize.js" />
+    <Content Include="node_modules\angular-sanitize\angular-sanitize.min.js" />
+    <Content Include="node_modules\angular-sanitize\angular-sanitize.min.js.map" />
+    <Content Include="node_modules\angular-sanitize\bower.json" />
+    <Content Include="node_modules\angular-sanitize\index.js" />
+    <Content Include="node_modules\angular-sanitize\package.json" />
+    <Content Include="node_modules\angular-sanitize\README.md" />
     <Content Include="node_modules\angular-winjs\js\angular-winjs.js" />
     <Content Include="node_modules\angular-winjs\License.txt" />
     <Content Include="node_modules\angular-winjs\package.json" />

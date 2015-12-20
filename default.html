@@ -11,6 +11,7 @@
 
     <!-- Angular WinJS references -->
     <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
     <script src="node_modules/angular-winjs/js/angular-winjs.js"></script>
 
     <!-- App references -->
@@ -28,7 +29,7 @@
                 <div class="title">Modern Gitter</div>
             </div>
 
-            <div class="nav-commands">
+            <div class="win-scrollview rooms-list">
                 <win-split-view-command class="room-tile" ng-repeat="room in rooms" ng-click="selectRoom(room)">
                     <img class="room-tile-icon" ng-src="{{ room.image }}" />
                     <div ng-show="splitViewWinControl.paneOpened" class="room-tile-text">{{ room.name }}</div>
@@ -46,9 +47,37 @@
             </div>
 
             <!-- show room -->
-            <div class="content" ng-show="currentRoom">
-                <h2 class="win-h2">{{ currentRoom.name }}</h2>
-                <h6 class="win-h6 room-topic">{{ currentRoom.topic }}</h6>
+            <div ng-show="currentRoom">
+                <!-- room description -->
+                <div id="roomDescription" class="content">
+                    <h2 class="win-h2">{{ currentRoom.name }}</h2>
+                    <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
+                </div>
+
+                <!-- message template -->
+                <div class="messageTemplate" data-win-control="WinJS.Binding.Template" style="display: none;">
+                    <div class="smallListIconTextItem">
+                        <div data-win-bind="innerHTML: html"></div>
+                    </div>
+                </div>
+
+                <!-- list view of messages -->
+                <div>
+                    <div id="messagesListView"
+                         data-win-control="WinJS.UI.ListView"
+                         data-win-options="{
+                            itemTemplate: select('.messageTemplate'),
+                            selectionMode: 'none',
+                            tapBehavior: 'none',
+                            layout: { type: WinJS.UI.ListLayout }
+                         }">
+                    </div>
+                </div>
+
+                <!-- actions (send message) -->
+                <div id="actions">
+
+                </div>
             </div>
         </win-split-view-content>
     </win-split-view>

@@ -41,6 +41,11 @@
     margin-top: 6px;
 }
 
+.rooms-list {
+    overflow-y: auto;
+    height: calc(100vh - 50px);
+}
+
 .room-tile {
     max-height: 40px;
 }
@@ -84,4 +89,28 @@
 
 .no-room-text {
     font-size: 2em;
+}
+
+#roomDescription {
+    height: 120px;
+}
+
+.win-listview .win-listlayout .win-container {
+    height: auto;
+}
+
+.messages-container {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#messagesListView {
+    height: calc(100vh - 120px - 40px);
+}
+
+#actions {
+    height: 60px;
 }

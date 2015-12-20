@@ -21,15 +21,21 @@
         // TODO : This application is about to be suspended, save any state that needs to persist across suspensions here
     };
 
+    // UI components
+    var splitView, messagesListView;
+
     WinJS.UI.processAll().then(function () {
         // makes the splitView adaptable to screen size
-        var splitView = document.querySelector(".splitView").winControl;
+        splitView = document.querySelector('.splitView').winControl;
         new WinJS.UI._WinKeyboard(splitView.paneElement);
+
+        // retrieve list view of messages
+        messagesListView = document.getElementById('messagesListView').winControl;
     });
 
-    app.start();
+    app.start();    
 
-    angular.module('modern-gitter', ['winjs'])
+    angular.module('modern-gitter', ['winjs', 'ngSanitize'])
         .service('ConfigService', function () {
             var configService = this;
 
@@ -172,15 +178,35 @@
                 });
             };
 
+            apiService.getMessages = function (roomId) {
+                return new Promise((done, error) => {
+                    WinJS
+                        .xhr({
+                            url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages?limit=50",
+                            headers: { "Content-type": "application/json", "Authorization": "Bearer " + OAuthService.refreshToken }
+                        })
+                        .then(function (success) {
+                            done(JSON.parse(success.response));
+                        });
+                });
+            };
+
             return apiService;
         })
         .controller('AppCtrl', function ($scope, OAuthService, ApiService) {
             // properties
             $scope.rooms = [];
+            $scope.messages = [];
 
             // methods
             $scope.selectRoom = function (room) {
                 $scope.currentRoom = room;
+
+                // retrieve messages
+                ApiService.getMessages($scope.currentRoom.id).then(messages => {
+                    $scope.messages = messages;
+                    messagesListView.itemDataSource = new WinJS.Binding.List($scope.messages).dataSource;
+                });
             };
 
             // initialize controller
