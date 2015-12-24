@@ -40,6 +40,7 @@
             var configService = this;
 
             configService.baseUrl = "https://api.gitter.im/v1/";
+            configService.streamBaseUrl = "https://stream.gitter.im/v1/";
             configService.tokenUri = "https://gitter.im/login/oauth/token";
             configService.clientId = "0f3fc414587a8d31a1514e005fa157168ad8efdb";
             configService.clientSecret = "55c361ef1de79ffef1a49a1a0bff1a7a0140799c";
@@ -167,16 +168,15 @@
 
             apiService.getRooms = function () {
                 return new Promise((done, error) => {
-                    WinJS
-                        .xhr({
-                            type: 'GET',
-                            url: ConfigService.baseUrl + "rooms",
-                            headers: {
-                                "Accept": "application/json",
-                                "Content-Type": "application/json",
-                                "Authorization": "Bearer " + OAuthService.refreshToken
-                            }
-                        })
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: ConfigService.baseUrl + "rooms",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    })
                         .then(function (success) {
                             done(JSON.parse(success.response));
                         });
@@ -185,20 +185,41 @@
 
             apiService.getMessages = function (roomId) {
                 return new Promise((done, error) => {
-                    WinJS
-                        .xhr({
-                            type: 'GET',
-                            url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages?limit=50",
-                            headers: {
-                                "Accept": "application/json",
-                                "Content-Type": "application/json",
-                                "Authorization": "Bearer " + OAuthService.refreshToken
-                            }
-                        })
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages?limit=50",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    })
                         .then(function (success) {
                             done(JSON.parse(success.response));
                         });
                 });
+            };
+
+            apiService.getRealtimeMessages = function (roomId, onMessageReceived) {
+                var request = new XMLHttpRequest();
+                request.open("GET", ConfigService.streamBaseUrl + "rooms/" + roomId + "/chatMessages", true);
+                request.setRequestHeader("Accept", "application/json");
+                request.setRequestHeader("Content-Type", "application/json");
+                request.setRequestHeader("Authorization", "Bearer " + OAuthService.refreshToken);
+
+                var startIndex = 0;
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 3 && request.response) {
+                        var response = request.response.toString().replace(/[ ]*[\n+][ ]*/gi, '').substr(startIndex);
+                        if (response) {
+                            onMessageReceived(JSON.parse(response));
+                            startIndex += response.length;
+                        }
+                    }
+                }
+
+                request.send(null);
             };
 
             apiService.sendMessage = function (roomId, text) {
@@ -234,7 +255,16 @@
                 // retrieve messages
                 ApiService.getMessages($scope.currentRoom.id).then(messages => {
                     $scope.messages = messages;
-                    messagesListView.itemDataSource = new WinJS.Binding.List($scope.messages).dataSource;
+
+                    // refresh ListView of messages
+                    var list = new WinJS.Binding.List($scope.messages);
+                    messagesListView.itemDataSource = list.dataSource;
+
+                    // retrieve realtime messages
+                    ApiService.getRealtimeMessages($scope.currentRoom.id, message => {
+                        $scope.messages.push(message);
+                        list.push(message);
+                    });
                 });
             };
 
@@ -243,7 +273,6 @@
 
                 if (textMessage.value) {
                     ApiService.sendMessage($scope.currentRoom.id, textMessage.value).then(message => {
-                        console.log(message);
                         textMessage.value = '';
                     });
                 } else {
