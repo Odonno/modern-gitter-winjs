@@ -40,7 +40,6 @@
             var configService = this;
 
             configService.baseUrl = "https://api.gitter.im/v1/";
-            configService.streamBaseUrl = "https://stream.gitter.im/v1/";
             configService.tokenUri = "https://gitter.im/login/oauth/token";
             configService.clientId = "0f3fc414587a8d31a1514e005fa157168ad8efdb";
             configService.clientSecret = "55c361ef1de79ffef1a49a1a0bff1a7a0140799c";
@@ -60,6 +59,7 @@
             };
 
             oauthService.connect = function () {
+                oauthService.initialize();
                 return new Promise((done, error) => {
                     if (!oauthService.refreshToken) {
                         authenticate().then(
@@ -200,28 +200,6 @@
                 });
             };
 
-            apiService.getRealtimeMessages = function (roomId, onMessageReceived) {
-                var request = new XMLHttpRequest();
-                request.open("GET", ConfigService.streamBaseUrl + "rooms/" + roomId + "/chatMessages", true);
-                request.setRequestHeader("Accept", "application/json");
-                request.setRequestHeader("Content-Type", "application/json");
-                request.setRequestHeader("Authorization", "Bearer " + OAuthService.refreshToken);
-
-                var startIndex = 0;
-
-                request.onreadystatechange = function () {
-                    if (request.readyState === 3 && request.response) {
-                        var response = request.response.toString().replace(/[ ]*[\n+][ ]*/gi, '').substr(startIndex);
-                        if (response) {
-                            onMessageReceived(JSON.parse(response));
-                            startIndex += response.length;
-                        }
-                    }
-                }
-
-                request.send(null);
-            };
-
             apiService.sendMessage = function (roomId, text) {
                 return new Promise((done, error) => {
                     WinJS
@@ -243,7 +221,54 @@
 
             return apiService;
         })
-        .controller('AppCtrl', function ($scope, OAuthService, ApiService) {
+        .service('RealtimeApiService', function (ConfigService, OAuthService) {
+            var realtimeApiService = this;
+
+            realtimeApiService.initialize = function () {
+                return new Promise((done, error) => {
+                    var ClientAuthExt = function () { };
+
+                    ClientAuthExt.prototype.outgoing = function (message, callback) {
+                        if (message.channel == '/meta/handshake') {
+                            if (!message.ext) {
+                                message.ext = {};
+                            }
+                            message.ext.token = OAuthService.refreshToken;
+                        }
+
+                        callback(message);
+                    };
+
+                    ClientAuthExt.prototype.incoming = function (message, callback) {
+                        if (message.channel == '/meta/handshake') {
+                            if (message.successful) {
+                                console.log('Successfuly subscribed');
+                            } else {
+                                console.log('Something went wrong: ', message.error);
+                            }
+                        }
+
+                        callback(message);
+                    };
+
+                    realtimeApiService.client = new Faye.Client('https://ws.gitter.im/faye', { timeout: 60, retry: 5, interval: 1 });
+                    realtimeApiService.client.addExtension(new ClientAuthExt());
+
+                    done();
+                });
+            };
+
+            realtimeApiService.subscribe = function (roomId, callback) {
+                // subscribe to realtime messages
+                realtimeApiService.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
+                    var message = response.model;
+                    callback(roomId, message);
+                });
+            };
+
+            return realtimeApiService;
+        })
+        .controller('AppCtrl', function ($scope, OAuthService, ApiService, RealtimeApiService) {
             // properties
             $scope.rooms = [];
             $scope.messages = [];
@@ -257,14 +282,8 @@
                     $scope.messages = messages;
 
                     // refresh ListView of messages
-                    var list = new WinJS.Binding.List($scope.messages);
-                    messagesListView.itemDataSource = list.dataSource;
-
-                    // retrieve realtime messages
-                    ApiService.getRealtimeMessages($scope.currentRoom.id, message => {
-                        $scope.messages.push(message);
-                        list.push(message);
-                    });
+                    $scope.list = new WinJS.Binding.List($scope.messages);
+                    messagesListView.itemDataSource = $scope.list.dataSource;
                 });
             };
 
@@ -281,23 +300,34 @@
             };
 
             // initialize controller
-            OAuthService.initialize();
             OAuthService.connect().then(t => {
                 console.log('Sucessfully logged to Gitter API');
 
-                ApiService.getRooms().then(rooms => {
-                    $scope.rooms = rooms;
+                RealtimeApiService.initialize().then(t => {
+                    console.log('Sucessfully subscribed to realtime API');
 
-                    // compute room image
-                    for (var i = 0; i < $scope.rooms.length; i++) {
-                        if ($scope.rooms[i].user) {
-                            $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
-                        } else {
-                            $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
+                    ApiService.getRooms().then(rooms => {
+                        $scope.rooms = rooms;
+
+                        for (var i = 0; i < $scope.rooms.length; i++) {
+                            // compute room image
+                            if ($scope.rooms[i].user) {
+                                $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
+                            } else {
+                                $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
+                            }
+
+                            // subscribe to realtime messages
+                            RealtimeApiService.subscribe($scope.rooms[i].id, function (roomId, message) {
+                                if ($scope.currentRoom && $scope.currentRoom.id === roomId) {
+                                    $scope.messages.push(message);
+                                    $scope.list.push(message);
+                                }
+                            });
                         }
-                    }
 
-                    $scope.$apply();
+                        $scope.$apply();
+                    });
                 });
             });
         });
