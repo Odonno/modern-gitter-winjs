@@ -33,7 +33,7 @@
         messagesListView = document.getElementById('messagesListView').winControl;
     });
 
-    app.start();    
+    app.start();
 
     angular.module('modern-gitter', ['winjs', 'ngSanitize'])
         .service('ConfigService', function () {
@@ -169,8 +169,13 @@
                 return new Promise((done, error) => {
                     WinJS
                         .xhr({
+                            type: 'GET',
                             url: ConfigService.baseUrl + "rooms",
-                            headers: { "Content-type": "application/json", "Authorization": "Bearer " + OAuthService.refreshToken }
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + OAuthService.refreshToken
+                            }
                         })
                         .then(function (success) {
                             done(JSON.parse(success.response));
@@ -182,8 +187,32 @@
                 return new Promise((done, error) => {
                     WinJS
                         .xhr({
+                            type: 'GET',
                             url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages?limit=50",
-                            headers: { "Content-type": "application/json", "Authorization": "Bearer " + OAuthService.refreshToken }
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + OAuthService.refreshToken
+                            }
+                        })
+                        .then(function (success) {
+                            done(JSON.parse(success.response));
+                        });
+                });
+            };
+
+            apiService.sendMessage = function (roomId, text) {
+                return new Promise((done, error) => {
+                    WinJS
+                        .xhr({
+                            type: 'POST',
+                            url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
+                            data: JSON.stringify({ text: text }),
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + OAuthService.refreshToken
+                            }
                         })
                         .then(function (success) {
                             done(JSON.parse(success.response));
@@ -207,6 +236,19 @@
                     $scope.messages = messages;
                     messagesListView.itemDataSource = new WinJS.Binding.List($scope.messages).dataSource;
                 });
+            };
+
+            $scope.sendMessage = function () {
+                var textMessage = document.getElementById('textMessage');
+
+                if (textMessage.value) {
+                    ApiService.sendMessage($scope.currentRoom.id, textMessage.value).then(message => {
+                        console.log(message);
+                        textMessage.value = '';
+                    });
+                } else {
+                    console.error('textMessage is empty');
+                }
             };
 
             // initialize controller

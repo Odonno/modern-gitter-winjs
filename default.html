@@ -76,7 +76,8 @@
 
                 <!-- actions (send message) -->
                 <div id="actions">
-
+                    <input id="textMessage" type="text" placeholder="Enter your text here..." />
+                    <button ng-disabled="!textMessage" ng-click="sendMessage()">Send</button>
                 </div>
             </div>
         </win-split-view-content>
