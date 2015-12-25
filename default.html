@@ -62,11 +62,16 @@
                     <div data-win-bind="innerHTML: html"></div>
                 </div>
 
+                <div class="list-header">
+                    <progress class="win-progress-bar progress"></progress>
+                </div>
+
                 <!-- list view of messages -->
                 <div id="messagesListView"
                      data-win-control="WinJS.UI.ListView"
                      data-win-options="{
                         itemTemplate: select('.messageTemplate'),
+                        header: select('.list-header'),
                         selectionMode: 'none',
                         tapBehavior: 'none',
                         layout: { type: WinJS.UI.ListLayout }

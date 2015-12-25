@@ -114,3 +114,7 @@
 #actions {
     height: 60px;
 }
+
+.progress {
+    width: 100%;
+}

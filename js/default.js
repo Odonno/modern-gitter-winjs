@@ -288,6 +288,13 @@
                     // scroll down to the last message
                     setTimeout(function () {
                         messagesListView.ensureVisible($scope.messages.length - 1);
+
+                        messagesListView.onheadervisibilitychanged = function (ev) {
+                            var visible = ev.detail.visible;
+                            if (visible) {
+                                // TODO : load more messages
+                            }
+                        };
                     }, 500);
                 });
             };
