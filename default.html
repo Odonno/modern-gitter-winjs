@@ -59,22 +59,18 @@
 
                 <!-- message template -->
                 <div class="messageTemplate" data-win-control="WinJS.Binding.Template" style="display: none;">
-                    <div class="smallListIconTextItem">
-                        <div data-win-bind="innerHTML: html"></div>
-                    </div>
+                    <div data-win-bind="innerHTML: html"></div>
                 </div>
 
                 <!-- list view of messages -->
-                <div>
-                    <div id="messagesListView"
-                         data-win-control="WinJS.UI.ListView"
-                         data-win-options="{
-                            itemTemplate: select('.messageTemplate'),
-                            selectionMode: 'none',
-                            tapBehavior: 'none',
-                            layout: { type: WinJS.UI.ListLayout }
-                         }">
-                    </div>
+                <div id="messagesListView"
+                     data-win-control="WinJS.UI.ListView"
+                     data-win-options="{
+                        itemTemplate: select('.messageTemplate'),
+                        selectionMode: 'none',
+                        tapBehavior: 'none',
+                        layout: { type: WinJS.UI.ListLayout }
+                        }">
                 </div>
 
                 <!-- actions (send message) -->
