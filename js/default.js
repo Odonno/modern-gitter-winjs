@@ -284,6 +284,11 @@
                     // refresh ListView of messages
                     $scope.list = new WinJS.Binding.List($scope.messages);
                     messagesListView.itemDataSource = $scope.list.dataSource;
+
+                    // scroll down to the last message
+                    setTimeout(function () {
+                        messagesListView.ensureVisible($scope.messages.length - 1);
+                    }, 500);
                 });
             };
 
@@ -323,6 +328,8 @@
                                     $scope.messages.push(message);
                                     $scope.list.push(message);
                                 }
+
+                                // TODO : send notification
                             });
                         }
 
