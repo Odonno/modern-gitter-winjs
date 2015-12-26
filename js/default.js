@@ -22,15 +22,16 @@
     };
 
     // UI components
-    var splitView, messagesListView;
+    var splitView, messagesListView, progress;
 
     WinJS.UI.processAll().then(function () {
         // makes the splitView adaptable to screen size
         splitView = document.querySelector('.splitView').winControl;
         new WinJS.UI._WinKeyboard(splitView.paneElement);
 
-        // retrieve list view of messages
+        // retrieve list view of messages and his components
         messagesListView = document.getElementById('messagesListView').winControl;
+        progress = document.querySelector('.list-header .progress');
     });
 
     app.start();
@@ -292,6 +293,7 @@
                     // scroll down to the last message
                     setTimeout(function () {
                         messagesListView.ensureVisible($scope.messages.length - 1);
+                        WinJS.Utilities.removeClass(progress, "hide");
 
                         messagesListView.onheadervisibilitychanged = function (ev) {
                             var visible = ev.detail.visible;
@@ -301,7 +303,8 @@
 
                                 // load more messages
                                 ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
-                                    if (!beforeMessages) {
+                                    if (beforeMessages.length === 0) {
+                                        WinJS.Utilities.addClass(progress, "hide");
                                         return;
                                     }
 
@@ -312,7 +315,7 @@
 
                                     // scroll again to stay where the user was (reading message)
                                     setTimeout(function () {
-                                        messagesListView.ensureVisible(lastVisible + 50);
+                                        messagesListView.ensureVisible(lastVisible + beforeMessages.length);
                                     }, 250);
                                 });
                             }
