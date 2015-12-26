@@ -46,6 +46,8 @@
             configService.redirectUri = "http://localhost";
             configService.authUri = "https://gitter.im/login/oauth/authorize";
 
+            configService.messagesLimit = 50;
+
             return configService;
         })
         .service('OAuthService', function (ConfigService) {
@@ -176,46 +178,48 @@
                             "Content-Type": "application/json",
                             "Authorization": "Bearer " + OAuthService.refreshToken
                         }
-                    })
-                        .then(function (success) {
-                            done(JSON.parse(success.response));
-                        });
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
                 });
             };
 
-            apiService.getMessages = function (roomId) {
+            apiService.getMessages = function (roomId, beforeId) {
                 return new Promise((done, error) => {
+                    var query = '?limit=' + ConfigService.messagesLimit;
+
+                    if (beforeId) {
+                        query += '&beforeId=' + beforeId;
+                    }
+
                     WinJS.xhr({
                         type: 'GET',
-                        url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages?limit=50",
+                        url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages" + query,
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
                             "Authorization": "Bearer " + OAuthService.refreshToken
                         }
-                    })
-                        .then(function (success) {
-                            done(JSON.parse(success.response));
-                        });
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
                 });
             };
 
             apiService.sendMessage = function (roomId, text) {
                 return new Promise((done, error) => {
-                    WinJS
-                        .xhr({
-                            type: 'POST',
-                            url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
-                            data: JSON.stringify({ text: text }),
-                            headers: {
-                                "Accept": "application/json",
-                                "Content-Type": "application/json",
-                                "Authorization": "Bearer " + OAuthService.refreshToken
-                            }
-                        })
-                        .then(function (success) {
-                            done(JSON.parse(success.response));
-                        });
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
+                        data: JSON.stringify({ text: text }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
                 });
             };
 
@@ -268,7 +272,7 @@
 
             return realtimeApiService;
         })
-        .controller('AppCtrl', function ($scope, OAuthService, ApiService, RealtimeApiService) {
+        .controller('AppCtrl', function ($scope, ConfigService, OAuthService, ApiService, RealtimeApiService) {
             // properties
             $scope.rooms = [];
             $scope.messages = [];
@@ -292,7 +296,25 @@
                         messagesListView.onheadervisibilitychanged = function (ev) {
                             var visible = ev.detail.visible;
                             if (visible) {
-                                // TODO : load more messages
+                                // retrieve index of message that was visible before the load of new messages
+                                var lastVisible = messagesListView.indexOfLastVisible;
+
+                                // load more messages
+                                ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
+                                    if (!beforeMessages) {
+                                        return;
+                                    }
+
+                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                        $scope.messages.unshift(beforeMessages[i]);
+                                        $scope.list.unshift(beforeMessages[i]);
+                                    }
+
+                                    // scroll again to stay where the user was (reading message)
+                                    setTimeout(function () {
+                                        messagesListView.ensureVisible(lastVisible + 50);
+                                    }, 250);
+                                });
                             }
                         };
                     }, 500);
