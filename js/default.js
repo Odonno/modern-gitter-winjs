@@ -5,6 +5,7 @@
 
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
+    var networkInformation = Windows.Networking.Connectivity.NetworkInformation;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -37,6 +38,33 @@
     app.start();
 
     angular.module('modern-gitter', ['winjs', 'ngSanitize'])
+        .service('NetworkService', function () {
+            var networkService = this;
+
+            networkService.currentStatus = function (callback) {
+                var internetConnectionProfile = networkInformation.getInternetConnectionProfile();
+                var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+
+                switch (networkConnectivityLevel) {
+                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.none:
+                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.localAccess:
+                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.constrainedInternetAccess:
+                        callback(false);
+                        return;
+                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess:
+                        callback(true);
+                        return;
+                }
+            }
+
+            networkService.statusChanged = function (callback) {
+                networkInformation.onnetworkstatuschanged = function (ev) {
+                    networkService.currentStatus(callback);
+                };
+            };
+
+            return networkService;
+        })
         .service('ConfigService', function () {
             var configService = this;
 
@@ -273,10 +301,55 @@
 
             return realtimeApiService;
         })
-        .controller('AppCtrl', function ($scope, ConfigService, OAuthService, ApiService, RealtimeApiService) {
+        .controller('AppCtrl', function ($scope, NetworkService, ConfigService, OAuthService, ApiService, RealtimeApiService) {
             // properties
             $scope.rooms = [];
             $scope.messages = [];
+            $scope.initialized = false;
+
+            // private methods
+            function initialize() {
+                OAuthService.connect().then(t => {
+                    console.log('Sucessfully logged to Gitter API');
+
+                    RealtimeApiService.initialize().then(t => {
+                        console.log('Sucessfully subscribed to realtime API');
+
+                        ApiService.getRooms().then(rooms => {
+                            $scope.rooms = rooms;
+
+                            for (var i = 0; i < $scope.rooms.length; i++) {
+                                // compute room image
+                                if ($scope.rooms[i].user) {
+                                    $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
+                                } else {
+                                    $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
+                                }
+
+                                // subscribe to realtime messages
+                                RealtimeApiService.subscribe($scope.rooms[i].id, function (roomId, message) {
+                                    if ($scope.currentRoom && $scope.currentRoom.id === roomId) {
+                                        $scope.messages.push(message);
+                                        $scope.list.push(message);
+                                    }
+
+                                    // TODO : send notification
+                                });
+                            }
+
+                            $scope.initialized = true;
+                            $scope.$apply();
+                        });
+                    });
+                });
+            }
+
+            function internetStatusChanged(internetAvailable) {
+                $scope.internetAvailable = internetAvailable;
+                if (!$scope.initialized && $scope.internetAvailable) {
+                    initialize();
+                }
+            }
 
             // methods
             $scope.selectRoom = function (room) {
@@ -304,6 +377,7 @@
                                 // load more messages
                                 ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
                                     if (beforeMessages.length === 0) {
+                                        // no more message to load
                                         WinJS.Utilities.addClass(progress, "hide");
                                         return;
                                     }
@@ -336,37 +410,13 @@
                 }
             };
 
-            // initialize controller
-            OAuthService.connect().then(t => {
-                console.log('Sucessfully logged to Gitter API');
+            // initialize controller (check with current internet status)
+            NetworkService.currentStatus(function (internetAvailable) {
+                internetStatusChanged(internetAvailable);
 
-                RealtimeApiService.initialize().then(t => {
-                    console.log('Sucessfully subscribed to realtime API');
-
-                    ApiService.getRooms().then(rooms => {
-                        $scope.rooms = rooms;
-
-                        for (var i = 0; i < $scope.rooms.length; i++) {
-                            // compute room image
-                            if ($scope.rooms[i].user) {
-                                $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
-                            } else {
-                                $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
-                            }
-
-                            // subscribe to realtime messages
-                            RealtimeApiService.subscribe($scope.rooms[i].id, function (roomId, message) {
-                                if ($scope.currentRoom && $scope.currentRoom.id === roomId) {
-                                    $scope.messages.push(message);
-                                    $scope.list.push(message);
-                                }
-
-                                // TODO : send notification
-                            });
-                        }
-
-                        $scope.$apply();
-                    });
+                // check when internet status changed
+                NetworkService.statusChanged(function (internetAvailableChanged) {
+                    internetStatusChanged(internetAvailableChanged);
                 });
             });
         });
