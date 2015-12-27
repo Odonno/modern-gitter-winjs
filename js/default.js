@@ -41,27 +41,19 @@
         .service('NetworkService', function () {
             var networkService = this;
 
-            networkService.currentStatus = function (callback) {
+            networkService.currentStatus = function () {
                 var internetConnectionProfile = networkInformation.getInternetConnectionProfile();
                 var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-
-                switch (networkConnectivityLevel) {
-                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.none:
-                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.localAccess:
-                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.constrainedInternetAccess:
-                        callback(false);
-                        return;
-                    case Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess:
-                        callback(true);
-                        return;
-                }
+                return networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess;
             }
 
             networkService.statusChanged = function (callback) {
                 networkInformation.onnetworkstatuschanged = function (ev) {
-                    networkService.currentStatus(callback);
+                    callback(networkService.currentStatus());
                 };
             };
+
+            networkService.internetAvailable = networkService.currentStatus();
 
             return networkService;
         })
@@ -306,6 +298,7 @@
             $scope.rooms = [];
             $scope.messages = [];
             $scope.initialized = false;
+            $scope.internetAvailable = NetworkService.internetAvailable;
 
             // private methods
             function initialize() {
@@ -342,13 +335,6 @@
                         });
                     });
                 });
-            }
-
-            function internetStatusChanged(internetAvailable) {
-                $scope.internetAvailable = internetAvailable;
-                if (!$scope.initialized && $scope.internetAvailable) {
-                    initialize();
-                }
             }
 
             // methods
@@ -410,14 +396,17 @@
                 }
             };
 
-            // initialize controller (check with current internet status)
-            NetworkService.currentStatus(function (internetAvailable) {
-                internetStatusChanged(internetAvailable);
+            // initialize controller 
+            if ($scope.internetAvailable) {
+                initialize();
+            }
 
-                // check when internet status changed
-                NetworkService.statusChanged(function (internetAvailableChanged) {
-                    internetStatusChanged(internetAvailableChanged);
-                });
+            // check when internet status changed
+            NetworkService.statusChanged(function (internetAvailable) {
+                $scope.internetAvailable = internetAvailable;
+                if (!$scope.initialized && $scope.internetAvailable) {
+                    initialize();
+                }
             });
         });
 })();
