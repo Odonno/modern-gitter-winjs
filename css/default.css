@@ -1,6 +1,14 @@
 ﻿body {
 }
 
+.win-h2 {
+    padding-top: 12px !important;
+}
+
+hr {
+    margin: 0;
+}
+
 .win-splitviewpanetoggle {
     float: left;
 }
@@ -35,10 +43,6 @@
 
 .win-splitview-content {
     background-color: white;
-}
-
-.content-area {
-    margin-top: 6px;
 }
 
 .rooms-list {
@@ -93,6 +97,7 @@
 
 #roomDescription {
     height: 120px;
+    background-color: #f2f2f2;
 }
 
 .win-listview .win-listlayout .win-container {
@@ -108,7 +113,7 @@
 }
 
 #messagesListView {
-    height: calc(100vh - 120px - 50px);
+    height: calc(100vh - 120px - 60px);
 }
 
 .progress {
@@ -121,7 +126,6 @@
 
 #actions {
     height: 50px;
-    border-top: 1px solid gray;
 }
 
 .btn {

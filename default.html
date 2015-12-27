@@ -18,7 +18,7 @@
     <script src="dist/faye/faye-browser.js"></script>
 
     <!-- Winstrap references -->
-    <link href="dist/winstrap/winstrap.css" rel="stylesheet" />
+    <link href="dist/winstrap/css/winstrap.css" rel="stylesheet" />
 
     <!-- App references -->
     <link href="/css/default.css" rel="stylesheet" />
@@ -55,9 +55,11 @@
             <!-- show room -->
             <div ng-show="currentRoom">
                 <!-- room description -->
-                <div id="roomDescription" class="content">
-                    <h2 class="win-h2">{{ currentRoom.name }}</h2>
-                    <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
+                <div id="roomDescription">
+                    <div class="content">
+                        <h2 class="win-h2">{{ currentRoom.name }}</h2>
+                        <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
+                    </div>
                 </div>
 
                 <!-- message template -->
@@ -80,6 +82,8 @@
                         layout: { type: WinJS.UI.ListLayout }
                         }">
                 </div>
+
+                <hr />
 
                 <!-- actions (send message) -->
                 <div id="actions">
