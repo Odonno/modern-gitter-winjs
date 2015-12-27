@@ -33,7 +33,7 @@
             </div>
 
             <div class="win-scrollview rooms-list">
-                <win-split-view-command class="room-tile" ng-repeat="room in rooms" ng-click="selectRoom(room)">
+                <win-split-view-command class="room-tile" ng-repeat="room in rooms | orderBy: ['favourite', '-unreadItems', '-lastAccessTime']" ng-click="selectRoom(room)">
                     <img class="room-tile-icon" ng-src="{{ room.image }}" />
                     <div ng-show="splitViewWinControl.paneOpened" class="room-tile-text">{{ room.name }}</div>
                 </win-split-view-command>
