@@ -17,6 +17,9 @@
     <!-- Faye references -->
     <script src="dist/faye/faye-browser.js"></script>
 
+    <!-- Winstrap references -->
+    <link href="dist/winstrap/winstrap.css" rel="stylesheet" />
+
     <!-- App references -->
     <link href="/css/default.css" rel="stylesheet" />
     <script src="/js/default.js"></script>
@@ -80,8 +83,9 @@
 
                 <!-- actions (send message) -->
                 <div id="actions">
+                    <button id="sendFiles" class="btn btn-link btn-icon no-outline">&#xE16C;</button>
                     <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." />
-                    <button ng-disabled="!textMessage" ng-click="sendMessage()" style="font-family: 'Segoe MDL2 Assets'">&#xE122;</button>
+                    <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
                 </div>
             </div>
         </win-split-view-content>

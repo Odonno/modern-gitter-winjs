@@ -34,7 +34,7 @@
 }
 
 .win-splitview-content {
-    background-color: rgba(241, 240, 237, 0.2);
+    background-color: white;
 }
 
 .content-area {
@@ -108,11 +108,7 @@
 }
 
 #messagesListView {
-    height: calc(100vh - 120px - 40px);
-}
-
-#actions {
-    height: 60px;
+    height: calc(100vh - 120px - 50px);
 }
 
 .progress {
@@ -121,4 +117,34 @@
 
 .hide {
     display: none;
+}
+
+#actions {
+    height: 50px;
+    border-top: 1px solid gray;
+}
+
+.btn {
+    min-width: 0;
+}
+
+.btn-link {
+    margin: 0;
+    padding: 0;
+    height: 38px;
+    max-height: 38px; 
+    text-decoration: none !important;
+}
+
+.btn-icon {
+    font-family: 'Segoe MDL2 Assets';
+    width: 30px;
+    margin: 0 6px !important;
+    font-size: 22px;
+}
+
+#textMessage {
+    height: 100%;
+    width: calc(100vw - 58px - 42px - 42px);
+    border: 0;
 }
