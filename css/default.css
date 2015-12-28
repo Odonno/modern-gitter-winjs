@@ -136,7 +136,7 @@ hr {
     margin: 0;
     padding: 0;
     height: 38px;
-    max-height: 38px; 
+    max-height: 38px;
     text-decoration: none !important;
 }
 
@@ -150,5 +150,10 @@ hr {
 #textMessage {
     height: 100%;
     width: calc(100vw - 58px - 42px - 42px);
-    border: 0;
+    border: none;
+}
+
+html.win-hoverable .win-listview .win-itembox:hover::before,
+html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
+    border: none;
 }
