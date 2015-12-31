@@ -116,7 +116,7 @@ hr {
     height: calc(100vh - 120px - 60px);
 }
 
-.progress {
+.win-progress-bar {
     width: 100%;
 }
 

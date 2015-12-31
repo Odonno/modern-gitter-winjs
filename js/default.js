@@ -32,7 +32,7 @@
 
         // retrieve list view of messages and his components
         messagesListView = document.getElementById('messagesListView').winControl;
-        progress = document.querySelector('.progress');
+        progress = document.querySelector('.win-progress-bar');
     });
 
     app.start();
