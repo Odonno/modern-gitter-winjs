@@ -72,14 +72,6 @@ hr {
     margin: 0 20px;
 }
 
-.fit-view {
-    position: absolute;
-    top: 0;
-    left: 300px;
-    right: 0;
-    bottom: 0;
-}
-
 .flex {
     display: flex;
     justify-content: center;
@@ -135,30 +127,12 @@ hr {
     font-size: 22px;
 }
 
-#rooms-area {
-	display: inline-block;
-	width: 300px;
-	height: 100%;
-	border-right: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-#room-area {
-	display: inline-block;
-	width: calc(100vw - 300px - 60px);
-}
-
 #roomsHeader {
 	height: 60px;
 }
 
 #roomsListView {
 	height: calc(100vh - 60px);
-}
-
-#textMessage {
-    height: 100%;
-    width: calc(100vw - 300px - 58px - 42px - 42px);
-    border: none;
 }
 
 html.win-hoverable .win-listview .win-itembox:hover::before,
@@ -169,4 +143,57 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 .unread {
     border-right: 2px solid #2ECC71;
     background-color: rgba(46, 204, 113, 0.08);
+}
+
+@media screen and (max-width: 1020px) {
+	#rooms-area {
+		display: none;
+	}
+
+	#room-area {
+		display: inline-block;
+		width: calc(100vw - 60px);
+	}
+
+	#textMessage {
+		height: 100%;
+		width: calc(100vw - 58px - 42px - 42px);
+		border: none;
+	}
+
+	.fit-view {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+}
+
+@media screen and (min-width: 1020px) {
+	#rooms-area {
+		display: inline-block;
+		width: 300px;
+		height: 100%;
+		border-right: 1px solid rgba(0, 0, 0, 0.2);
+	}
+
+	#room-area {
+		display: inline-block;
+		width: calc(100vw - 300px - 60px);
+	}
+
+	#textMessage {
+		height: 100%;
+		width: calc(100vw - 300px - 58px - 42px - 42px);
+		border: none;
+	}
+
+	.fit-view {
+		position: absolute;
+		top: 0;
+		left: 300px;
+		right: 0;
+		bottom: 0;
+	}
 }
