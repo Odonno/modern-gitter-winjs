@@ -306,7 +306,7 @@
 
             return realtimeApiService;
         })
-        .controller('AppCtrl', function ($scope, NetworkService, ConfigService, OAuthService, ApiService, RealtimeApiService) {
+        .controller('AppCtrl', function ($scope, $filter, NetworkService, ConfigService, OAuthService, ApiService, RealtimeApiService) {
             // properties
             $scope.rooms = [];
             $scope.messages = [];
@@ -419,6 +419,11 @@
                 if (!$scope.initialized && $scope.internetAvailable) {
                     initialize();
                 }
+            });
+
+            // watch events
+            $scope.$watch('rooms', function () {
+                $scope.orderedRooms = $filter('orderBy')($scope.rooms, ['favourite', '-unreadItems', '-lastAccessTime']);
             });
         });
 })();

@@ -28,66 +28,81 @@
     <win-split-view win-control="splitViewWinControl" class="splitView">
         <!-- pane area -->
         <win-split-view-pane>
-            <div class="header">
+            <div class="split-view-header">
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
                         data-win-options="{ splitView: select('.splitView') }"></button>
                 <div class="title">Modern Gitter</div>
             </div>
 
-            <div class="win-scrollview rooms-list">
-                <win-split-view-command class="room-tile" ng-repeat="room in rooms | orderBy: ['favourite', '-unreadItems', '-lastAccessTime']" ng-click="selectRoom(room)">
-                    <img class="room-tile-icon" ng-src="{{ room.image }}" />
-                    <div ng-show="splitViewWinControl.paneOpened" class="room-tile-text">{{ room.name }}</div>
-                </win-split-view-command>
+            <div class="split-view-commands">
+                <win-split-view-command label="'Home'" icon="'home'" on-invoked="goToHome()"></win-split-view-command>
+                <win-split-view-command label="'Settings'" icon="'settings'" on-invoked="goToSettings()"></win-split-view-command>
             </div>
         </win-split-view-pane>
 
         <!-- content area -->
         <win-split-view-content class="content-area">
-            <!-- showed when no room selected -->
-            <div class="content" ng-hide="currentRoom">
-                <div class="fit-view flex">
-                    <div class="no-room-text">Select a room</div>
-                </div>
-            </div>
+            <aside id="rooms-area">
+                <h2 id="roomsHeader" class="win-h2 content">Rooms</h2>
 
-            <!-- show room -->
-            <div ng-show="currentRoom">
-                <!-- room description -->
-                <div id="roomDescription">
-                    <div class="content">
-                        <h2 class="win-h2">{{ currentRoom.name }}</h2>
-                        <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
-                    </div>
-                </div>
-
-                <!-- list view of messages -->
-                <win-list-view id="messagesListView" item-data-source="messages">
-                    <!-- header template -->
-                    <win-list-view-header>
-                        <progress class="win-progress-bar hide"></progress>
-                    </win-list-view-header>
-
-                    <!-- message template -->
+                <!-- list view of rooms -->
+                <win-list-view id="roomsListView" item-data-source="orderedRooms">
+                    <!-- room template -->
                     <win-item-template>
-                        <div ng-class="item.data.unread ? 'unread' : 'read'">
-                            <div ng-bind-html="item.data.html"></div>
+                        <div ng-click="selectRoom(item.data)">
+                            <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
+                            <div class="room-tile-text">{{ item.data.name }}</div>
                         </div>
                     </win-item-template>
 
                     <win-list-layout></win-list-layout>
                 </win-list-view>
+            </aside>
 
-                <hr />
-
-                <!-- actions (send message) -->
-                <div id="actions">
-                    <button id="sendFiles" class="btn btn-link btn-icon no-outline">&#xE16C;</button>
-                    <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." ng-enter="sendMessage()" />
-                    <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
+            <section id="room-area">
+                <!-- showed when no room selected -->
+                <div ng-hide="currentRoom" class="fit-view flex">
+                    <div class="no-room-text">Select a room</div>
                 </div>
-            </div>
+
+                <!-- show room -->
+                <div ng-show="currentRoom" class="fit-view">
+                    <!-- room description -->
+                    <div id="roomDescription">
+                        <div class="content">
+                            <h2 class="win-h2">{{ currentRoom.name }}</h2>
+                            <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
+                        </div>
+                    </div>
+
+                    <!-- list view of messages -->
+                    <win-list-view id="messagesListView" item-data-source="messages">
+                        <!-- header template -->
+                        <win-list-view-header>
+                            <progress class="win-progress-bar hide"></progress>
+                        </win-list-view-header>
+
+                        <!-- message template -->
+                        <win-item-template>
+                            <div ng-class="item.data.unread ? 'unread' : 'read'">
+                                <div ng-bind-html="item.data.html"></div>
+                            </div>
+                        </win-item-template>
+
+                        <win-list-layout></win-list-layout>
+                    </win-list-view>
+
+                    <hr />
+
+                    <!-- actions (send message) -->
+                    <div id="actions">
+                        <button id="sendFiles" class="btn btn-link btn-icon no-outline">&#xE16C;</button>
+                        <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." ng-enter="sendMessage()" />
+                        <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
+                    </div>
+                </div>
+            </section>
         </win-split-view-content>
     </win-split-view>
 </body>
