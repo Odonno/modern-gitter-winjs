@@ -358,39 +358,41 @@
                 ApiService.getMessages($scope.currentRoom.id).then(messages => {
                     $scope.messages = messages;
 
-                    // BUG : it takes a lot of time to make UI refresh... (not refreshed if we don't do something in the UI)
+                    // refresh UI
+                    messagesListView.forceLayout();
 
-                    // scroll down to the last message
-                    //setTimeout(function () {
-                    //    messagesListView.ensureVisible($scope.messages.length - 1);
-                    //    WinJS.Utilities.removeClass(progress, "hide");
+                    // wait for refresh
+                    setTimeout(function () {
+                        // scroll down to the last message
+                        messagesListView.ensureVisible($scope.messages.length - 1);
+                        WinJS.Utilities.removeClass(progress, "hide");
 
-                    //    messagesListView.onheadervisibilitychanged = function (ev) {
-                    //        var visible = ev.detail.visible;
-                    //        if (visible) {
-                    //            // retrieve index of message that was visible before the load of new messages
-                    //            var lastVisible = messagesListView.indexOfLastVisible;
+                        messagesListView.onheadervisibilitychanged = function (ev) {
+                            var visible = ev.detail.visible;
+                            if (visible && $scope.messages.length > 0) {
+                                // retrieve index of message that was visible before the load of new messages
+                                var lastVisible = messagesListView.indexOfLastVisible;
 
-                    //            // load more messages
-                    //            ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
-                    //                if (beforeMessages.length === 0) {
-                    //                    // no more message to load
-                    //                    WinJS.Utilities.addClass(progress, "hide");
-                    //                    return;
-                    //                }
+                                // load more messages
+                                ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
+                                    if (beforeMessages.length === 0) {
+                                        // no more message to load
+                                        WinJS.Utilities.addClass(progress, "hide");
+                                        return;
+                                    }
 
-                    //                for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                    //                    $scope.messages.unshift(beforeMessages[i]);
-                    //                }
+                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                        $scope.messages.unshift(beforeMessages[i]);
+                                    }
 
-                    //                // scroll again to stay where the user was (reading message)
-                    //                setTimeout(function () {
-                    //                    messagesListView.ensureVisible(lastVisible + beforeMessages.length);
-                    //                }, 250);
-                    //            });
-                    //        }
-                    //    };
-                    //}, 500);
+                                    // scroll again to stay where the user was (reading message)
+                                    setTimeout(function () {
+                                        messagesListView.ensureVisible(lastVisible + beforeMessages.length);
+                                    }, 250);
+                                });
+                            }
+                        };
+                    }, 500);
                 });
             };
 
