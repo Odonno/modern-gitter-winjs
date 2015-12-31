@@ -62,27 +62,22 @@
                     </div>
                 </div>
 
-                <!-- message template (ListView item) -->
-                <div class="messageTemplate" data-win-control="WinJS.Binding.Template" style="display: none;">
-                    <div data-win-bind="innerHTML: html"></div>
-                </div>
-
-                <!-- header template (ListView header) -->
-                <div class="list-header">
-                    <progress class="win-progress-bar progress hide"></progress>
-                </div>
-
                 <!-- list view of messages -->
-                <div id="messagesListView"
-                     data-win-control="WinJS.UI.ListView"
-                     data-win-options="{
-                        itemTemplate: select('.messageTemplate'),
-                        header: select('.list-header'),
-                        selectionMode: 'none',
-                        tapBehavior: 'none',
-                        layout: { type: WinJS.UI.ListLayout }
-                        }">
-                </div>
+                <win-list-view id="messagesListView" item-data-source="messages">
+                    <!-- header template -->
+                    <win-list-view-header>
+                        <progress class="win-progress-bar progress hide"></progress>
+                    </win-list-view-header>
+
+                    <!-- message template -->
+                    <win-item-template>
+                        <div ng-class="item.data.unread ? 'unread' : 'read'">
+                            <div ng-bind-html="item.data.html"></div>
+                        </div>
+                    </win-item-template>
+
+                    <win-list-layout></win-list-layout>
+                </win-list-view>
 
                 <hr />
 

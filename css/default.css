@@ -157,3 +157,8 @@ html.win-hoverable .win-listview .win-itembox:hover::before,
 html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     border: none;
 }
+
+.unread {
+    border-right: 2px solid #2ECC71;
+    background-color: rgba(46, 204, 113, 0.08);
+}

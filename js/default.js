@@ -32,7 +32,7 @@
 
         // retrieve list view of messages and his components
         messagesListView = document.getElementById('messagesListView').winControl;
-        progress = document.querySelector('.list-header .progress');
+        progress = document.querySelector('.progress');
     });
 
     app.start();
@@ -336,7 +336,6 @@
                                 RealtimeApiService.subscribe($scope.rooms[i].id, function (roomId, message) {
                                     if ($scope.currentRoom && $scope.currentRoom.id === roomId) {
                                         $scope.messages.push(message);
-                                        $scope.list.push(message);
                                     }
 
                                     // TODO : send notification
@@ -352,48 +351,46 @@
 
             // methods
             $scope.selectRoom = function (room) {
+                $scope.messages = [];
                 $scope.currentRoom = room;
 
                 // retrieve messages
                 ApiService.getMessages($scope.currentRoom.id).then(messages => {
                     $scope.messages = messages;
 
-                    // refresh ListView of messages
-                    $scope.list = new WinJS.Binding.List($scope.messages);
-                    messagesListView.itemDataSource = $scope.list.dataSource;
+                    // BUG : it takes a lot of time to make UI refresh... (not refreshed if we don't do something in the UI)
 
                     // scroll down to the last message
-                    setTimeout(function () {
-                        messagesListView.ensureVisible($scope.messages.length - 1);
-                        WinJS.Utilities.removeClass(progress, "hide");
+                    //setTimeout(function () {
+                    //    messagesListView.ensureVisible($scope.messages.length - 1);
+                    //    WinJS.Utilities.removeClass(progress, "hide");
 
-                        messagesListView.onheadervisibilitychanged = function (ev) {
-                            var visible = ev.detail.visible;
-                            if (visible) {
-                                // retrieve index of message that was visible before the load of new messages
-                                var lastVisible = messagesListView.indexOfLastVisible;
+                    //    messagesListView.onheadervisibilitychanged = function (ev) {
+                    //        var visible = ev.detail.visible;
+                    //        if (visible) {
+                    //            // retrieve index of message that was visible before the load of new messages
+                    //            var lastVisible = messagesListView.indexOfLastVisible;
 
-                                // load more messages
-                                ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
-                                    if (beforeMessages.length === 0) {
-                                        // no more message to load
-                                        WinJS.Utilities.addClass(progress, "hide");
-                                        return;
-                                    }
+                    //            // load more messages
+                    //            ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
+                    //                if (beforeMessages.length === 0) {
+                    //                    // no more message to load
+                    //                    WinJS.Utilities.addClass(progress, "hide");
+                    //                    return;
+                    //                }
 
-                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                        $scope.messages.unshift(beforeMessages[i]);
-                                        $scope.list.unshift(beforeMessages[i]);
-                                    }
+                    //                for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                    //                    $scope.messages.unshift(beforeMessages[i]);
+                    //                }
 
-                                    // scroll again to stay where the user was (reading message)
-                                    setTimeout(function () {
-                                        messagesListView.ensureVisible(lastVisible + beforeMessages.length);
-                                    }, 250);
-                                });
-                            }
-                        };
-                    }, 500);
+                    //                // scroll again to stay where the user was (reading message)
+                    //                setTimeout(function () {
+                    //                    messagesListView.ensureVisible(lastVisible + beforeMessages.length);
+                    //                }, 250);
+                    //            });
+                    //        }
+                    //    };
+                    //}, 500);
                 });
             };
 
