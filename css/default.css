@@ -142,8 +142,16 @@ hr {
 	height: 100px;
 }
 
-#roomsListView {
+#roomsContent {
 	height: calc(100vh - 100px);
+}
+
+#addRoomHeader {
+	height: 60px;
+}
+
+#addRoomContent {
+	height: calc(100vh - 60px);
 }
 
 html.win-hoverable .win-listview .win-itembox:hover::before,

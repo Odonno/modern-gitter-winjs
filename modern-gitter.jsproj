@@ -117,6 +117,7 @@
     <Content Include="js\app.js" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
+    <Content Include="partials\addRoom.html" />
     <Content Include="partials\home.html" />
     <Content Include="partials\room.html" />
     <Content Include="partials\rooms.html" />

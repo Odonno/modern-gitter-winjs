@@ -13,6 +13,11 @@ angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
                 templateUrl: 'partials/rooms.html',
                 controller: 'RoomsCtrl',
             })
+            .state('addRoom', {
+                url: '/addRoom',
+                templateUrl: 'partials/addRoom.html',
+                controller: 'AddRoomCtrl',
+            })
             .state('room', {
                 url: '/room',
                 templateUrl: 'partials/room.html',

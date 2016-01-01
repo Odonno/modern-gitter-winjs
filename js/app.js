@@ -13,11 +13,20 @@
                 templateUrl: 'partials/rooms.html',
                 controller: 'RoomsCtrl',
             })
+            .state('addRoom', {
+                url: '/addRoom',
+                templateUrl: 'partials/addRoom.html',
+                controller: 'AddRoomCtrl',
+            })
             .state('room', {
                 url: '/room',
                 templateUrl: 'partials/room.html',
                 controller: 'RoomCtrl',
             });
+    });
+angular.module('modern-gitter')
+    .controller('AddRoomCtrl', function ($scope) {
+        
     });
 angular.module('modern-gitter')
     .controller('HomeCtrl', function ($scope, RoomsService) {
