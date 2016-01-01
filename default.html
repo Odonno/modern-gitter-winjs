@@ -36,8 +36,9 @@
             </div>
 
             <div class="split-view-commands">
-                <win-split-view-command label="'Rooms'" icon="'find'" on-invoked="goToHome()"></win-split-view-command>
-                <win-split-view-command label="'Messages'" icon="'message'" on-invoked="goToSettings()"></win-split-view-command>
+                <win-split-view-command label="'Home'" icon="'home'" on-invoked="goToHome()"></win-split-view-command>
+                <win-split-view-command label="'Rooms'" icon="'find'" on-invoked="goToRooms()"></win-split-view-command>
+                <win-split-view-command label="'Messages'" icon="'message'" on-invoked="goToMessages()"></win-split-view-command>
             </div>
         </win-split-view-pane>
 
@@ -62,8 +63,26 @@
 
             <section id="room-area">
                 <!-- showed when no room selected -->
-                <div ng-hide="currentRoom" class="fit-view flex">
-                    <div class="no-room-text">Select a room</div>
+                <div ng-hide="currentRoom" class="fit-view">
+                    <div class="content">
+                        <h1 class="win-h1">Welcome to Modern Gitter !</h1>
+                        <h2 class="win-h2">A non official app especially designed for the Windows platform.</h2>
+                    </div>      
+                                  
+                    <div class="text-center">
+                        <div class="circle circle-200 circle-lightgrey circle-center">
+                            <img id="me-img" src="/assets/me.png" />
+                        </div>
+
+                        <div>
+                            <h1 class="win-h1">Hi,</h1>
+                            <h2 class="win-h2">
+                                I'm David Bottiau, an independant developer.<br />
+                                I think you're here to chat, just select a room.
+                            </h2>
+                            <h1 class="win-h1">:)</h1>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- show room -->

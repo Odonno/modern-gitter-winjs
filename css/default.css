@@ -1,7 +1,7 @@
 ﻿body {
 }
 
-.win-h2 {
+.win-h1, .win-h2 {
     padding-top: 12px !important;
 }
 
@@ -143,6 +143,32 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 .unread {
     border-right: 2px solid #2ECC71;
     background-color: rgba(46, 204, 113, 0.08);
+}
+
+.circle {
+    background-position: 50%;
+    border-radius: 50%;
+}
+
+.circle-200 {
+	width: 200px;
+	height: 200px;
+}
+
+.circle-lightgrey {
+	background-color: #c9cbc7;
+}
+
+.circle-center {
+	margin: 30px auto;
+}
+
+#me-img {
+    background-repeat: no-repeat;
+	max-width: 200px;
+	max-height: 200px;
+    background-position: 50%;
+    border-radius: 100%;
 }
 
 @media screen and (max-width: 1020px) {
