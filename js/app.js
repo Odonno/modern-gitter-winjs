@@ -31,11 +31,9 @@ angular.module('modern-gitter')
 
         // methods
         $scope.sendMessage = function () {
-            var textMessage = document.getElementById('textMessage');
-
-            if (textMessage.value) {
-                ApiService.sendMessage($scope.currentRoom.id, textMessage.value).then(message => {
-                    textMessage.value = '';
+            if ($scope.textMessage) {
+                ApiService.sendMessage($scope.room.id, $scope.textMessage).then(message => {
+                    $scope.textMessage = '';
                 });
             } else {
                 console.error('textMessage is empty');
@@ -43,7 +41,7 @@ angular.module('modern-gitter')
         };
 
         // initialize controller
-        if (!RoomsService.currentRoom) {
+        if (!$scope.room) {
             console.error('no room selected...');
             return;
         }
