@@ -54,6 +54,10 @@
                         <div ng-click="selectRoom(item.data)">
                             <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
                             <div class="room-tile-text">{{ item.data.name }}</div>
+                            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center">
+                                <span ng-show="item.data.unreadItems < 100">{{ item.data.unreadItems }}</span>
+                                <span ng-hide="item.data.unreadItems < 100">*</span>
+                            </div>
                         </div>
                     </win-item-template>
 
@@ -70,7 +74,7 @@
                     </div>      
                                   
                     <div class="text-center">
-                        <div class="circle circle-200 circle-lightgrey circle-center">
+                        <div class="circle circle-200 circle-lightgrey circle-center" style="margin-top: 30px; margin-bottom; 20px;">
                             <img id="me-img" src="/assets/me.png" />
                         </div>
 
