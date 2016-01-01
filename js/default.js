@@ -22,22 +22,29 @@
         // TODO : This application is about to be suspended, save any state that needs to persist across suspensions here
     };
 
-    // UI components
-    var splitView, messagesListView, progress;
-
-    WinJS.UI.processAll().then(function () {
-        // makes the splitView adaptable to screen size
-        splitView = document.querySelector('.splitView').winControl;
-        new WinJS.UI._WinKeyboard(splitView.paneElement);
-
-        // retrieve list view of messages and his components
-        messagesListView = document.getElementById('messagesListView').winControl;
-        progress = document.querySelector('.win-progress-bar');
-    });
-
     app.start();
 
-    angular.module('modern-gitter', ['winjs', 'ngSanitize'])
+    angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
+        .config(function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/home');
+
+            $stateProvider
+             .state('home', {
+                 url: '/home',
+                 templateUrl: 'partials/home.html',
+                 controller: 'HomeCtrl',
+             })
+            .state('rooms', {
+                url: '/rooms',
+                templateUrl: 'partials/rooms.html',
+                controller: 'RoomsCtrl',
+            })
+            .state('room', {
+                url: '/room',
+                templateUrl: 'partials/room.html',
+                controller: 'RoomCtrl',
+            });
+        })
         .directive('ngEnter', function () {
             return function (scope, element, attrs) {
                 element.bind("keydown keypress", function (event) {
@@ -57,7 +64,8 @@
             networkService.currentStatus = function () {
                 var internetConnectionProfile = networkInformation.getInternetConnectionProfile();
                 var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-                return networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess;
+                networkService.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                return networkService.internetAvailable;
             }
 
             networkService.statusChanged = function (callback) {
@@ -66,7 +74,7 @@
                 };
             };
 
-            networkService.internetAvailable = networkService.currentStatus();
+            networkService.currentStatus();
 
             return networkService;
         })
@@ -306,15 +314,15 @@
 
             return realtimeApiService;
         })
-        .controller('AppCtrl', function ($scope, $filter, NetworkService, ConfigService, OAuthService, ApiService, RealtimeApiService) {
-            // properties
-            $scope.rooms = [];
-            $scope.messages = [];
-            $scope.initialized = false;
-            $scope.internetAvailable = NetworkService.internetAvailable;
+        .service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService) {
+            var roomsService = this;
 
-            // private methods
-            function initialize() {
+            // properties
+            roomsService.initialized = false;
+            roomsService.rooms = [];
+
+            // methods
+            roomsService.initialize = function () {
                 OAuthService.connect().then(t => {
                     console.log('Sucessfully logged to Gitter API');
 
@@ -322,80 +330,78 @@
                         console.log('Sucessfully subscribed to realtime API');
 
                         ApiService.getRooms().then(rooms => {
-                            $scope.rooms = rooms;
-
-                            for (var i = 0; i < $scope.rooms.length; i++) {
-                                // compute room image
-                                if ($scope.rooms[i].user) {
-                                    $scope.rooms[i].image = $scope.rooms[i].user.avatarUrlMedium;
-                                } else {
-                                    $scope.rooms[i].image = "https://avatars.githubusercontent.com/" + $scope.rooms[i].name.split('/')[0];
-                                }
-
-                                // subscribe to realtime messages
-                                RealtimeApiService.subscribe($scope.rooms[i].id, function (roomId, message) {
-                                    if ($scope.currentRoom && $scope.currentRoom.id === roomId) {
-                                        $scope.messages.push(message);
-                                    }
-
-                                    // TODO : send notification
-                                });
-                            }
-
-                            $scope.initialized = true;
-                            $scope.$apply();
+                            roomsService.setRooms(rooms);
+                            roomsService.initialized = true;
                         });
                     });
                 });
             }
 
-            // methods
-            $scope.selectRoom = function (room) {
-                $scope.messages = [];
-                $scope.currentRoom = room;
+            roomsService.setRooms = function (rooms) {
+                roomsService.rooms = rooms;
 
-                // retrieve messages
-                ApiService.getMessages($scope.currentRoom.id).then(messages => {
-                    $scope.messages = messages;
+                for (var i = 0; i < roomsService.rooms.length; i++) {
+                    // compute room image
+                    if (roomsService.rooms[i].user) {
+                        roomsService.rooms[i].image = roomsService.rooms[i].user.avatarUrlMedium;
+                    } else {
+                        roomsService.rooms[i].image = "https://avatars.githubusercontent.com/" + roomsService.rooms[i].name.split('/')[0];
+                    }
 
-                    // refresh UI
-                    messagesListView.forceLayout();
-
-                    // wait for refresh
-                    setTimeout(function () {
-                        // scroll down to the last message
-                        messagesListView.ensureVisible($scope.messages.length - 1);
-                        WinJS.Utilities.removeClass(progress, "hide");
-
-                        messagesListView.onheadervisibilitychanged = function (ev) {
-                            var visible = ev.detail.visible;
-                            if (visible && $scope.messages.length > 0) {
-                                // retrieve index of message that was visible before the load of new messages
-                                var lastVisible = messagesListView.indexOfLastVisible;
-
-                                // load more messages
-                                ApiService.getMessages($scope.currentRoom.id, $scope.messages[0].id).then(beforeMessages => {
-                                    if (beforeMessages.length === 0) {
-                                        // no more message to load
-                                        WinJS.Utilities.addClass(progress, "hide");
-                                        return;
-                                    }
-
-                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                        $scope.messages.unshift(beforeMessages[i]);
-                                    }
-
-                                    // scroll again to stay where the user was (reading message)
-                                    setTimeout(function () {
-                                        messagesListView.ensureVisible(lastVisible + beforeMessages.length);
-                                    }, 250);
-                                });
-                            }
-                        };
-                    }, 500);
-                });
+                    // subscribe to realtime messages
+                    RealtimeApiService.subscribe(roomsService.rooms[i].id, function (roomId, message) {
+                        if (roomsService.onmessagereceived) {
+                            roomsService.onmessagereceived(roomId, message);
+                        }
+                        // TODO : send notification
+                    });
+                }
             };
 
+            roomsService.selectRoom = function (room) {
+                roomsService.currentRoom = room;
+                if (roomsService.onroomselected) {
+                    roomsService.onroomselected();
+                }
+            };
+
+            // initialize service 
+            if (NetworkService.internetAvailable) {
+                roomsService.initialize();
+            }
+
+            // check when internet status changed
+            NetworkService.statusChanged(function () {
+                if (!roomsService.initialized && NetworkService.internetAvailable) {
+                    roomsService.initialize();
+                }
+            });
+
+            return roomsService;
+        })
+        .controller('HomeCtrl', function ($scope, RoomsService) {
+        })
+        .controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) {
+            $scope.rooms = RoomsService.rooms;
+
+            // methods
+            $scope.selectRoom = function (room) {
+                RoomsService.selectRoom(room);
+                $state.go('room');
+            };
+
+            // watch events
+            $scope.$watch('rooms', function () {
+                $scope.orderedRooms = $filter('orderBy')($scope.rooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+            });
+        })
+        .controller('RoomCtrl', function ($scope, ApiService, RoomsService) {
+            // properties
+            $scope.hideProgress = true;
+            $scope.room = RoomsService.currentRoom;
+            $scope.messages = [];
+
+            // methods
             $scope.sendMessage = function () {
                 var textMessage = document.getElementById('textMessage');
 
@@ -408,22 +414,56 @@
                 }
             };
 
-            // initialize controller 
-            if ($scope.internetAvailable) {
-                initialize();
+            // initialize controller
+            if (!RoomsService.currentRoom) {
+                console.error('no room selected...');
+                return;
             }
 
-            // check when internet status changed
-            NetworkService.statusChanged(function (internetAvailable) {
-                $scope.internetAvailable = internetAvailable;
-                if (!$scope.initialized && $scope.internetAvailable) {
-                    initialize();
+            RoomsService.onmessagereceived = function (roomId, message) {
+                if ($scope.room && $scope.room.id === roomId) {
+                    $scope.messages.push(message);
                 }
-            });
+            };
 
-            // watch events
-            $scope.$watch('rooms', function () {
-                $scope.orderedRooms = $filter('orderBy')($scope.rooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+            ApiService.getMessages($scope.room.id).then(messages => {
+                $scope.messages = messages;
+
+                // refresh UI
+                $scope.messagesWinControl.forceLayout();
+
+                // wait for refresh
+                setTimeout(function () {
+                    // scroll down to the last message
+                    $scope.messagesWinControl.ensureVisible($scope.messages.length - 1);
+                    $scope.hideProgress = false;
+
+                    $scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
+                        var visible = ev.detail.visible;
+                        if (visible && $scope.messages.length > 0) {
+                            // retrieve index of message that was visible before the load of new messages
+                            var lastVisible = $scope.messagesWinControl.indexOfLastVisible;
+
+                            // load more messages
+                            ApiService.getMessages($scope.room.id, $scope.messages[0].id).then(beforeMessages => {
+                                if (beforeMessages.length === 0) {
+                                    // no more message to load
+                                    $scope.hideProgress = true;
+                                    return;
+                                }
+
+                                for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                    $scope.messages.unshift(beforeMessages[i]);
+                                }
+
+                                // scroll again to stay where the user was (reading message)
+                                setTimeout(function () {
+                                    $scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                                }, 250);
+                            });
+                        }
+                    };
+                }, 500);
             });
         });
 })();

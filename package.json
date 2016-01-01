@@ -7,6 +7,7 @@
     "angular-sanitize": "^1.4.8",
     "angular-winjs": "^4.4.0",
     "faye": "^1.1.2",
+    "ui-router": "^0.2.15",
     "winjs": "^4.4.0",
     "winstrap": "^0.5.6"
   }

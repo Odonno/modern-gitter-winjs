@@ -12,6 +12,7 @@
     <!-- Angular WinJS references -->
     <script src="dist/angular/angular.js"></script>
     <script src="dist/angular-sanitize/angular-sanitize.js"></script>
+    <script src="dist/angular-ui-router/angular-ui-router.js"></script>
     <script src="dist/angular-winjs/angular-winjs.js"></script>
 
     <!-- Faye references -->
@@ -24,7 +25,7 @@
     <link href="/css/default.css" rel="stylesheet" />
     <script src="/js/default.js"></script>
 </head>
-<body class="win-type-body" ng-controller="AppCtrl">
+<body class="win-type-body">
     <win-split-view win-control="splitViewWinControl" class="splitView">
         <!-- pane area -->
         <win-split-view-pane>
@@ -36,96 +37,15 @@
             </div>
 
             <div class="split-view-commands">
-                <win-split-view-command label="'Home'" icon="'home'" on-invoked="goToHome()"></win-split-view-command>
-                <win-split-view-command label="'Rooms'" icon="'find'" on-invoked="goToRooms()"></win-split-view-command>
-                <win-split-view-command label="'Messages'" icon="'message'" on-invoked="goToMessages()"></win-split-view-command>
+                <win-split-view-command label="'Home'" icon="'home'" ui-sref="home"></win-split-view-command>
+                <win-split-view-command label="'Rooms'" icon="'find'" ui-sref="rooms"></win-split-view-command>
+                <win-split-view-command label="'Messages'" icon="'message'" ui-sref="room"></win-split-view-command>
             </div>
         </win-split-view-pane>
 
         <!-- content area -->
         <win-split-view-content class="content-area">
-            <aside id="rooms-area">
-                <h2 id="roomsHeader" class="win-h2 content">Rooms</h2>
-
-                <!-- list view of rooms -->
-                <win-list-view id="roomsListView" item-data-source="orderedRooms">
-                    <!-- room template -->
-                    <win-item-template>
-                        <div ng-click="selectRoom(item.data)">
-                            <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
-                            <div class="room-tile-text">{{ item.data.name }}</div>
-                            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center">
-                                <span ng-show="item.data.unreadItems < 100">{{ item.data.unreadItems }}</span>
-                                <span ng-hide="item.data.unreadItems < 100">*</span>
-                            </div>
-                        </div>
-                    </win-item-template>
-
-                    <win-list-layout></win-list-layout>
-                </win-list-view>
-            </aside>
-
-            <section id="room-area">
-                <!-- showed when no room selected -->
-                <div ng-hide="currentRoom" class="fit-view">
-                    <div class="content">
-                        <h1 class="win-h1">Welcome to Modern Gitter !</h1>
-                        <h2 class="win-h2">A non official app especially designed for the Windows platform.</h2>
-                    </div>      
-                                  
-                    <div class="text-center">
-                        <div class="circle circle-200 circle-lightgrey circle-center" style="margin-top: 30px; margin-bottom; 20px;">
-                            <img id="me-img" src="/assets/me.png" />
-                        </div>
-
-                        <div>
-                            <h1 class="win-h1">Hi,</h1>
-                            <h2 class="win-h2">
-                                I'm David Bottiau, an independant developer.<br />
-                                I think you're here to chat, just select a room.
-                            </h2>
-                            <h1 class="win-h1">:)</h1>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- show room -->
-                <div ng-show="currentRoom" class="fit-view">
-                    <!-- room description -->
-                    <div id="roomDescription">
-                        <div class="content">
-                            <h2 class="win-h2">{{ currentRoom.name }}</h2>
-                            <h6 class="win-h6 room-topic" ng-show="currentRoom.topic">{{ currentRoom.topic }}</h6>
-                        </div>
-                    </div>
-
-                    <!-- list view of messages -->
-                    <win-list-view id="messagesListView" item-data-source="messages">
-                        <!-- header template -->
-                        <win-list-view-header>
-                            <progress class="win-progress-bar hide"></progress>
-                        </win-list-view-header>
-
-                        <!-- message template -->
-                        <win-item-template>
-                            <div ng-class="item.data.unread ? 'unread' : 'read'">
-                                <div ng-bind-html="item.data.html"></div>
-                            </div>
-                        </win-item-template>
-
-                        <win-list-layout></win-list-layout>
-                    </win-list-view>
-
-                    <hr />
-
-                    <!-- actions (send message) -->
-                    <div id="actions">
-                        <button id="sendFiles" class="btn btn-link btn-icon no-outline">&#xE16C;</button>
-                        <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." ng-enter="sendMessage()" />
-                        <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
-                    </div>
-                </div>
-            </section>
+            <div ui-view></div>
         </win-split-view-content>
     </win-split-view>
 </body>

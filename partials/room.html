@@ -1,0 +1,33 @@
+﻿<!-- room description -->
+<div id="roomDescription">
+    <div class="content">
+        <h2 class="win-h2">{{ room.name }}</h2>
+        <h6 class="win-h6 room-topic" ng-show="room.topic">{{ room.topic }}</h6>
+    </div>
+</div>
+
+<!-- list view of messages -->
+<win-list-view id="messagesListView" item-data-source="messages" win-control="messagesWinControl">
+    <!-- header template -->
+    <win-list-view-header>
+        <progress class="win-progress-bar" ng-hide="hideProgress"></progress>
+    </win-list-view-header>
+
+    <!-- message template -->
+    <win-item-template>
+        <div ng-class="item.data.unread ? 'unread' : 'read'">
+            <div ng-bind-html="item.data.html"></div>
+        </div>
+    </win-item-template>
+
+    <win-list-layout></win-list-layout>
+</win-list-view>
+
+<hr />
+
+<!-- actions (send message) -->
+<div id="actions">
+    <button id="sendFiles" class="btn btn-link btn-icon no-outline">&#xE16C;</button>
+    <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." ng-enter="sendMessage()" />
+    <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
+</div>

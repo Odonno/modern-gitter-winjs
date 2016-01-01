@@ -65,6 +65,7 @@
     <Content Include="assets\me.png" />
     <Content Include="default.html" />
     <Content Include="dist\angular-sanitize\angular-sanitize.js" />
+    <Content Include="dist\angular-ui-router\angular-ui-router.js" />
     <Content Include="dist\angular-winjs\angular-winjs.js" />
     <Content Include="dist\angular\angular.js" />
     <Content Include="dist\faye\faye-browser.js" />
@@ -115,6 +116,9 @@
     <Content Include="images\Wide310x150Logo.scale-400.png" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
+    <Content Include="partials\home.html" />
+    <Content Include="partials\room.html" />
+    <Content Include="partials\rooms.html" />
     <None Include="modern-gitter_StoreKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />
     <None Include="modern-gitter_TemporaryKey.pfx" />
