@@ -1,4 +1,4 @@
-angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
+﻿angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/home');
 

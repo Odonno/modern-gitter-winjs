@@ -1,2 +1,2 @@
-MainPackage=C:\Users\David\Documents\GitHub\modern-gitter-winjs\bin\Release\modern-gitter_2.1.16.0_AnyCPU.appx
-ResourcePack=C:\Users\David\Documents\GitHub\modern-gitter-winjs\bin\Release\modern-gitter_2.1.16.0_scale-400.appx
+MainPackage=C:\Users\David\Documents\GitHub\modern-gitter-winjs\bin\Release\modern-gitter_2.1.19.0_AnyCPU.appx
+ResourcePack=C:\Users\David\Documents\GitHub\modern-gitter-winjs\bin\Release\modern-gitter_2.1.19.0_scale-400.appx
