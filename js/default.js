@@ -14,6 +14,7 @@
             } else {
                 // TODO : This application was suspended and then terminated
             }
+
             args.setPromise(WinJS.UI.processAll());
         }
     };

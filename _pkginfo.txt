@@ -1,1 +1,1 @@
-C:\Users\David\Documents\GitHub\modern-gitter-winjs\AppPackages\modern-gitter_2.0.15.0\modern-gitter_2.0.15.0_AnyCPU.appxbundle
+C:\Users\David\Documents\GitHub\modern-gitter-winjs\AppPackages\modern-gitter_2.1.16.0\modern-gitter_2.1.16.0_AnyCPU.appxbundle
