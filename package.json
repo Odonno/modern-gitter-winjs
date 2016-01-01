@@ -10,5 +10,9 @@
     "ui-router": "^0.2.15",
     "winjs": "^4.4.0",
     "winstrap": "^0.5.6"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0"
   }
 }
