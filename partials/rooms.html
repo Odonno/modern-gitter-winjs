@@ -1,7 +1,12 @@
-﻿<h2 id="roomsHeader" class="win-h2 content">Rooms</h2>
+﻿<div id="roomsHeader" class="content">
+    <h2 class="win-h2">Rooms</h2>
+
+    <!-- search input -->
+    <input type="text" placeholder="Search a room..." class="form-control" ng-model="search" style="max-width: 100%;" />
+</div>
 
 <!-- list view of rooms -->
-<win-list-view id="roomsListView" item-data-source="orderedRooms">
+<win-list-view id="roomsListView" item-data-source="filteredRooms">
     <!-- room template -->
     <win-item-template>
         <div ng-click="selectRoom(item.data)">

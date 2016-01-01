@@ -105,8 +105,9 @@ angular.module('modern-gitter')
         };
 
         // watch events
-        $scope.$watch('rooms', function () {
-            $scope.orderedRooms = $filter('orderBy')($scope.rooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+        $scope.$watchGroup(['rooms', 'search'], function () {
+            $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
+            $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
         });
     });
 angular.module('modern-gitter')

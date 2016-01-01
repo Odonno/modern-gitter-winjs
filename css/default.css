@@ -139,11 +139,11 @@ hr {
 }
 
 #roomsHeader {
-	height: 60px;
+	height: 100px;
 }
 
 #roomsListView {
-	height: calc(100vh - 60px);
+	height: calc(100vh - 100px);
 }
 
 html.win-hoverable .win-listview .win-itembox:hover::before,
