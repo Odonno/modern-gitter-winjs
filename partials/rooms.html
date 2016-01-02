@@ -2,17 +2,17 @@
     <h2 class="win-h2">Rooms</h2>
 
     <!-- search input -->
-    <input type="text" placeholder="Search a room..." class="form-control" ng-model="search" style="max-width: 100%;" />
+    <input type="text" placeholder="Search a room..." class="form-control form-control-full" ng-model="search" />
 </div>
 
 <!-- list view of rooms -->
 <win-list-view id="roomsContent" item-data-source="filteredRooms">
     <!-- room template -->
     <win-item-template>
-        <div ng-click="selectRoom(item.data)">
+        <div ng-click="selectRoom(item.data)" class="clickable" style="padding-bottom: 6px;">
             <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
             <div class="room-tile-text">{{ item.data.name }}</div>
-            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center">
+            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center" style="margin-right: 12px;">
                 <span ng-show="item.data.unreadItems < 100">{{ item.data.unreadItems }}</span>
                 <span ng-hide="item.data.unreadItems < 100">*</span>
             </div>

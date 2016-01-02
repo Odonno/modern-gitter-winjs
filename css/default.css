@@ -14,6 +14,10 @@ hr {
     margin: 0 20px;
 }
 
+.form-control-full {
+	max-width: 100% !important;
+}
+
 /* split-view style */
 .win-splitviewpanetoggle {
     float: left;
@@ -155,6 +159,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	padding-top: 6px;
 }
 
+.dropdown {
+	margin-top: 12px;
+}
+
 .owner-image {
 	max-width: 20px;
 	max-height: 20px;
@@ -164,6 +172,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 #channel-name {
 	max-width: 100%;
 	margin-bottom: 6px;
+	margin-top: 12px;
 }
 
 /* add a room - one to one view style */
@@ -230,7 +239,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	color: white;
 	font-size: 12px;
 	font-weight: bold;
-	margin-top: 10px !important;
+	margin-top: 8px !important;
 	padding-top: 2px;
 	float: right;
 }

@@ -1,6 +1,6 @@
 ﻿<!-- owner of this new room -->
 <h3 class="win-h3 channel-form-title">Owner</h3>
-<div class="dropdown" style="margin-top: 12px;">
+<div class="dropdown">
     <button id="dropdown-owner" class="btn btn-dropdown dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
         <span ng-hide="channel.owner">Select an owner</span>
         <span ng-show="channel.owner">
@@ -22,7 +22,7 @@
 
 <!-- room name -->
 <h3 class="win-h3 channel-form-title">Room name</h3>
-<input id="channel-name" type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" style="margin-top: 12px;" />
+<input id="channel-name" type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" />
 
 <!-- permissions of the new room -->
 <h3 class="win-h3 channel-form-title">Permissions</h3>
@@ -41,7 +41,7 @@
             <input type="radio" name="radioPermissions" ng-model="channel.permission" value="Organisation">
             <span>
                 <b>Organisation</b>
-                <div>Anyone in <b>{{ channel.owner.name }}</b> can join. </div>
+                <div>Anyone in <b>{{ channel.owner.name }}</b> can join.</div>
             </span>
         </label>
     </div>
