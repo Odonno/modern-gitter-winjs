@@ -151,6 +151,20 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* add a room - channel view style */
+.channel-form-title {
+	padding-top: 6px;
+}
+
+.owner-image {
+	max-width: 20px;
+	max-height: 20px;
+	margin-right: 6px;
+}
+
+#channel-name {
+	max-width: 100%;
+	margin-bottom: 6px;
+}
 
 /* add a room - one to one view style */
 #usersListView {

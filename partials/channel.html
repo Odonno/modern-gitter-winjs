@@ -1,10 +1,10 @@
 ﻿<!-- owner of this new room -->
-<h3 class="win-h3" style="padding-top: 6px;">Owner</h3>
+<h3 class="win-h3 channel-form-title">Owner</h3>
 <div class="dropdown">
     <button id="dropdown-owner" class="btn btn-dropdown dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
         <span ng-hide="channel.owner">Select an owner</span>
         <span ng-show="channel.owner">
-            <img ng-src="{{ channel.owner.avatarUrlSmall }}" style="max-width: 20px; max-height: 20px;" />
+            <img class="owner-image" ng-src="{{ channel.owner.avatarUrlSmall }}" />
             <span>{{ channel.owner.username }}</span>
         </span>
         <span class="caret"></span>
@@ -13,7 +13,7 @@
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-owner">
         <li ng-repeat="owner in owners">
             <a ng-click="selectOwner(owner)">
-                <img ng-src="{{ owner.avatarUrlSmall }}" style="max-width: 20px; max-height: 20px;" />
+                <img class="owner-image" ng-src="{{ owner.avatarUrlSmall }}" />
                 <span>{{ owner.username }}</span>
             </a>
         </li>
@@ -21,11 +21,11 @@
 </div>
 
 <!-- room name -->
-<h3 class="win-h3" style="padding-top: 6px;">Room name</h3>
-<input type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" style="max-width: 100%; margin-bottom: 6px;" />
+<h3 class="win-h3 channel-form-title">Room name</h3>
+<input id="channel-name" type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" />
 
 <!-- permissions of the new room -->
-<h3 class="win-h3" style="padding-top: 6px;">Permissions</h3>
+<h3 class="win-h3 channel-form-title">Permissions</h3>
 <div class="form-group">
     <div class="radio">
         <label>
