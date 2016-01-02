@@ -104,6 +104,22 @@ angular.module('modern-gitter')
                 });
             });
         };
+        
+        apiService.searchUsers = function(query, limit) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
 
         return apiService;
     });

@@ -27,12 +27,14 @@
 angular.module('modern-gitter')
     .controller('AddRoomCtrl', function ($scope, $filter, ApiService) {
         // properties
+        $scope.username = '';
+        $scope.users = [];
         $scope.owners = [];
         $scope.channel = {};
         
         // methods
         $scope.selectOwner = function (owner) {
-            $scope.channel.owner = owner;  
+            $scope.channel.owner = owner;
         };
         
         // initialize controller
@@ -48,6 +50,14 @@ angular.module('modern-gitter')
         $scope.$watch('repositories', function () {
             $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
         }, true);
+
+        $scope.$watch('username', function () {
+            if ($scope.username) {
+                ApiService.searchUsers($scope.username, 30).then(function (users) {
+                    $scope.users = users.results;
+                });
+            }
+        });
     });
 angular.module('modern-gitter')
     .controller('HomeCtrl', function ($scope, RoomsService) {
@@ -248,6 +258,22 @@ angular.module('modern-gitter')
                 WinJS.xhr({
                     type: 'GET',
                     url: ConfigService.baseUrl + "user/" + userId + "/repos",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
+        
+        apiService.searchUsers = function(query, limit) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
