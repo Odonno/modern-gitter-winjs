@@ -1,4 +1,5 @@
-﻿body {
+﻿/* app global style */
+body {
 }
 
 .win-h1, .win-h2 {
@@ -9,6 +10,11 @@ hr {
     margin: 0;
 }
 
+.content {
+    margin: 0 20px;
+}
+
+/* split-view style */
 .win-splitviewpanetoggle {
     float: left;
 }
@@ -17,20 +23,8 @@ hr {
     white-space: nowrap;
 }
 
-.title {
-    font-size: 25px;
-    left: 50px;
-    margin-top: 6px;
-    vertical-align: middle;
-    display: inline-block;
-}
-
 .split-view-commands {
     margin-top: 20px;
-}
-
-.win-navbarcommand-button {
-    background-color: transparent;
 }
 
 .win-splitview-pane-hidden .win-navbarcommand-button {
@@ -41,8 +35,105 @@ hr {
     visibility: hidden;
 }
 
-.win-splitview-content {
-    background-color: white;
+.split-view-title {
+    font-size: 25px;
+    left: 50px;
+    margin-top: 6px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* list-view style */
+.win-listview .win-listlayout .win-container {
+    height: auto;
+}
+
+html.win-hoverable .win-listview .win-itembox:hover::before,
+html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
+    border: none;
+}
+
+/* button style */
+.btn {
+    min-width: 0;
+}
+
+.btn-link {
+    margin: 0;
+    padding: 0;
+    height: 38px;
+    max-height: 38px;
+    text-decoration: none !important;
+}
+
+.btn-icon {
+    font-family: 'Segoe MDL2 Assets';
+    width: 30px;
+    margin: 0 6px !important;
+    font-size: 22px;
+}
+
+/* circle style */
+.circle {
+    background-position: 50%;
+    border-radius: 50%;
+}
+
+.circle-20 {
+	width: 20px;
+	height: 20px;
+}
+
+.circle-200 {
+	width: 200px;
+	height: 200px;
+}
+
+.circle-dark {
+	background-color: #383435;
+}
+
+.circle-lightgrey {
+	background-color: #c9cbc7;
+}
+
+.circle-center {
+	margin: auto;
+}
+
+/* home view style */
+#me-img {
+    background-repeat: no-repeat;
+	max-width: 200px;
+	max-height: 200px;
+    background-position: 50%;
+    border-radius: 100%;
+}
+
+/* add a room view style */
+#addRoomHeader {
+	height: 60px;
+}
+
+#addRoomContent {
+	height: calc(100vh - 60px);
+}
+
+#repositoriesListView {
+	height: calc(100vh - 180px);
+}
+
+#usersListView {
+	height: calc(100vh - 220px);
+}
+
+/* all rooms view style */
+#roomsHeader {
+	height: 100px;
+}
+
+#roomsContent {
+	height: calc(100vh - 100px);
 }
 
 .room-tile {
@@ -75,23 +166,9 @@ hr {
 	float: right;
 }
 
+/* room view style */
 .room-topic {
     padding-top: 6px;
-}
-
-.content {
-    margin: 0 20px;
-}
-
-.flex {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.no-room-text {
-	text-align: center;
-    font-size: 2em;
 }
 
 #roomDescription {
@@ -99,12 +176,18 @@ hr {
     background-color: #f2f2f2;
 }
 
-.win-listview .win-listlayout .win-container {
-    height: auto;
-}
-
 #messagesListView {
     height: calc(100vh - 120px - 60px);
+}
+
+#textMessage {
+	height: 100%;
+	width: calc(100vw - 58px - 42px - 42px);
+	border: none;
+}
+
+#actions {
+    height: 50px;
 }
 
 .win-progress-bar {
@@ -115,121 +198,12 @@ hr {
     display: none;
 }
 
-#actions {
-    height: 50px;
-}
-
-.btn {
-    min-width: 0;
-}
-
-.btn-link {
-    margin: 0;
-    padding: 0;
-    height: 38px;
-    max-height: 38px;
-    text-decoration: none !important;
-}
-
-.btn-icon {
-    font-family: 'Segoe MDL2 Assets';
-    width: 30px;
-    margin: 0 6px !important;
-    font-size: 22px;
-}
-
-#roomsHeader {
-	height: 100px;
-}
-
-#roomsContent {
-	height: calc(100vh - 100px);
-}
-
-#addRoomHeader {
-	height: 60px;
-}
-
-#addRoomContent {
-	height: calc(100vh - 60px);
-}
-
-#repositoriesListView {
-	height: calc(100vh - 180px);
-}
-
-#usersListView {
-	height: calc(100vh - 220px);
-}
-
-html.win-hoverable .win-listview .win-itembox:hover::before,
-html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
-    border: none;
-}
-
 .unread {
     border-right: 2px solid #2ECC71;
     background-color: rgba(46, 204, 113, 0.08);
 }
 
-.circle {
-    background-position: 50%;
-    border-radius: 50%;
-}
-
-.circle-20 {
-	width: 20px;
-	height: 20px;
-}
-
-.circle-200 {
-	width: 200px;
-	height: 200px;
-}
-
-.circle-dark {
-	background-color: #383435;
-}
-
-.circle-lightgrey {
-	background-color: #c9cbc7;
-}
-
-.circle-center {
-	margin: auto;
-}
-
-#me-img {
-    background-repeat: no-repeat;
-	max-width: 200px;
-	max-height: 200px;
-    background-position: 50%;
-    border-radius: 100%;
-}
-
-#rooms-area {
-	display: none;
-}
-
-#room-area {
-	display: inline-block;
-	width: calc(100vw - 60px);
-}
-
-#textMessage {
-	height: 100%;
-	width: calc(100vw - 58px - 42px - 42px);
-	border: none;
-}
-
-.fit-view {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-}
-
+/* adaptative design style */
 @media screen and (max-width: 1020px) {
 	
 }
