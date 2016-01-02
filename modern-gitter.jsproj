@@ -121,7 +121,10 @@
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
     <Content Include="partials\addRoom.html" />
+    <Content Include="partials\channel.html" />
     <Content Include="partials\home.html" />
+    <Content Include="partials\oneToOne.html" />
+    <Content Include="partials\repository.html" />
     <Content Include="partials\room.html" />
     <Content Include="partials\rooms.html" />
     <None Include="modern-gitter_StoreKey.pfx" />

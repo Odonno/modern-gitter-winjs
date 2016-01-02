@@ -6,23 +6,84 @@
             .state('home', {
                 url: '/home',
                 templateUrl: 'partials/home.html',
-                controller: 'HomeCtrl',
+                controller: 'HomeCtrl'
+            })
+            .state('addRoom', {
+                url: '/addRoom',
+                views: {
+                    '': {
+                        templateUrl: 'partials/addRoom.html',
+                        controller: 'AddRoomCtrl'
+                    },
+                    'repository@addRoom': {
+                        templateUrl: 'partials/repository.html',
+                        controller: 'AddRepositoryRoomCtrl'
+                    },
+                    'channel@addRoom': {
+                        templateUrl: 'partials/channel.html',
+                        controller: 'AddChannelRoomCtrl'
+                    },
+                    'oneToOne@addRoom': {
+                        templateUrl: 'partials/oneToOne.html',
+                        controller: 'AddOneToOneRoomCtrl'
+                    }
+                }
             })
             .state('rooms', {
                 url: '/rooms',
                 templateUrl: 'partials/rooms.html',
-                controller: 'RoomsCtrl',
-            })
-            .state('addRoom', {
-                url: '/addRoom',
-                templateUrl: 'partials/addRoom.html',
-                controller: 'AddRoomCtrl',
+                controller: 'RoomsCtrl'
             })
             .state('room', {
                 url: '/room',
                 templateUrl: 'partials/room.html',
-                controller: 'RoomCtrl',
+                controller: 'RoomCtrl'
             });
+    });
+angular.module('modern-gitter')
+    .controller('AddChannelRoomCtrl', function ($scope, ApiService) {
+        // properties
+        $scope.owners = [];
+        $scope.channel = {};
+        
+        // methods
+        $scope.selectOwner = function (owner) {
+            $scope.channel.owner = owner;
+        };
+        
+        // initialize controller
+        ApiService.getCurrentUser().then(function (user) {
+            $scope.owners.push(user);
+        });
+    });
+angular.module('modern-gitter')
+    .controller('AddOneToOneRoomCtrl', function ($scope, ApiService) {
+        // properties
+        $scope.username = '';
+        $scope.users = [];
+        
+        // watch events
+        $scope.$watch('username', function () {
+            if ($scope.username) {
+                ApiService.searchUsers($scope.username, 50).then(function (users) {
+                    $scope.users = users.results;
+                });
+            }
+        });
+    });
+angular.module('modern-gitter')
+    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, ApiService) {
+        // initialize controller
+        ApiService.getCurrentUser().then(function (user) {
+            ApiService.getRepositories(user.id).then(function (repositories) {
+                $scope.repositories = repositories;
+            });
+        });
+        
+        // watch events
+        $scope.$watch('repositories', function () {
+            $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
+        }, true);
     });
 angular.module('modern-gitter')
     .controller('AddRoomCtrl', function ($scope, $filter, ApiService) {
