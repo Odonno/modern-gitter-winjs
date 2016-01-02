@@ -18,7 +18,7 @@
             <win-grid-layout></win-grid-layout>
         </win-list-view>
 
-        <button class="btn">Create room</button>
+        <button class="btn">Create project room</button>
     </win-pivot-item>
 
     <!-- create a custom channel -->
@@ -30,8 +30,9 @@
 
     <!-- create a one to one room based on username -->
     <win-pivot-item header="'One to one'">
-        <div>
-            Currently not available...
-        </div>
+        <!-- search input -->
+        <input type="text" placeholder="Search a user..." class="form-control" ng-model="username" style="max-width: 100%; margin-bottom: 6px;" />
+
+        <button class="btn">Chat with him</button>
     </win-pivot-item>
 </win-pivot>
