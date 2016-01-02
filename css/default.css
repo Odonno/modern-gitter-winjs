@@ -84,11 +84,6 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	height: 20px;
 }
 
-.circle-200 {
-	width: 200px;
-	height: 200px;
-}
-
 .circle-dark {
 	background-color: #383435;
 }
@@ -102,6 +97,13 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* home view style */
+#me-circle {
+	width: 200px;
+	height: 200px;
+	margin-top: 30px;
+	margin-bottom; 20px;
+}
+
 #me-img {
     background-repeat: no-repeat;
 	max-width: 200px;
@@ -204,6 +206,29 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* adaptative design style */
+@media screen and (max-width: 400px) {
+	/* home view style */ 
+	.win-h1 {
+		font-size: 18px;
+	}
+
+	.win-h2 {
+		font-size: 14px;
+	}
+
+	#me-circle {
+		width: 100px;
+		height: 100px;
+		margin-top: 20px;
+		margin-bottom; 10px;
+	}
+
+	#me-img {
+		max-width: 100px;
+		max-height: 100px;
+	}
+}
+
 @media screen and (max-width: 1020px) {
 	
 }
