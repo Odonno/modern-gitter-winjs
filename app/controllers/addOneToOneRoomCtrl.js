@@ -1,5 +1,5 @@
 angular.module('modern-gitter')
-    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
+    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.username = '';
         $scope.users = [];
@@ -9,6 +9,7 @@ angular.module('modern-gitter')
         $scope.createRoom = function () {
             var selectedUser = $scope.users[$scope.selection[0]];
             RoomsService.createRoom(selectedUser.username, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name);
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });

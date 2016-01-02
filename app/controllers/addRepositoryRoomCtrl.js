@@ -1,5 +1,5 @@
 angular.module('modern-gitter')
-    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService) {
+    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.selection = [];
         
@@ -7,6 +7,7 @@ angular.module('modern-gitter')
         $scope.createRoom = function () {
             var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
             RoomsService.createRoom(repository.uri, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });

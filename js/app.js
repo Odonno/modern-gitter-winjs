@@ -1,4 +1,4 @@
-﻿angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
+angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/home');
 
@@ -41,7 +41,7 @@
             });
     });
 angular.module('modern-gitter')
-    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
+    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.owners = [];
         $scope.permissions = [
@@ -63,6 +63,7 @@ angular.module('modern-gitter')
 
         $scope.createRoom = function () {
             RoomsService.createChannel($scope.channel, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created');
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });
@@ -88,7 +89,7 @@ angular.module('modern-gitter')
         });
     });
 angular.module('modern-gitter')
-    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
+    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.username = '';
         $scope.users = [];
@@ -98,6 +99,7 @@ angular.module('modern-gitter')
         $scope.createRoom = function () {
             var selectedUser = $scope.users[$scope.selection[0]];
             RoomsService.createRoom(selectedUser.username, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name);
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });
@@ -117,7 +119,7 @@ angular.module('modern-gitter')
         });
     });
 angular.module('modern-gitter')
-    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService) {
+    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.selection = [];
         
@@ -125,6 +127,7 @@ angular.module('modern-gitter')
         $scope.createRoom = function () {
             var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
             RoomsService.createRoom(repository.uri, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });
@@ -763,4 +766,50 @@ angular.module('modern-gitter')
         });
 
         return roomsService;
+    });
+angular.module('modern-gitter')
+    .service('ToastNotificationService', function () {
+        var toastNotificationService = this;
+
+        var notifications = Windows.UI.Notifications;
+        var toastNotifier = notifications.ToastNotificationManager.createToastNotifier();
+        
+        toastNotificationService.sendTextNotification = function (text) {
+            var template = notifications.ToastTemplateType.toastText01;
+            var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
+
+            var toastTextElements = toastXml.getElementsByTagName('text');
+            toastTextElements[0].appendChild(toastXml.createTextNode(text));
+
+            var toast = new notifications.ToastNotification(toastXml);
+            toastNotifier.show(toast);
+        };
+
+        toastNotificationService.sendTitleAndTextNotification = function (title, text) {
+            var template = notifications.ToastTemplateType.toastText02;
+            var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
+
+            var toastTextElements = toastXml.getElementsByTagName('text');
+            toastTextElements[0].appendChild(toastXml.createTextNode(title));
+            toastTextElements[1].appendChild(toastXml.createTextNode(text));
+
+            var toast = new notifications.ToastNotification(toastXml);
+            toastNotifier.show(toast);
+        };
+
+        toastNotificationService.sendImageAndTextNotification = function (image, text) {
+            var template = notifications.ToastTemplateType.toastImageAndText01;
+            var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
+
+            var toastImageElements = toastXml.getElementsByTagName('image');
+            toastImageElements[0].setAttribute('src', image);
+
+            var toastTextElements = toastXml.getElementsByTagName('text');
+            toastTextElements[0].appendChild(toastXml.createTextNode(text));
+
+            var toast = new notifications.ToastNotification(toastXml);
+            toastNotifier.show(toast);
+        };
+
+        return toastNotificationService;
     });

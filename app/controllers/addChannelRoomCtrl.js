@@ -1,5 +1,5 @@
 angular.module('modern-gitter')
-    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
+    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
         // properties
         $scope.owners = [];
         $scope.permissions = [
@@ -21,6 +21,7 @@ angular.module('modern-gitter')
 
         $scope.createRoom = function () {
             RoomsService.createChannel($scope.channel, function (room) {
+                ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created');
                 RoomsService.selectRoom(room);
                 $state.go('room');
             });
