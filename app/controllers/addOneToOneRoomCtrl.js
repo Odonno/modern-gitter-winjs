@@ -9,6 +9,10 @@ angular.module('modern-gitter')
             if ($scope.username) {
                 ApiService.searchUsers($scope.username, 50).then(function (users) {
                     $scope.users = users.results;
+
+                    setTimeout(function () {
+                        $scope.usersWinControl.forceLayout();
+                    }, 500);
                 });
             }
         });

@@ -10,5 +10,9 @@ angular.module('modern-gitter')
         // watch events
         $scope.$watch('repositories', function () {
             $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
+            
+            setTimeout(function() {
+                $scope.repositoriesWinControl.forceLayout();
+            }, 500);
         }, true);
     });

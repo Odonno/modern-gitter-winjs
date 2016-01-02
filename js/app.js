@@ -67,6 +67,10 @@ angular.module('modern-gitter')
             if ($scope.username) {
                 ApiService.searchUsers($scope.username, 50).then(function (users) {
                     $scope.users = users.results;
+
+                    setTimeout(function () {
+                        $scope.usersWinControl.forceLayout();
+                    }, 500);
                 });
             }
         });
@@ -83,6 +87,10 @@ angular.module('modern-gitter')
         // watch events
         $scope.$watch('repositories', function () {
             $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
+            
+            setTimeout(function() {
+                $scope.repositoriesWinControl.forceLayout();
+            }, 500);
         }, true);
     });
 angular.module('modern-gitter')
