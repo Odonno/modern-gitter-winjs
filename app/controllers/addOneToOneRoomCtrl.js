@@ -1,8 +1,18 @@
 angular.module('modern-gitter')
-    .controller('AddOneToOneRoomCtrl', function ($scope, ApiService) {
+    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
         // properties
         $scope.username = '';
         $scope.users = [];
+        $scope.selection = [];
+        
+        // methods
+        $scope.createRoom = function () {
+            var selectedUser = $scope.users[$scope.selection[0]];
+            RoomsService.createRoom(selectedUser.username, function (room) {
+                RoomsService.selectRoom(room);
+                $state.go('room');
+            });
+        };
         
         // watch events
         $scope.$watch('username', function () {

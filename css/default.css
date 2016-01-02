@@ -167,6 +167,11 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* add a room - one to one view style */
+#oneToOneHeader {
+	max-width: 100%;
+	margin-bottom: 6px;
+}
+
 #usersListView {
 	height: calc(100vh - 220px);
 }
