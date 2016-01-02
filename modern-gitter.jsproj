@@ -98,6 +98,9 @@
     <Content Include="dist\winstrap\fonts\selawksb.ttf" />
     <Content Include="dist\winstrap\fonts\selawksl.eot" />
     <Content Include="dist\winstrap\fonts\selawksl.ttf" />
+    <Content Include="dist\winstrap\js\bootstrap.min.js" />
+    <Content Include="dist\winstrap\js\jquery.min.js" />
+    <Content Include="dist\winstrap\js\winstrap.js" />
     <Content Include="images\scale-200\SplashScreen.png" />
     <Content Include="images\scale-200\Square150x150Logo.png" />
     <Content Include="images\scale-200\Square310x310Logo.png" />
