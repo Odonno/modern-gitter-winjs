@@ -57,6 +57,13 @@ angular.module('modern-gitter')
                 callback(room);
             });
         };
+        
+        roomsService.createChannel = function (channel, callback) {
+            ApiService.createChannel(channel).then(room => {
+                addRoom(room);
+                callback(room);
+            });
+        };
 
         // initialize service 
         if (NetworkService.internetAvailable) {

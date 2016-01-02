@@ -1,11 +1,11 @@
 ﻿<!-- owner of this new room -->
 <h3 class="win-h3 channel-form-title">Owner</h3>
-<div class="dropdown">
+<div class="dropdown" style="margin-top: 12px;">
     <button id="dropdown-owner" class="btn btn-dropdown dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
         <span ng-hide="channel.owner">Select an owner</span>
         <span ng-show="channel.owner">
-            <img class="owner-image" ng-src="{{ channel.owner.avatarUrlSmall }}" />
-            <span>{{ channel.owner.username }}</span>
+            <img class="owner-image" ng-src="{{ channel.owner.image }}" />
+            <span>{{ channel.owner.name }}</span>
         </span>
         <span class="caret"></span>
     </button>
@@ -13,8 +13,8 @@
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-owner">
         <li ng-repeat="owner in owners">
             <a ng-click="selectOwner(owner)">
-                <img class="owner-image" ng-src="{{ owner.avatarUrlSmall }}" />
-                <span>{{ owner.username }}</span>
+                <img class="owner-image" ng-src="{{ owner.image }}" />
+                <span>{{ owner.name }}</span>
             </a>
         </li>
     </ul>
@@ -22,29 +22,29 @@
 
 <!-- room name -->
 <h3 class="win-h3 channel-form-title">Room name</h3>
-<input id="channel-name" type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" />
+<input id="channel-name" type="text" placeholder="Required (letters and numbers only)" class="form-control" ng-model="channel.name" style="margin-top: 12px;" />
 
 <!-- permissions of the new room -->
 <h3 class="win-h3 channel-form-title">Permissions</h3>
 <div class="form-group">
-    <div class="radio">
+    <div class="radio" ng-repeat="permission in permissions">
         <label>
-            <input type="radio" name="radioPermissions">
+            <input type="radio" name="radioPermissions" ng-model="channel.permission" ng-value="permission.name">
             <span>
-                <b>Public</b>
-                <div>Anyone in the world can join.</div>
+                <b>{{ permission.name }}</b>
+                <div>{{ permission.description }}</div>
             </span>
         </label>
     </div>
-    <div class="radio">
+    <div class="radio" ng-show="channel.owner.org">
         <label>
-            <input type="radio" name="radioPermissions">
+            <input type="radio" name="radioPermissions" ng-model="channel.permission" value="Organisation">
             <span>
-                <b>Private</b>
-                <div>Only people added to the room can join.</div>
+                <b>Organisation</b>
+                <div>Anyone in <b>{{ channel.owner.name }}</b> can join. </div>
             </span>
         </label>
     </div>
 </div>
 
-<button class="btn">Create channel room</button>
+<button class="btn" ng-click="createRoom()">Create channel room</button>

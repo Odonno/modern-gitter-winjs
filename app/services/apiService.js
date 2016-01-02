@@ -35,6 +35,45 @@ angular.module('modern-gitter')
             });
         };
 
+        apiService.createChannel = function (channel) {
+            return new Promise((done, error) => {
+                if (channel.owner.org) {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: ConfigService.baseUrl + "private/channels/",
+                        data: JSON.stringify({
+                            name: channel.name,
+                            security: channel.permission.toUpperCase(),
+                            ownerUri: channel.owner.name
+                        }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                } else {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
+                        data: JSON.stringify({
+                            name: channel.name,
+                            security: channel.permission.toUpperCase()
+                        }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                }
+            });
+        };
+
         apiService.deleteRoom = function (roomId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
@@ -102,6 +141,22 @@ angular.module('modern-gitter')
                     }
                 }).then(function (success) {
                     done(JSON.parse(success.response)[0]);
+                });
+            });
+        };
+
+        apiService.getOrganizations = function (userId) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user/" + userId + "/orgs",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
                 });
             });
         };

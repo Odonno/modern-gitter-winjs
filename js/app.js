@@ -1,4 +1,4 @@
-angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
+﻿angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/home');
 
@@ -41,19 +41,50 @@ angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
             });
     });
 angular.module('modern-gitter')
-    .controller('AddChannelRoomCtrl', function ($scope, ApiService) {
+    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService) {
         // properties
         $scope.owners = [];
+        $scope.permissions = [
+            {
+                name: "Public",
+                description: "Anyone in the world can join."
+            },
+            {
+                name: "Private",
+                description: "Only people added to the room can join."
+            }
+        ];
         $scope.channel = {};
         
         // methods
         $scope.selectOwner = function (owner) {
             $scope.channel.owner = owner;
         };
+
+        $scope.createRoom = function () {
+            RoomsService.createChannel($scope.channel, function (room) {
+                RoomsService.selectRoom(room);
+                $state.go('room');
+            });
+        };
         
         // initialize controller
         ApiService.getCurrentUser().then(function (user) {
-            $scope.owners.push(user);
+            $scope.owners.push({
+                name: user.username,
+                image: user.avatarUrlSmall,
+                org: false
+            });
+
+            ApiService.getOrganizations(user.id).then(function (orgs) {
+                for (var i = 0; i < orgs.length; i++) {
+                    $scope.owners.push({
+                        name: orgs[i].name,
+                        image: orgs[i].avatar_url,
+                        org: true
+                    });
+                }
+            });
         });
     });
 angular.module('modern-gitter')
@@ -290,6 +321,45 @@ angular.module('modern-gitter')
             });
         };
 
+        apiService.createChannel = function (channel) {
+            return new Promise((done, error) => {
+                if (channel.owner.org) {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: ConfigService.baseUrl + "private/channels/",
+                        data: JSON.stringify({
+                            name: channel.name,
+                            security: channel.permission.toUpperCase(),
+                            ownerUri: channel.owner.name
+                        }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                } else {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
+                        data: JSON.stringify({
+                            name: channel.name,
+                            security: channel.permission.toUpperCase()
+                        }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                }
+            });
+        };
+
         apiService.deleteRoom = function (roomId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
@@ -357,6 +427,22 @@ angular.module('modern-gitter')
                     }
                 }).then(function (success) {
                     done(JSON.parse(success.response)[0]);
+                });
+            });
+        };
+
+        apiService.getOrganizations = function (userId) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user/" + userId + "/orgs",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
                 });
             });
         };
@@ -652,6 +738,13 @@ angular.module('modern-gitter')
 
         roomsService.createRoom = function (name, callback) {
             ApiService.joinRoom(name).then(room => {
+                addRoom(room);
+                callback(room);
+            });
+        };
+        
+        roomsService.createChannel = function (channel, callback) {
+            ApiService.createChannel(channel).then(room => {
                 addRoom(room);
                 callback(room);
             });
