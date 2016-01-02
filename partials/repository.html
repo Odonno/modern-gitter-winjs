@@ -2,10 +2,10 @@
 <win-list-view id="repositoriesListView" item-data-source="repositoriesWithoutRoom" win-control="repositoriesWinControl">
     <!-- repository template -->
     <win-item-template>
-        <div class="clickable" style="width: 200px; height: 200px; padding: 6px;">
-            <img ng-src="{{ item.data.avatar_url }}" style="max-width: 100px; max-height: 100px;" />
-            <h5 class="win-h5" style="margin-top: 6px; padding-top: 0px;">{{ item.data.name }}</h5>
-            <em style="font-size: 12px;">{{ item.data.description }}</em>
+        <div class="repository clickable">
+            <img class="repository-image" ng-src="{{ item.data.avatar_url }}" />
+            <h5 class="win-h5 repository-name">{{ item.data.name }}</h5>
+            <em class="repository-description">{{ item.data.description }}</em>
         </div>
     </win-item-template>
 

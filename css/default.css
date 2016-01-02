@@ -125,10 +125,34 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	height: calc(100vh - 60px);
 }
 
+/* add a room - repository view style */
 #repositoriesListView {
 	height: calc(100vh - 180px);
 }
 
+.repository {
+	width: 200px;
+	height: 200px;
+	padding: 6px;
+}
+
+.repository-image {
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.repository-name {
+	margin-top: 6px;
+	padding-top: 0px;
+}
+
+.repository-description {
+	font-size: 12px;
+}
+
+/* add a room - channel view style */
+
+/* add a room - one to one view style */
 #usersListView {
 	height: calc(100vh - 220px);
 }
