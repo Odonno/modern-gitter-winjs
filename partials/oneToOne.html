@@ -5,7 +5,7 @@
 <win-list-view id="usersListView" item-data-source="users" win-control="usersWinControl">
     <!-- user template -->
     <win-item-template>
-        <div style="width: 150px; height: 150px;">
+        <div class="clickable" style="width: 150px; height: 150px; padding: 6px;">
             <img ng-src="{{ item.data.avatarUrlSmall }}" style="max-width: 100px; max-height: 100px;" />
             <h5 class="win-h5" style="margin-top: 6px; padding-top: 0px;">{{ item.data.username }}</h5>
             <em style="font-size: 12px;" ng-show="item.data.username !== item.data.displayName">{{ item.data.displayName }}</em>

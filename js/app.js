@@ -64,7 +64,7 @@ angular.module('modern-gitter')
         
         // watch events
         $scope.$watch('username', function () {
-            if ($scope.username) {
+            if ($scope.username && $scope.username.length > 0) {
                 ApiService.searchUsers($scope.username, 50).then(function (users) {
                     $scope.users = users.results;
 

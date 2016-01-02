@@ -53,6 +53,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     border: none;
 }
 
+.clickable:hover {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
 /* button style */
 .btn {
     min-width: 0;
