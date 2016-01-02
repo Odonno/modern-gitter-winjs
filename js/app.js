@@ -25,8 +25,18 @@
             });
     });
 angular.module('modern-gitter')
-    .controller('AddRoomCtrl', function ($scope) {
+    .controller('AddRoomCtrl', function ($scope, $filter, ApiService) {
+        // initialize controller
+        ApiService.getCurrentUser().then(function (user) {
+            ApiService.getRepositories(user.id).then(function (repositories) {
+                $scope.repositories = repositories;
+            });
+        });
         
+        // watch events
+        $scope.$watch('repositories', function () {
+            $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
+        }, true);
     });
 angular.module('modern-gitter')
     .controller('HomeCtrl', function ($scope, RoomsService) {
@@ -150,6 +160,22 @@ angular.module('modern-gitter')
                 });
             });
         };
+        
+        apiService.deleteRoom = function(roomId) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'DELETE',
+                    url: ConfigService.baseUrl + "rooms/" + roomId,
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
 
         apiService.getMessages = function (roomId, beforeId) {
             return new Promise((done, error) => {
@@ -179,6 +205,38 @@ angular.module('modern-gitter')
                     type: 'POST',
                     url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
                     data: JSON.stringify({ text: text }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
+        
+        apiService.getCurrentUser = function() {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user/",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response)[0]);
+                });
+            });
+        };
+        
+        apiService.getRepositories = function(userId) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: ConfigService.baseUrl + "user/" + userId + "/repos",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
