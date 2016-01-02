@@ -76,7 +76,19 @@ angular.module('modern-gitter')
         });
     });
 angular.module('modern-gitter')
-    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, ApiService) {
+    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService) {
+        // properties
+        $scope.selection = [];
+        
+        // methods
+        $scope.createRoom = function () {
+            var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
+            RoomsService.createRoom(repository.uri, function (room) {
+                RoomsService.selectRoom(room);
+                $state.go('room');
+            });
+        };
+        
         // initialize controller
         ApiService.getCurrentUser().then(function (user) {
             ApiService.getRepositories(user.id).then(function (repositories) {
@@ -87,8 +99,8 @@ angular.module('modern-gitter')
         // watch events
         $scope.$watch('repositories', function () {
             $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 $scope.repositoriesWinControl.forceLayout();
             }, 500);
         }, true);
@@ -250,8 +262,25 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.deleteRoom = function(roomId) {
+
+        apiService.joinRoom = function (name) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'POST',
+                    url: ConfigService.baseUrl + "rooms",
+                    data: JSON.stringify({ uri: name }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
+
+        apiService.deleteRoom = function (roomId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'DELETE',
@@ -305,8 +334,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.getCurrentUser = function() {
+
+        apiService.getCurrentUser = function () {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
@@ -321,8 +350,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.getRepositories = function(userId) {
+
+        apiService.getRepositories = function (userId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
@@ -337,8 +366,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.searchUsers = function(query, limit) {
+
+        apiService.searchUsers = function (query, limit) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
@@ -608,6 +637,28 @@ angular.module('modern-gitter')
             if (roomsService.onroomselected) {
                 roomsService.onroomselected();
             }
+        };
+
+        roomsService.createRoom = function (name, callback) {
+            ApiService.joinRoom(name).then(room => {
+                // compute room image
+                if (room.user) {
+                    room.image = room.user.avatarUrlMedium;
+                } else {
+                    room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+                }
+                
+                // subscribe to realtime messages
+                RealtimeApiService.subscribe(room.id, function (roomId, message) {
+                    if (roomsService.onmessagereceived) {
+                        roomsService.onmessagereceived(roomId, message);
+                    }
+                    // TODO : send notification
+                });
+                
+                roomsService.rooms.push(room);
+                callback(room);
+            });
         };
 
         // initialize service 

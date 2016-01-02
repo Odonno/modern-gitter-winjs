@@ -1,5 +1,5 @@
 ﻿<!-- list view of repositories without room -->
-<win-list-view id="repositoriesListView" item-data-source="repositoriesWithoutRoom" win-control="repositoriesWinControl">
+<win-list-view id="repositoriesListView" item-data-source="repositoriesWithoutRoom" selection-mode="'single'" tap-behavior="'directSelect'" selection="selection" win-control="repositoriesWinControl">
     <!-- repository template -->
     <win-item-template>
         <div class="repository clickable">
@@ -12,4 +12,4 @@
     <win-grid-layout></win-grid-layout>
 </win-list-view>
 
-<button class="btn">Create project room</button>
+<button class="btn" ng-disabled="selection.length !== 1" ng-click="createRoom()">Create project room</button>

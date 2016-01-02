@@ -17,8 +17,25 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.deleteRoom = function(roomId) {
+
+        apiService.joinRoom = function (name) {
+            return new Promise((done, error) => {
+                WinJS.xhr({
+                    type: 'POST',
+                    url: ConfigService.baseUrl + "rooms",
+                    data: JSON.stringify({ uri: name }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + OAuthService.refreshToken
+                    }
+                }).then(function (success) {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
+
+        apiService.deleteRoom = function (roomId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'DELETE',
@@ -72,8 +89,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.getCurrentUser = function() {
+
+        apiService.getCurrentUser = function () {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
@@ -88,8 +105,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.getRepositories = function(userId) {
+
+        apiService.getRepositories = function (userId) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
@@ -104,8 +121,8 @@ angular.module('modern-gitter')
                 });
             });
         };
-        
-        apiService.searchUsers = function(query, limit) {
+
+        apiService.searchUsers = function (query, limit) {
             return new Promise((done, error) => {
                 WinJS.xhr({
                     type: 'GET',

@@ -50,6 +50,28 @@ angular.module('modern-gitter')
             }
         };
 
+        roomsService.createRoom = function (name, callback) {
+            ApiService.joinRoom(name).then(room => {
+                // compute room image
+                if (room.user) {
+                    room.image = room.user.avatarUrlMedium;
+                } else {
+                    room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+                }
+                
+                // subscribe to realtime messages
+                RealtimeApiService.subscribe(room.id, function (roomId, message) {
+                    if (roomsService.onmessagereceived) {
+                        roomsService.onmessagereceived(roomId, message);
+                    }
+                    // TODO : send notification
+                });
+                
+                roomsService.rooms.push(room);
+                callback(room);
+            });
+        };
+
         // initialize service 
         if (NetworkService.internetAvailable) {
             roomsService.initialize();
