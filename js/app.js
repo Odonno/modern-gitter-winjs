@@ -285,6 +285,21 @@ var Application;
 (function (Application) {
     var Services;
     (function (Services) {
+        var FeatureToggleService = (function () {
+            function FeatureToggleService() {
+                this.isWindowsApp = function () {
+                    return Windows !== undefined;
+                };
+            }
+            return FeatureToggleService;
+        })();
+        Services.FeatureToggleService = FeatureToggleService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
         var NetworkService = (function () {
             function NetworkService() {
                 this.networkInformation = Windows.Networking.Connectivity.NetworkInformation;
@@ -868,6 +883,7 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
+appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
 appModule.service('NetworkService', function () { return new Application.Services.NetworkService(); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });

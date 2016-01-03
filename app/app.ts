@@ -4,6 +4,7 @@
 
 /// <reference path="./services/apiService.ts"/>
 /// <reference path="./services/configService.ts"/>
+/// <reference path="./services/featureToggleService.ts"/>
 /// <reference path="./services/networkService.ts"/>
 /// <reference path="./services/oauthService.ts"/>
 /// <reference path="./services/realtimeApiService.ts"/>
@@ -29,6 +30,7 @@ appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.u
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
+appModule.service('FeatureToggleService', () => new Application.Services.FeatureToggleService());
 appModule.service('NetworkService', () => new Application.Services.NetworkService());
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));
 appModule.service('RealtimeApiService', (OAuthService: Application.Services.OAuthService) => new Application.Services.RealtimeApiService(OAuthService));
