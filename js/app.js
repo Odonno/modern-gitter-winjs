@@ -188,6 +188,10 @@ angular.module('modern-gitter')
     });
 angular.module('modern-gitter')
     .controller('HomeCtrl', function ($scope, RoomsService) {
+        var currentPackage = Windows.ApplicationModel.Package.current;
+        
+        // properties
+        $scope.appVersion = currentPackage.id.version;
     });
 angular.module('modern-gitter')
     .controller('RoomCtrl', function ($scope, ApiService, RoomsService) {
@@ -274,6 +278,20 @@ angular.module('modern-gitter')
             $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
             $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
         });
+    });
+angular.module('modern-gitter')
+    .directive('ngEnter', function () {
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if (event.which === 13) {
+                    scope.$apply(function () {
+                        scope.$eval(attrs.ngEnter);
+                    });
+
+                    event.preventDefault();
+                }
+            });
+        };
     });
 angular.module('modern-gitter')
     .service('ApiService', function (ConfigService, OAuthService) {
@@ -817,18 +835,4 @@ angular.module('modern-gitter')
         };
 
         return toastNotificationService;
-    });
-angular.module('modern-gitter')
-    .directive('ngEnter', function () {
-        return function (scope, element, attrs) {
-            element.bind("keydown keypress", function (event) {
-                if (event.which === 13) {
-                    scope.$apply(function () {
-                        scope.$eval(attrs.ngEnter);
-                    });
-
-                    event.preventDefault();
-                }
-            });
-        };
     });

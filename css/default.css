@@ -110,6 +110,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	overflow-y: auto;
 }
 
+#app-version {
+	margin-bottom: 12px;
+}
+
 #me-circle {
 	width: 200px;
 	height: 200px;
