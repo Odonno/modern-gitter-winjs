@@ -784,10 +784,16 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var HomeCtrl = (function () {
-            function HomeCtrl($scope, RoomsService) {
+            function HomeCtrl($scope, RoomsService, FeatureToggleService) {
                 this.scope = $scope;
-                var currentPackage = Windows.ApplicationModel.Package.current;
-                this.scope.appVersion = currentPackage.id.version;
+                if (FeatureToggleService.isWindowsApp()) {
+                    var currentPackage = Windows.ApplicationModel.Package.current;
+                    var packageVersion = currentPackage.id.version;
+                    this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
+                }
+                else {
+                    this.scope.appVersion = 'web';
+                }
             }
             return HomeCtrl;
         })();
@@ -894,6 +900,6 @@ appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService,
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });
-appModule.controller('HomeCtrl', function ($scope, RoomsService) { return new Application.Controllers.HomeCtrl($scope, RoomsService); });
+appModule.controller('HomeCtrl', function ($scope, RoomsService, FeatureToggleService) { return new Application.Controllers.HomeCtrl($scope, RoomsService, FeatureToggleService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });
