@@ -30,6 +30,7 @@ angular.module('modern-gitter')
         // initialize controller
         ApiService.getCurrentUser().then(function (user) {
             $scope.owners.push({
+                id: user.id,
                 name: user.username,
                 image: user.avatarUrlSmall,
                 org: false
@@ -38,6 +39,7 @@ angular.module('modern-gitter')
             ApiService.getOrganizations(user.id).then(function (orgs) {
                 for (var i = 0; i < orgs.length; i++) {
                     $scope.owners.push({
+                        id: orgs[i].id,
                         name: orgs[i].name,
                         image: orgs[i].avatar_url,
                         org: true

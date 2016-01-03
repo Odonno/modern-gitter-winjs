@@ -1,5 +1,5 @@
 angular.module('modern-gitter')
-    .service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService) {
+    .service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
         var roomsService = this;
 
         // properties
@@ -20,7 +20,9 @@ angular.module('modern-gitter')
                 if (roomsService.onmessagereceived) {
                     roomsService.onmessagereceived(roomId, message);
                 }
-                // TODO : send notification
+                
+                // send notification
+                ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
             });
 
             roomsService.rooms.push(room);
