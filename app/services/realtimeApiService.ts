@@ -9,9 +9,9 @@ module Application.Services {
 
         public initialize() {
             return new Promise((done, error) => {
-                var ClientAuthExt = function() { };
+                var ClientAuthExt = () => { };
 
-                ClientAuthExt.prototype.outgoing = function(message, callback) {
+                ClientAuthExt.prototype.outgoing = (message, callback) => {
                     if (message.channel == '/meta/handshake') {
                         if (!message.ext) {
                             message.ext = {};
@@ -22,7 +22,7 @@ module Application.Services {
                     callback(message);
                 };
 
-                ClientAuthExt.prototype.incoming = function(message, callback) {
+                ClientAuthExt.prototype.incoming = (message, callback) => {
                     if (message.channel == '/meta/handshake') {
                         if (message.successful) {
                             console.log('Successfuly subscribed');
@@ -43,7 +43,7 @@ module Application.Services {
 
         public subscribe(roomId, callback) {
             // subscribe to realtime messages
-            this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function(response) {
+            this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', (response) => {
                 var message = response.model;
                 callback(roomId, message);
             });

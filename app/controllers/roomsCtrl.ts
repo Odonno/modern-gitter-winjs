@@ -1,18 +1,26 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) {
-        $scope.rooms = RoomsService.rooms;
+module Application.Controllers {
+    export class RoomsCtrl {
+        private scope: any;
 
-        // methods
-        $scope.selectRoom = function (room) {
-            RoomsService.selectRoom(room);
-            $state.go('room');
-        };
+        constructor($scope, $filter, $state, RoomsService) {
+            this.scope = $scope;
+            
+            // properties
+            this.scope.rooms = RoomsService.rooms;
 
-        // watch events
-        $scope.$watchGroup(['rooms', 'search'], function () {
-            $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
-            $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
-        });
-    });
+            // methods
+            this.scope.selectRoom = (room) => {
+                RoomsService.selectRoom(room);
+                $state.go('room');
+            };
+
+            // watch events
+            this.scope.$watchGroup(['rooms', 'search'], () => {
+                this.scope.filteredRooms = $filter('filter')(this.scope.rooms, { name: this.scope.search });
+                this.scope.filteredRooms = $filter('orderBy')(this.scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+            });
+        }
+    }
+}

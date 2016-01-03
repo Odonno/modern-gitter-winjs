@@ -17,7 +17,7 @@ module Application.Services {
         }
 
         public statusChanged(callback) {
-            this.networkInformation.onnetworkstatuschanged = function(ev) {
+            this.networkInformation.onnetworkstatuschanged = (ev) => {
                 callback(this.currentStatus());
             };
         };

@@ -70,7 +70,7 @@ module Application.Services {
         };
 
         private authenticate() {
-            return new Promise(function(complete, error) {
+            return new Promise((complete, error) => {
                 let oauthUrl = this.ConfigService.authUri;
                 let clientId = this.ConfigService.clientId;
                 let redirectUrl = this.ConfigService.redirectUri;

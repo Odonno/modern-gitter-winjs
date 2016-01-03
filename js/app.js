@@ -297,8 +297,9 @@ var Application;
                 return this.internetAvailable;
             };
             NetworkService.prototype.statusChanged = function (callback) {
+                var _this = this;
                 this.networkInformation.onnetworkstatuschanged = function (ev) {
-                    callback(this.currentStatus());
+                    callback(_this.currentStatus());
                 };
             };
             ;
@@ -373,10 +374,11 @@ var Application;
             };
             ;
             OAuthService.prototype.authenticate = function () {
+                var _this = this;
                 return new Promise(function (complete, error) {
-                    var oauthUrl = this.ConfigService.authUri;
-                    var clientId = this.ConfigService.clientId;
-                    var redirectUrl = this.ConfigService.redirectUri;
+                    var oauthUrl = _this.ConfigService.authUri;
+                    var clientId = _this.ConfigService.clientId;
+                    var redirectUrl = _this.ConfigService.redirectUri;
                     var requestUri = new Windows.Foundation.Uri(oauthUrl + "?client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUrl) + "&response_type=code&access_type=offline");
                     var callbackUri = new Windows.Foundation.Uri(redirectUrl);
                     Windows.Security.Authentication.Web.WebAuthenticationBroker.
@@ -433,7 +435,7 @@ var Application;
                             if (!message.ext) {
                                 message.ext = {};
                             }
-                            message.ext.token = this.OAuthService.refreshToken;
+                            message.ext.token = _this.OAuthService.refreshToken;
                         }
                         callback(message);
                     };
@@ -472,6 +474,7 @@ var Application;
     (function (Services) {
         var RoomsService = (function () {
             function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
+                var _this = this;
                 this.OAuthService = OAuthService;
                 this.NetworkService = NetworkService;
                 this.ApiService = ApiService;
@@ -483,12 +486,13 @@ var Application;
                     this.initialize();
                 }
                 this.NetworkService.statusChanged(function () {
-                    if (!this.initialized && this.NetworkService.internetAvailable) {
-                        this.initialize();
+                    if (!_this.initialized && _this.NetworkService.internetAvailable) {
+                        _this.initialize();
                     }
                 });
             }
             RoomsService.prototype.addRoom = function (room) {
+                var _this = this;
                 if (room.user) {
                     room.image = room.user.avatarUrlMedium;
                 }
@@ -496,10 +500,10 @@ var Application;
                     room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
                 }
                 this.RealtimeApiService.subscribe(room.id, function (roomId, message) {
-                    if (this.onmessagereceived) {
-                        this.onmessagereceived(roomId, message);
+                    if (_this.onmessagereceived) {
+                        _this.onmessagereceived(roomId, message);
                     }
-                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                    _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
                 });
                 this.rooms.push(room);
             };
@@ -624,6 +628,242 @@ var Application;
         Directives.NgEnter = NgEnter;
     })(Directives = Application.Directives || (Application.Directives = {}));
 })(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AddChannelRoomCtrl = (function () {
+            function AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.owners = [];
+                this.scope.permissions = [
+                    {
+                        name: "Public",
+                        description: "Anyone in the world can join."
+                    },
+                    {
+                        name: "Private",
+                        description: "Only people added to the room can join."
+                    }
+                ];
+                this.scope.channel = {};
+                this.scope.selectOwner = function (owner) {
+                    _this.scope.channel.owner = owner;
+                };
+                this.scope.createRoom = function () {
+                    RoomsService.createChannel(_this.scope.channel, function (room) {
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created');
+                        RoomsService.selectRoom(room);
+                        $state.go('room');
+                    });
+                };
+                ApiService.getCurrentUser().then(function (user) {
+                    _this.scope.owners.push({
+                        id: user.id,
+                        name: user.username,
+                        image: user.avatarUrlSmall,
+                        org: false
+                    });
+                    ApiService.getOrganizations(user.id).then(function (orgs) {
+                        for (var i = 0; i < orgs.length; i++) {
+                            _this.scope.owners.push({
+                                id: orgs[i].id,
+                                name: orgs[i].name,
+                                image: orgs[i].avatar_url,
+                                org: true
+                            });
+                        }
+                    });
+                });
+            }
+            return AddChannelRoomCtrl;
+        })();
+        Controllers.AddChannelRoomCtrl = AddChannelRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AddOneToOneRoomCtrl = (function () {
+            function AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.username = '';
+                this.scope.users = [];
+                this.scope.selection = [];
+                this.scope.createRoom = function () {
+                    var selectedUser = _this.scope.users[_this.scope.selection[0]];
+                    RoomsService.createRoom(selectedUser.username, function (room) {
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name);
+                        RoomsService.selectRoom(room);
+                        $state.go('room');
+                    });
+                };
+                this.scope.$watch('username', function () {
+                    if (_this.scope.username && _this.scope.username.length > 0) {
+                        ApiService.searchUsers(_this.scope.username, 50).then(function (users) {
+                            _this.scope.users = users;
+                            setTimeout(function () {
+                                _this.scope.usersWinControl.forceLayout();
+                            }, 500);
+                        });
+                    }
+                });
+            }
+            return AddOneToOneRoomCtrl;
+        })();
+        Controllers.AddOneToOneRoomCtrl = AddOneToOneRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AddRepositoryRoomCtrl = (function () {
+            function AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.selection = [];
+                this.scope.createRoom = function () {
+                    var repository = _this.scope.repositoriesWithoutRoom[_this.scope.selection[0]];
+                    RoomsService.createRoom(repository.uri, function (room) {
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
+                        RoomsService.selectRoom(room);
+                        $state.go('room');
+                    });
+                };
+                ApiService.getCurrentUser().then(function (user) {
+                    ApiService.getRepositories(user.id).then(function (repositories) {
+                        _this.scope.repositories = repositories;
+                    });
+                });
+                this.scope.$watch('repositories', function () {
+                    _this.scope.repositoriesWithoutRoom = $filter('filter')(_this.scope.repositories, { exists: false });
+                    setTimeout(function () {
+                        _this.scope.repositoriesWinControl.forceLayout();
+                    }, 500);
+                }, true);
+            }
+            return AddRepositoryRoomCtrl;
+        })();
+        Controllers.AddRepositoryRoomCtrl = AddRepositoryRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AddRoomCtrl = (function () {
+            function AddRoomCtrl($scope) {
+                this.scope = $scope;
+            }
+            return AddRoomCtrl;
+        })();
+        Controllers.AddRoomCtrl = AddRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var HomeCtrl = (function () {
+            function HomeCtrl($scope, RoomsService) {
+                this.scope = $scope;
+                var currentPackage = Windows.ApplicationModel.Package.current;
+                this.scope.appVersion = currentPackage.id.version;
+            }
+            return HomeCtrl;
+        })();
+        Controllers.HomeCtrl = HomeCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var RoomCtrl = (function () {
+            function RoomCtrl($scope, ApiService, RoomsService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.hideProgress = true;
+                this.scope.room = RoomsService.currentRoom;
+                this.scope.messages = [];
+                this.scope.sendMessage = function () {
+                    if (_this.scope.textMessage) {
+                        ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
+                            _this.scope.textMessage = '';
+                        });
+                    }
+                    else {
+                        console.error('textMessage is empty');
+                    }
+                };
+                if (!this.scope.room) {
+                    console.error('no room selected...');
+                    return;
+                }
+                RoomsService.onmessagereceived = function (roomId, message) {
+                    if (_this.scope.room && _this.scope.room.id === roomId) {
+                        _this.scope.messages.push(message);
+                    }
+                };
+                ApiService.getMessages(this.scope.room.id).then(function (messages) {
+                    _this.scope.messages = messages;
+                    _this.scope.messagesWinControl.forceLayout();
+                    setTimeout(function () {
+                        _this.scope.messagesWinControl.ensureVisible(_this.scope.messages.length - 1);
+                        _this.scope.hideProgress = false;
+                        _this.scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
+                            var visible = ev.detail.visible;
+                            if (visible && _this.scope.messages.length > 0) {
+                                var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
+                                ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
+                                    if (beforeMessages.length === 0) {
+                                        _this.scope.hideProgress = true;
+                                        return;
+                                    }
+                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                        _this.scope.messages.unshift(beforeMessages[i]);
+                                    }
+                                    setTimeout(function () {
+                                        _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                                    }, 250);
+                                });
+                            }
+                        };
+                    }, 500);
+                });
+            }
+            return RoomCtrl;
+        })();
+        Controllers.RoomCtrl = RoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var RoomsCtrl = (function () {
+            function RoomsCtrl($scope, $filter, $state, RoomsService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.rooms = RoomsService.rooms;
+                this.scope.selectRoom = function (room) {
+                    RoomsService.selectRoom(room);
+                    $state.go('room');
+                };
+                this.scope.$watchGroup(['rooms', 'search'], function () {
+                    _this.scope.filteredRooms = $filter('filter')(_this.scope.rooms, { name: _this.scope.search });
+                    _this.scope.filteredRooms = $filter('orderBy')(_this.scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+                });
+            }
+            return RoomsCtrl;
+        })();
+        Controllers.RoomsCtrl = RoomsCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
@@ -634,187 +874,10 @@ appModule.service('RealtimeApiService', function (OAuthService) { return new App
 appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService); });
 appModule.service('ToastNotificationService', function () { return new Application.Services.ToastNotificationService(); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
-angular.module('modern-gitter')
-    .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-    $scope.owners = [];
-    $scope.permissions = [
-        {
-            name: "Public",
-            description: "Anyone in the world can join."
-        },
-        {
-            name: "Private",
-            description: "Only people added to the room can join."
-        }
-    ];
-    $scope.channel = {};
-    $scope.selectOwner = function (owner) {
-        $scope.channel.owner = owner;
-    };
-    $scope.createRoom = function () {
-        RoomsService.createChannel($scope.channel, function (room) {
-            ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created');
-            RoomsService.selectRoom(room);
-            $state.go('room');
-        });
-    };
-    ApiService.getCurrentUser().then(function (user) {
-        $scope.owners.push({
-            id: user.id,
-            name: user.username,
-            image: user.avatarUrlSmall,
-            org: false
-        });
-        ApiService.getOrganizations(user.id).then(function (orgs) {
-            for (var i = 0; i < orgs.length; i++) {
-                $scope.owners.push({
-                    id: orgs[i].id,
-                    name: orgs[i].name,
-                    image: orgs[i].avatar_url,
-                    org: true
-                });
-            }
-        });
-    });
-});
-angular.module('modern-gitter')
-    .controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-    $scope.username = '';
-    $scope.users = [];
-    $scope.selection = [];
-    $scope.createRoom = function () {
-        var selectedUser = $scope.users[$scope.selection[0]];
-        RoomsService.createRoom(selectedUser.username, function (room) {
-            ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name);
-            RoomsService.selectRoom(room);
-            $state.go('room');
-        });
-    };
-    $scope.$watch('username', function () {
-        if ($scope.username && $scope.username.length > 0) {
-            ApiService.searchUsers($scope.username, 50).then(function (users) {
-                $scope.users = users;
-                setTimeout(function () {
-                    $scope.usersWinControl.forceLayout();
-                }, 500);
-            });
-        }
-    });
-});
-angular.module('modern-gitter')
-    .controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
-    $scope.selection = [];
-    $scope.createRoom = function () {
-        var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
-        RoomsService.createRoom(repository.uri, function (room) {
-            ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
-            RoomsService.selectRoom(room);
-            $state.go('room');
-        });
-    };
-    ApiService.getCurrentUser().then(function (user) {
-        ApiService.getRepositories(user.id).then(function (repositories) {
-            $scope.repositories = repositories;
-        });
-    });
-    $scope.$watch('repositories', function () {
-        $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
-        setTimeout(function () {
-            $scope.repositoriesWinControl.forceLayout();
-        }, 500);
-    }, true);
-});
-angular.module('modern-gitter')
-    .controller('AddRoomCtrl', function ($scope, $filter, ApiService) {
-    $scope.username = '';
-    $scope.users = [];
-    $scope.owners = [];
-    $scope.channel = {};
-    $scope.selectOwner = function (owner) {
-        $scope.channel.owner = owner;
-    };
-    ApiService.getCurrentUser().then(function (user) {
-        $scope.owners.push(user);
-        ApiService.getRepositories(user.id).then(function (repositories) {
-            $scope.repositories = repositories;
-        });
-    });
-    $scope.$watch('repositories', function () {
-        $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
-    }, true);
-    $scope.$watch('username', function () {
-        if ($scope.username) {
-            ApiService.searchUsers($scope.username, 30).then(function (users) {
-                $scope.users = users.results;
-            });
-        }
-    });
-});
-angular.module('modern-gitter')
-    .controller('HomeCtrl', function ($scope, RoomsService) {
-    var currentPackage = Windows.ApplicationModel.Package.current;
-    $scope.appVersion = currentPackage.id.version;
-});
-angular.module('modern-gitter')
-    .controller('RoomCtrl', function ($scope, ApiService, RoomsService) {
-    $scope.hideProgress = true;
-    $scope.room = RoomsService.currentRoom;
-    $scope.messages = [];
-    $scope.sendMessage = function () {
-        if ($scope.textMessage) {
-            ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
-                $scope.textMessage = '';
-            });
-        }
-        else {
-            console.error('textMessage is empty');
-        }
-    };
-    if (!$scope.room) {
-        console.error('no room selected...');
-        return;
-    }
-    RoomsService.onmessagereceived = function (roomId, message) {
-        if ($scope.room && $scope.room.id === roomId) {
-            $scope.messages.push(message);
-        }
-    };
-    ApiService.getMessages($scope.room.id).then(function (messages) {
-        $scope.messages = messages;
-        $scope.messagesWinControl.forceLayout();
-        setTimeout(function () {
-            $scope.messagesWinControl.ensureVisible($scope.messages.length - 1);
-            $scope.hideProgress = false;
-            $scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
-                var visible = ev.detail.visible;
-                if (visible && $scope.messages.length > 0) {
-                    var lastVisible = $scope.messagesWinControl.indexOfLastVisible;
-                    ApiService.getMessages($scope.room.id, $scope.messages[0].id).then(function (beforeMessages) {
-                        if (beforeMessages.length === 0) {
-                            $scope.hideProgress = true;
-                            return;
-                        }
-                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                            $scope.messages.unshift(beforeMessages[i]);
-                        }
-                        setTimeout(function () {
-                            $scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                        }, 250);
-                    });
-                }
-            };
-        }, 500);
-    });
-});
-angular.module('modern-gitter')
-    .controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) {
-    $scope.rooms = RoomsService.rooms;
-    $scope.selectRoom = function (room) {
-        RoomsService.selectRoom(room);
-        $state.go('room');
-    };
-    $scope.$watchGroup(['rooms', 'search'], function () {
-        $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
-        $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
-    });
-});
+appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
+appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
+appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
+appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });
+appModule.controller('HomeCtrl', function ($scope, RoomsService) { return new Application.Controllers.HomeCtrl($scope, RoomsService); });
+appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
+appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });

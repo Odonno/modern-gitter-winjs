@@ -15,7 +15,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -32,7 +32,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -54,7 +54,7 @@ module Application.Services {
                             "Content-Type": "application/json",
                             "Authorization": "Bearer " + this.OAuthService.refreshToken
                         }
-                    }).then(function(success) {
+                    }).then((success) => {
                         done(JSON.parse(success.response));
                     });
                 } else {
@@ -70,7 +70,7 @@ module Application.Services {
                             "Content-Type": "application/json",
                             "Authorization": "Bearer " + this.OAuthService.refreshToken
                         }
-                    }).then(function(success) {
+                    }).then((success) => {
                         done(JSON.parse(success.response));
                     });
                 }
@@ -87,7 +87,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -109,7 +109,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -126,7 +126,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -142,7 +142,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response)[0]);
                 });
             });
@@ -158,7 +158,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -174,7 +174,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response));
                 });
             });
@@ -190,7 +190,7 @@ module Application.Services {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function(success) {
+                }).then((success) => {
                     done(JSON.parse(success.response).results);
                 });
             });

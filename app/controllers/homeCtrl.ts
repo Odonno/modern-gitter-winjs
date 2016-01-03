@@ -1,9 +1,16 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .controller('HomeCtrl', function ($scope, RoomsService) {
-        var currentPackage = Windows.ApplicationModel.Package.current;
+module Application.Controllers {
+    export class HomeCtrl {
+        private scope: any;
+
+        constructor($scope, RoomsService) {
+            this.scope = $scope;
+
+            var currentPackage = Windows.ApplicationModel.Package.current;
         
-        // properties
-        $scope.appVersion = currentPackage.id.version;
-    });
+            // properties
+            this.scope.appVersion = currentPackage.id.version;
+        }
+    }
+}

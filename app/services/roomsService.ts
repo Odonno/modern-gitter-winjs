@@ -7,6 +7,7 @@ module Application.Services {
         public currentRoom: any;
         public rooms = [];
         public onroomselected: any;
+        public onmessagereceived: any;
 
         constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
             // initialize service 
@@ -15,7 +16,7 @@ module Application.Services {
             }
 
             // check when internet status changed
-            this.NetworkService.statusChanged(function() {
+            this.NetworkService.statusChanged(() => {
                 if (!this.initialized && this.NetworkService.internetAvailable) {
                     this.initialize();
                 }
@@ -32,7 +33,7 @@ module Application.Services {
             }
                 
             // subscribe to realtime messages
-            this.RealtimeApiService.subscribe(room.id, function(roomId, message) {
+            this.RealtimeApiService.subscribe(room.id, (roomId, message) => {
                 if (this.onmessagereceived) {
                     this.onmessagereceived(roomId, message);
                 }
