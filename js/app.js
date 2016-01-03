@@ -584,49 +584,50 @@ var Application;
     var Services;
     (function (Services) {
         var ToastNotificationService = (function () {
-            function ToastNotificationService() {
-                this.notifications = Windows.UI.Notifications;
-                this.toastNotifier = this.notifications.ToastNotificationManager.createToastNotifier();
+            function ToastNotificationService(FeatureToggleService) {
+                if (FeatureToggleService.isWindowsApp()) {
+                    this.toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
+                }
             }
             ToastNotificationService.prototype.sendTextNotification = function (text) {
-                var template = this.notifications.ToastTemplateType.toastText01;
-                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var template = Windows.UI.Notifications.ToastTemplateType.toastText01;
+                var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                var toast = new this.notifications.ToastNotification(toastXml);
+                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
             ;
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text) {
-                var template = this.notifications.ToastTemplateType.toastText02;
-                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
+                var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(title));
                 toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                var toast = new this.notifications.ToastNotification(toastXml);
+                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
             ;
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text) {
-                var template = this.notifications.ToastTemplateType.toastImageAndText01;
-                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
+                var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
                 var toastImageElements = toastXml.getElementsByTagName('image');
                 toastImageElements[0].setAttribute('src', image);
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                var toast = new this.notifications.ToastNotification(toastXml);
+                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
             ;
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text) {
-                var template = this.notifications.ToastTemplateType.toastImageAndText02;
-                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
+                var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
                 var toastImageElements = toastXml.getElementsByTagName('image');
                 toastImageElements[0].setAttribute('src', image);
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(title));
                 toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                var toast = new this.notifications.ToastNotification(toastXml);
+                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
             ;
@@ -908,7 +909,7 @@ appModule.service('NetworkService', function (FeatureToggleService) { return new
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
 appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService); });
-appModule.service('ToastNotificationService', function () { return new Application.Services.ToastNotificationService(); });
+appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
