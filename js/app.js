@@ -288,7 +288,14 @@ var Application;
         var FeatureToggleService = (function () {
             function FeatureToggleService() {
                 this.isWindowsApp = function () {
-                    return Windows !== undefined;
+                    try {
+                        if (Windows) {
+                            return true;
+                        }
+                    }
+                    catch (e) {
+                        return false;
+                    }
                 };
             }
             return FeatureToggleService;
@@ -301,21 +308,28 @@ var Application;
     var Services;
     (function (Services) {
         var NetworkService = (function () {
-            function NetworkService() {
-                this.networkInformation = Windows.Networking.Connectivity.NetworkInformation;
+            function NetworkService(FeatureToggleService) {
+                this.FeatureToggleService = FeatureToggleService;
                 this.currentStatus();
             }
             NetworkService.prototype.currentStatus = function () {
-                var internetConnectionProfile = this.networkInformation.getInternetConnectionProfile();
-                var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-                this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-                return this.internetAvailable;
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    var internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
+                    var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                    this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                    return this.internetAvailable;
+                }
+                else {
+                    return true;
+                }
             };
             NetworkService.prototype.statusChanged = function (callback) {
                 var _this = this;
-                this.networkInformation.onnetworkstatuschanged = function (ev) {
-                    callback(_this.currentStatus());
-                };
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    Windows.Networking.Connectivity.NetworkInformation.onnetworkstatuschanged = function (ev) {
+                        callback(_this.currentStatus());
+                    };
+                }
             };
             ;
             return NetworkService;
@@ -890,7 +904,7 @@ appModule.config(function ($stateProvider, $urlRouterProvider) { return new Appl
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
-appModule.service('NetworkService', function () { return new Application.Services.NetworkService(); });
+appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
 appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService); });

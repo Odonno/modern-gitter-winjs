@@ -3,7 +3,14 @@
 module Application.Services {
     export class FeatureToggleService {
         public isWindowsApp = () => {
-            return Windows !== undefined;
+            try {
+                if (Windows) {
+                    return true;
+                }
+            }
+            catch (e) {
+                return false;
+            }
         };
     }
 }

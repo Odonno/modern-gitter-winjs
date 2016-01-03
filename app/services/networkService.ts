@@ -2,24 +2,29 @@
 
 module Application.Services {
     export class NetworkService {
-        private networkInformation = Windows.Networking.Connectivity.NetworkInformation;
         public internetAvailable: boolean;
 
-        constructor() {
+        constructor(private FeatureToggleService: Application.Services.FeatureToggleService) {
             this.currentStatus();
         }
 
         public currentStatus() {
-            var internetConnectionProfile = this.networkInformation.getInternetConnectionProfile();
-            var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-            this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-            return this.internetAvailable;
+            if (this.FeatureToggleService.isWindowsApp()) {
+                var internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
+                var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                return this.internetAvailable;
+            } else {
+                return true;
+            }
         }
 
         public statusChanged(callback) {
-            this.networkInformation.onnetworkstatuschanged = (ev) => {
-                callback(this.currentStatus());
-            };
+            if (this.FeatureToggleService.isWindowsApp()) {
+                Windows.Networking.Connectivity.NetworkInformation.onnetworkstatuschanged = (ev) => {
+                    callback(this.currentStatus());
+                };
+            }
         };
     }
 }
