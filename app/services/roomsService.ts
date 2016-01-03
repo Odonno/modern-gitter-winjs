@@ -1,15 +1,29 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
-        var roomsService = this;
-
+module Application.Services {
+    export class RoomsService {
         // properties
-        roomsService.initialized = false;
-        roomsService.rooms = [];
+        public initialized = false;
+        public currentRoom: any;
+        public rooms = [];
+        public onroomselected: any;
+
+        constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
+            // initialize service 
+            if (this.NetworkService.internetAvailable) {
+                this.initialize();
+            }
+
+            // check when internet status changed
+            this.NetworkService.statusChanged(function() {
+                if (!this.initialized && this.NetworkService.internetAvailable) {
+                    this.initialize();
+                }
+            });
+        }
 
         // private methods
-        function addRoom(room) {
+        private addRoom(room) {
             // compute room image
             if (room.user) {
                 room.image = room.user.avatarUrlMedium;
@@ -18,68 +32,55 @@ angular.module('modern-gitter')
             }
                 
             // subscribe to realtime messages
-            RealtimeApiService.subscribe(room.id, function (roomId, message) {
-                if (roomsService.onmessagereceived) {
-                    roomsService.onmessagereceived(roomId, message);
+            this.RealtimeApiService.subscribe(room.id, function(roomId, message) {
+                if (this.onmessagereceived) {
+                    this.onmessagereceived(roomId, message);
                 }
                 
                 // send notification
-                ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
             });
 
-            roomsService.rooms.push(room);
+            this.rooms.push(room);
         }
 
         // public methods
-        roomsService.initialize = function () {
-            OAuthService.connect().then(t => {
+        public initialize() {
+            this.OAuthService.connect().then(t => {
                 console.log('Sucessfully logged to Gitter API');
 
-                RealtimeApiService.initialize().then(t => {
+                this.RealtimeApiService.initialize().then(t => {
                     console.log('Sucessfully subscribed to realtime API');
 
-                    ApiService.getRooms().then(rooms => {
+                    this.ApiService.getRooms().then(rooms => {
                         for (var i = 0; i < rooms.length; i++) {
-                            addRoom(rooms[i]);
+                            this.addRoom(rooms[i]);
                         }
-                        roomsService.initialized = true;
+                        this.initialized = true;
                     });
                 });
             });
         }
 
-        roomsService.selectRoom = function (room) {
-            roomsService.currentRoom = room;
-            if (roomsService.onroomselected) {
-                roomsService.onroomselected();
+        public selectRoom(room) {
+            this.currentRoom = room;
+            if (this.onroomselected) {
+                this.onroomselected();
             }
         };
 
-        roomsService.createRoom = function (name, callback) {
-            ApiService.joinRoom(name).then(room => {
-                addRoom(room);
-                callback(room);
-            });
-        };
-        
-        roomsService.createChannel = function (channel, callback) {
-            ApiService.createChannel(channel).then(room => {
-                addRoom(room);
+        public createRoom(name, callback) {
+            this.ApiService.joinRoom(name).then(room => {
+                this.addRoom(room);
                 callback(room);
             });
         };
 
-        // initialize service 
-        if (NetworkService.internetAvailable) {
-            roomsService.initialize();
-        }
-
-        // check when internet status changed
-        NetworkService.statusChanged(function () {
-            if (!roomsService.initialized && NetworkService.internetAvailable) {
-                roomsService.initialize();
-            }
-        });
-
-        return roomsService;
-    });
+        public createChannel(channel, callback) {
+            this.ApiService.createChannel(channel).then(room => {
+                this.addRoom(room);
+                callback(room);
+            });
+        };
+    }
+}

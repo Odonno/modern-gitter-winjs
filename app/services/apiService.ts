@@ -1,48 +1,49 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .service('ApiService', function (ConfigService, OAuthService) {
-        var apiService = this;
+module Application.Services {
+    export class ApiService {
+        constructor(private ConfigService: Application.Services.ConfigService, private OAuthService: Application.Services.OAuthService) {
+        }
 
-        apiService.getRooms = function () {
-            return new Promise((done, error) => {
+        public getRooms() {
+            return new Promise<[{}]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "rooms",
+                    url: this.ConfigService.baseUrl + "rooms",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.joinRoom = function (name) {
-            return new Promise((done, error) => {
+        public joinRoom(name) {
+            return new Promise<{}>((done, error) => {
                 WinJS.xhr({
                     type: 'POST',
-                    url: ConfigService.baseUrl + "rooms",
+                    url: this.ConfigService.baseUrl + "rooms",
                     data: JSON.stringify({ uri: name }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.createChannel = function (channel) {
-            return new Promise((done, error) => {
+        public createChannel(channel) {
+            return new Promise<{}>((done, error) => {
                 if (channel.owner.org) {
                     WinJS.xhr({
                         type: 'POST',
-                        url: ConfigService.baseUrl + "private/channels/",
+                        url: this.ConfigService.baseUrl + "private/channels/",
                         data: JSON.stringify({
                             name: channel.name,
                             security: channel.permission.toUpperCase(),
@@ -51,15 +52,15 @@ angular.module('modern-gitter')
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
-                            "Authorization": "Bearer " + OAuthService.refreshToken
+                            "Authorization": "Bearer " + this.OAuthService.refreshToken
                         }
-                    }).then(function (success) {
+                    }).then(function(success) {
                         done(JSON.parse(success.response));
                     });
                 } else {
                     WinJS.xhr({
                         type: 'POST',
-                        url: ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
+                        url: this.ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
                         data: JSON.stringify({
                             name: channel.name,
                             security: channel.permission.toUpperCase()
@@ -67,34 +68,34 @@ angular.module('modern-gitter')
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
-                            "Authorization": "Bearer " + OAuthService.refreshToken
+                            "Authorization": "Bearer " + this.OAuthService.refreshToken
                         }
-                    }).then(function (success) {
+                    }).then(function(success) {
                         done(JSON.parse(success.response));
                     });
                 }
             });
         };
 
-        apiService.deleteRoom = function (roomId) {
-            return new Promise((done, error) => {
+        public deleteRoom(roomId) {
+            return new Promise<{}>((done, error) => {
                 WinJS.xhr({
                     type: 'DELETE',
-                    url: ConfigService.baseUrl + "rooms/" + roomId,
+                    url: this.ConfigService.baseUrl + "rooms/" + roomId,
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.getMessages = function (roomId, beforeId) {
-            return new Promise((done, error) => {
-                var query = '?limit=' + ConfigService.messagesLimit;
+        public getMessages(roomId, beforeId) {
+            return new Promise<[{}]>((done, error) => {
+                var query = '?limit=' + this.ConfigService.messagesLimit;
 
                 if (beforeId) {
                     query += '&beforeId=' + beforeId;
@@ -102,98 +103,97 @@ angular.module('modern-gitter')
 
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages" + query,
+                    url: this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages" + query,
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.sendMessage = function (roomId, text) {
-            return new Promise((done, error) => {
+        public sendMessage(roomId, text) {
+            return new Promise<{}>((done, error) => {
                 WinJS.xhr({
                     type: 'POST',
-                    url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
+                    url: this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
                     data: JSON.stringify({ text: text }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.getCurrentUser = function () {
-            return new Promise((done, error) => {
+        public getCurrentUser() {
+            return new Promise<{}>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "user/",
+                    url: this.ConfigService.baseUrl + "user/",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response)[0]);
                 });
             });
         };
 
-        apiService.getOrganizations = function (userId) {
-            return new Promise((done, error) => {
+        public getOrganizations(userId) {
+            return new Promise<[{}]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "user/" + userId + "/orgs",
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/orgs",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.getRepositories = function (userId) {
-            return new Promise((done, error) => {
+        public getRepositories(userId) {
+            return new Promise<[{}]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "user/" + userId + "/repos",
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/repos",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
+                }).then(function(success) {
                     done(JSON.parse(success.response));
                 });
             });
         };
 
-        apiService.searchUsers = function (query, limit) {
-            return new Promise((done, error) => {
+        public searchUsers(query, limit) {
+            return new Promise<[{}]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
-                    url: ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
+                    url: this.ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
                     }
-                }).then(function (success) {
-                    done(JSON.parse(success.response));
+                }).then(function(success) {
+                    done(JSON.parse(success.response).results);
                 });
             });
         };
-
-        return apiService;
-    });
+    }
+}

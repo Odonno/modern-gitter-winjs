@@ -1,36 +1,36 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .service('OAuthService', function (ConfigService) {
-        // based on the code of Timmy Kokke (https://github.com/sorskoot/UWP-OAuth-demo)
-        var oauthService = this;
+module Application.Services {
+    export class OAuthService {
+        public refreshToken = '';
 
-        oauthService.refreshToken = '';
+        constructor(private ConfigService: Application.Services.ConfigService) {
+        }
 
-        oauthService.initialize = function () {
-            oauthService.refreshToken = retrieveTokenFromVault();
+        public initialize() {
+            this.refreshToken = this.retrieveTokenFromVault();
         };
 
-        oauthService.connect = function () {
-            oauthService.initialize();
+        public connect() {
+            this.initialize();
             return new Promise((done, error) => {
-                if (!oauthService.refreshToken) {
-                    authenticate().then(
-                        token => grant(token).then(accessToken => {
+                if (!this.refreshToken) {
+                    this.authenticate().then(
+                        token => this.grant(token).then(accessToken => {
                             let cred = new Windows.Security.Credentials
                                 .PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
-                            oauthService.refreshToken = accessToken.access_token;
+                            this.refreshToken = accessToken.access_token;
                             let passwordVault = new Windows.Security.Credentials.PasswordVault();
                             passwordVault.add(cred);
-                            done(oauthService.refreshToken);
+                            done(this.refreshToken);
                         }));
                 } else {
-                    done(oauthService.refreshToken);
+                    done(this.refreshToken);
                 }
             });
         };
 
-        function retrieveTokenFromVault() {
+        private retrieveTokenFromVault() {
             let passwordVault = new Windows.Security.Credentials.PasswordVault();
             let storedToken;
 
@@ -46,16 +46,16 @@ angular.module('modern-gitter')
             return storedToken;
         }
 
-        function grant(token) {
-            let oauthUrl = ConfigService.tokenUri;
-            let clientId = ConfigService.clientId;
-            let clientSecret = ConfigService.clientSecret;
-            let redirectUrl = ConfigService.redirectUri;
+        private grant(token) {
+            let oauthUrl = this.ConfigService.tokenUri;
+            let clientId = this.ConfigService.clientId;
+            let clientSecret = this.ConfigService.clientSecret;
+            let redirectUrl = this.ConfigService.redirectUri;
 
             return WinJS.xhr({
                 type: "post",
                 url: oauthUrl,
-                data: serializeData({
+                data: this.serializeData({
                     code: token,
                     client_id: clientId,
                     client_secret: clientSecret,
@@ -69,12 +69,12 @@ angular.module('modern-gitter')
             }).then(x => JSON.parse(x.response));
         };
 
-        function authenticate() {
-            return new Promise(function (complete, error) {
-                let oauthUrl = ConfigService.authUri;
-                let clientId = ConfigService.clientId;
-                let redirectUrl = ConfigService.redirectUri;
-                let requestUri = new Windows.Foundation.Uri(`${oauthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUrl) }&response_type=code&access_type=offline`);
+        private authenticate() {
+            return new Promise(function(complete, error) {
+                let oauthUrl = this.ConfigService.authUri;
+                let clientId = this.ConfigService.clientId;
+                let redirectUrl = this.ConfigService.redirectUri;
+                let requestUri = new Windows.Foundation.Uri(`${oauthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUrl)}&response_type=code&access_type=offline`);
                 let callbackUri = new Windows.Foundation.Uri(redirectUrl);
 
                 Windows.Security.Authentication.Web.WebAuthenticationBroker.
@@ -91,7 +91,7 @@ angular.module('modern-gitter')
         }
 
         // Serialize a piece of data to a querystring
-        function serializeData(data, encode?) {
+        private serializeData(data, encode?) {
             if (typeof data !== 'object') {
                 return ((data == null) ? "" : data.toString());
             }
@@ -104,7 +104,7 @@ angular.module('modern-gitter')
                 }
                 let value = data[name];
                 if (!!encode) {
-                    buffer.push(`${encodeURIComponent(name) } = ${encodeURIComponent((value == null) ? "" : value) }`);
+                    buffer.push(`${encodeURIComponent(name)} = ${encodeURIComponent((value == null) ? "" : value)}`);
                 } else {
                     buffer.push(`${name}=${value == null ? "" : value}`);
                 }
@@ -113,6 +113,5 @@ angular.module('modern-gitter')
             // Serialize the buffer and clean it up for transportation
             return buffer.join("&").replace(/%20/g, "+");
         }
-
-        return oauthService;
-    });
+    }
+}

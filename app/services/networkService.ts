@@ -1,25 +1,25 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .service('NetworkService', function () {
-        var networkService = this;
-        
-        var networkInformation = Windows.Networking.Connectivity.NetworkInformation;
+module Application.Services {
+    export class NetworkService {
+        private networkInformation = Windows.Networking.Connectivity.NetworkInformation;
+        public internetAvailable: boolean;
 
-        networkService.currentStatus = function () {
-            var internetConnectionProfile = networkInformation.getInternetConnectionProfile();
-            var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-            networkService.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-            return networkService.internetAvailable;
+        constructor() {
+            this.currentStatus();
         }
 
-        networkService.statusChanged = function (callback) {
-            networkInformation.onnetworkstatuschanged = function (ev) {
-                callback(networkService.currentStatus());
+        public currentStatus() {
+            var internetConnectionProfile = this.networkInformation.getInternetConnectionProfile();
+            var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+            this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+            return this.internetAvailable;
+        }
+
+        public statusChanged(callback) {
+            this.networkInformation.onnetworkstatuschanged = function(ev) {
+                callback(this.currentStatus());
             };
         };
-
-        networkService.currentStatus();
-
-        return networkService;
-    });
+    }
+}

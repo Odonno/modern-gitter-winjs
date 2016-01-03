@@ -50,6 +50,560 @@ var Application;
 })(Application || (Application = {}));
 var Application;
 (function (Application) {
+    var Services;
+    (function (Services) {
+        var ApiService = (function () {
+            function ApiService(ConfigService, OAuthService) {
+                this.ConfigService = ConfigService;
+                this.OAuthService = OAuthService;
+            }
+            ApiService.prototype.getRooms = function () {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "rooms",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.joinRoom = function (name) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: _this.ConfigService.baseUrl + "rooms",
+                        data: JSON.stringify({ uri: name }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.createChannel = function (channel) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    if (channel.owner.org) {
+                        WinJS.xhr({
+                            type: 'POST',
+                            url: _this.ConfigService.baseUrl + "private/channels/",
+                            data: JSON.stringify({
+                                name: channel.name,
+                                security: channel.permission.toUpperCase(),
+                                ownerUri: channel.owner.name
+                            }),
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                            }
+                        }).then(function (success) {
+                            done(JSON.parse(success.response));
+                        });
+                    }
+                    else {
+                        WinJS.xhr({
+                            type: 'POST',
+                            url: _this.ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
+                            data: JSON.stringify({
+                                name: channel.name,
+                                security: channel.permission.toUpperCase()
+                            }),
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                            }
+                        }).then(function (success) {
+                            done(JSON.parse(success.response));
+                        });
+                    }
+                });
+            };
+            ;
+            ApiService.prototype.deleteRoom = function (roomId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'DELETE',
+                        url: _this.ConfigService.baseUrl + "rooms/" + roomId,
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.getMessages = function (roomId, beforeId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    var query = '?limit=' + _this.ConfigService.messagesLimit;
+                    if (beforeId) {
+                        query += '&beforeId=' + beforeId;
+                    }
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages" + query,
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.sendMessage = function (roomId, text) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: _this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
+                        data: JSON.stringify({ text: text }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.getCurrentUser = function () {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response)[0]);
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.getOrganizations = function (userId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/orgs",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.getRepositories = function (userId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/repos",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.searchUsers = function (query, limit) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response).results);
+                    });
+                });
+            };
+            ;
+            return ApiService;
+        })();
+        Services.ApiService = ApiService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var ConfigService = (function () {
+            function ConfigService() {
+                this.baseUrl = "https://api.gitter.im/v1/";
+                this.tokenUri = "https://gitter.im/login/oauth/token";
+                this.clientId = "0f3fc414587a8d31a1514e005fa157168ad8efdb";
+                this.clientSecret = "55c361ef1de79ffef1a49a1a0bff1a7a0140799c";
+                this.redirectUri = "http://localhost";
+                this.authUri = "https://gitter.im/login/oauth/authorize";
+                this.messagesLimit = 50;
+            }
+            return ConfigService;
+        })();
+        Services.ConfigService = ConfigService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var NetworkService = (function () {
+            function NetworkService() {
+                this.networkInformation = Windows.Networking.Connectivity.NetworkInformation;
+                this.currentStatus();
+            }
+            NetworkService.prototype.currentStatus = function () {
+                var internetConnectionProfile = this.networkInformation.getInternetConnectionProfile();
+                var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                return this.internetAvailable;
+            };
+            NetworkService.prototype.statusChanged = function (callback) {
+                this.networkInformation.onnetworkstatuschanged = function (ev) {
+                    callback(this.currentStatus());
+                };
+            };
+            ;
+            return NetworkService;
+        })();
+        Services.NetworkService = NetworkService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var OAuthService = (function () {
+            function OAuthService(ConfigService) {
+                this.ConfigService = ConfigService;
+                this.refreshToken = '';
+            }
+            OAuthService.prototype.initialize = function () {
+                this.refreshToken = this.retrieveTokenFromVault();
+            };
+            ;
+            OAuthService.prototype.connect = function () {
+                var _this = this;
+                this.initialize();
+                return new Promise(function (done, error) {
+                    if (!_this.refreshToken) {
+                        _this.authenticate().then(function (token) { return _this.grant(token).then(function (accessToken) {
+                            var cred = new Windows.Security.Credentials
+                                .PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
+                            _this.refreshToken = accessToken.access_token;
+                            var passwordVault = new Windows.Security.Credentials.PasswordVault();
+                            passwordVault.add(cred);
+                            done(_this.refreshToken);
+                        }); });
+                    }
+                    else {
+                        done(_this.refreshToken);
+                    }
+                });
+            };
+            ;
+            OAuthService.prototype.retrieveTokenFromVault = function () {
+                var passwordVault = new Windows.Security.Credentials.PasswordVault();
+                var storedToken;
+                try {
+                    var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
+                    storedToken = credential.password;
+                }
+                catch (e) {
+                }
+                return storedToken;
+            };
+            OAuthService.prototype.grant = function (token) {
+                var oauthUrl = this.ConfigService.tokenUri;
+                var clientId = this.ConfigService.clientId;
+                var clientSecret = this.ConfigService.clientSecret;
+                var redirectUrl = this.ConfigService.redirectUri;
+                return WinJS.xhr({
+                    type: "post",
+                    url: oauthUrl,
+                    data: this.serializeData({
+                        code: token,
+                        client_id: clientId,
+                        client_secret: clientSecret,
+                        redirect_uri: redirectUrl,
+                        grant_type: 'authorization_code'
+                    }),
+                    headers: {
+                        "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
+                    }
+                }).then(function (x) { return JSON.parse(x.response); });
+            };
+            ;
+            OAuthService.prototype.authenticate = function () {
+                return new Promise(function (complete, error) {
+                    var oauthUrl = this.ConfigService.authUri;
+                    var clientId = this.ConfigService.clientId;
+                    var redirectUrl = this.ConfigService.redirectUri;
+                    var requestUri = new Windows.Foundation.Uri(oauthUrl + "?client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUrl) + "&response_type=code&access_type=offline");
+                    var callbackUri = new Windows.Foundation.Uri(redirectUrl);
+                    Windows.Security.Authentication.Web.WebAuthenticationBroker.
+                        authenticateAsync(Windows.Security.Authentication.Web.
+                        WebAuthenticationOptions.none, requestUri, callbackUri)
+                        .done(function (result) {
+                        if (result.responseStatus === 0) {
+                            complete(result.responseData.replace('http://localhost/?code=', ''));
+                        }
+                        else {
+                            error(result);
+                        }
+                    });
+                });
+            };
+            OAuthService.prototype.serializeData = function (data, encode) {
+                if (typeof data !== 'object') {
+                    return ((data == null) ? "" : data.toString());
+                }
+                var buffer = [];
+                for (var name_1 in data) {
+                    if (!data.hasOwnProperty(name_1)) {
+                        continue;
+                    }
+                    var value = data[name_1];
+                    if (!!encode) {
+                        buffer.push(encodeURIComponent(name_1) + " = " + encodeURIComponent((value == null) ? "" : value));
+                    }
+                    else {
+                        buffer.push(name_1 + "=" + (value == null ? "" : value));
+                    }
+                }
+                return buffer.join("&").replace(/%20/g, "+");
+            };
+            return OAuthService;
+        })();
+        Services.OAuthService = OAuthService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var RealtimeApiService = (function () {
+            function RealtimeApiService(OAuthService) {
+                this.OAuthService = OAuthService;
+            }
+            RealtimeApiService.prototype.initialize = function () {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    var ClientAuthExt = function () { };
+                    ClientAuthExt.prototype.outgoing = function (message, callback) {
+                        if (message.channel == '/meta/handshake') {
+                            if (!message.ext) {
+                                message.ext = {};
+                            }
+                            message.ext.token = this.OAuthService.refreshToken;
+                        }
+                        callback(message);
+                    };
+                    ClientAuthExt.prototype.incoming = function (message, callback) {
+                        if (message.channel == '/meta/handshake') {
+                            if (message.successful) {
+                                console.log('Successfuly subscribed');
+                            }
+                            else {
+                                console.log('Something went wrong: ', message.error);
+                            }
+                        }
+                        callback(message);
+                    };
+                    _this.client = new Faye.Client('https://ws.gitter.im/faye', { timeout: 60, retry: 5, interval: 1 });
+                    _this.client.addExtension(new ClientAuthExt());
+                    done();
+                });
+            };
+            ;
+            RealtimeApiService.prototype.subscribe = function (roomId, callback) {
+                this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
+                    var message = response.model;
+                    callback(roomId, message);
+                });
+            };
+            ;
+            return RealtimeApiService;
+        })();
+        Services.RealtimeApiService = RealtimeApiService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var RoomsService = (function () {
+            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
+                this.OAuthService = OAuthService;
+                this.NetworkService = NetworkService;
+                this.ApiService = ApiService;
+                this.RealtimeApiService = RealtimeApiService;
+                this.ToastNotificationService = ToastNotificationService;
+                this.initialized = false;
+                this.rooms = [];
+                if (this.NetworkService.internetAvailable) {
+                    this.initialize();
+                }
+                this.NetworkService.statusChanged(function () {
+                    if (!this.initialized && this.NetworkService.internetAvailable) {
+                        this.initialize();
+                    }
+                });
+            }
+            RoomsService.prototype.addRoom = function (room) {
+                if (room.user) {
+                    room.image = room.user.avatarUrlMedium;
+                }
+                else {
+                    room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+                }
+                this.RealtimeApiService.subscribe(room.id, function (roomId, message) {
+                    if (this.onmessagereceived) {
+                        this.onmessagereceived(roomId, message);
+                    }
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                });
+                this.rooms.push(room);
+            };
+            RoomsService.prototype.initialize = function () {
+                var _this = this;
+                this.OAuthService.connect().then(function (t) {
+                    console.log('Sucessfully logged to Gitter API');
+                    _this.RealtimeApiService.initialize().then(function (t) {
+                        console.log('Sucessfully subscribed to realtime API');
+                        _this.ApiService.getRooms().then(function (rooms) {
+                            for (var i = 0; i < rooms.length; i++) {
+                                _this.addRoom(rooms[i]);
+                            }
+                            _this.initialized = true;
+                        });
+                    });
+                });
+            };
+            RoomsService.prototype.selectRoom = function (room) {
+                this.currentRoom = room;
+                if (this.onroomselected) {
+                    this.onroomselected();
+                }
+            };
+            ;
+            RoomsService.prototype.createRoom = function (name, callback) {
+                var _this = this;
+                this.ApiService.joinRoom(name).then(function (room) {
+                    _this.addRoom(room);
+                    callback(room);
+                });
+            };
+            ;
+            RoomsService.prototype.createChannel = function (channel, callback) {
+                var _this = this;
+                this.ApiService.createChannel(channel).then(function (room) {
+                    _this.addRoom(room);
+                    callback(room);
+                });
+            };
+            ;
+            return RoomsService;
+        })();
+        Services.RoomsService = RoomsService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var ToastNotificationService = (function () {
+            function ToastNotificationService() {
+                this.notifications = Windows.UI.Notifications;
+                this.toastNotifier = this.notifications.ToastNotificationManager.createToastNotifier();
+            }
+            ToastNotificationService.prototype.sendTextNotification = function (text) {
+                var template = this.notifications.ToastTemplateType.toastText01;
+                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var toastTextElements = toastXml.getElementsByTagName('text');
+                toastTextElements[0].appendChild(toastXml.createTextNode(text));
+                var toast = new this.notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toast);
+            };
+            ;
+            ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text) {
+                var template = this.notifications.ToastTemplateType.toastText02;
+                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var toastTextElements = toastXml.getElementsByTagName('text');
+                toastTextElements[0].appendChild(toastXml.createTextNode(title));
+                toastTextElements[1].appendChild(toastXml.createTextNode(text));
+                var toast = new this.notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toast);
+            };
+            ;
+            ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text) {
+                var template = this.notifications.ToastTemplateType.toastImageAndText01;
+                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var toastImageElements = toastXml.getElementsByTagName('image');
+                toastImageElements[0].setAttribute('src', image);
+                var toastTextElements = toastXml.getElementsByTagName('text');
+                toastTextElements[0].appendChild(toastXml.createTextNode(text));
+                var toast = new this.notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toast);
+            };
+            ;
+            ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text) {
+                var template = this.notifications.ToastTemplateType.toastImageAndText02;
+                var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
+                var toastImageElements = toastXml.getElementsByTagName('image');
+                toastImageElements[0].setAttribute('src', image);
+                var toastTextElements = toastXml.getElementsByTagName('text');
+                toastTextElements[0].appendChild(toastXml.createTextNode(title));
+                toastTextElements[1].appendChild(toastXml.createTextNode(text));
+                var toast = new this.notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toast);
+            };
+            ;
+            return ToastNotificationService;
+        })();
+        Services.ToastNotificationService = ToastNotificationService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
     var Directives;
     (function (Directives) {
         var NgEnter = (function () {
@@ -72,6 +626,13 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
+appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
+appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
+appModule.service('NetworkService', function () { return new Application.Services.NetworkService(); });
+appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
+appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
+appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService); });
+appModule.service('ToastNotificationService', function () { return new Application.Services.ToastNotificationService(); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 angular.module('modern-gitter')
     .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
@@ -132,7 +693,7 @@ angular.module('modern-gitter')
     $scope.$watch('username', function () {
         if ($scope.username && $scope.username.length > 0) {
             ApiService.searchUsers($scope.username, 50).then(function (users) {
-                $scope.users = users.results;
+                $scope.users = users;
                 setTimeout(function () {
                     $scope.usersWinControl.forceLayout();
                 }, 500);
@@ -256,463 +817,4 @@ angular.module('modern-gitter')
         $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
         $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
     });
-});
-angular.module('modern-gitter')
-    .service('ApiService', function (ConfigService, OAuthService) {
-    var apiService = this;
-    apiService.getRooms = function () {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "rooms",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.joinRoom = function (name) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'POST',
-                url: ConfigService.baseUrl + "rooms",
-                data: JSON.stringify({ uri: name }),
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.createChannel = function (channel) {
-        return new Promise(function (done, error) {
-            if (channel.owner.org) {
-                WinJS.xhr({
-                    type: 'POST',
-                    url: ConfigService.baseUrl + "private/channels/",
-                    data: JSON.stringify({
-                        name: channel.name,
-                        security: channel.permission.toUpperCase(),
-                        ownerUri: channel.owner.name
-                    }),
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
-                    }
-                }).then(function (success) {
-                    done(JSON.parse(success.response));
-                });
-            }
-            else {
-                WinJS.xhr({
-                    type: 'POST',
-                    url: ConfigService.baseUrl + "user/" + channel.owner.id + "/channels",
-                    data: JSON.stringify({
-                        name: channel.name,
-                        security: channel.permission.toUpperCase()
-                    }),
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + OAuthService.refreshToken
-                    }
-                }).then(function (success) {
-                    done(JSON.parse(success.response));
-                });
-            }
-        });
-    };
-    apiService.deleteRoom = function (roomId) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'DELETE',
-                url: ConfigService.baseUrl + "rooms/" + roomId,
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.getMessages = function (roomId, beforeId) {
-        return new Promise(function (done, error) {
-            var query = '?limit=' + ConfigService.messagesLimit;
-            if (beforeId) {
-                query += '&beforeId=' + beforeId;
-            }
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages" + query,
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.sendMessage = function (roomId, text) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'POST',
-                url: ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
-                data: JSON.stringify({ text: text }),
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.getCurrentUser = function () {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "user/",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response)[0]);
-            });
-        });
-    };
-    apiService.getOrganizations = function (userId) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "user/" + userId + "/orgs",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.getRepositories = function (userId) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "user/" + userId + "/repos",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    apiService.searchUsers = function (query, limit) {
-        return new Promise(function (done, error) {
-            WinJS.xhr({
-                type: 'GET',
-                url: ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + OAuthService.refreshToken
-                }
-            }).then(function (success) {
-                done(JSON.parse(success.response));
-            });
-        });
-    };
-    return apiService;
-});
-angular.module('modern-gitter')
-    .service('ConfigService', function () {
-    var configService = this;
-    configService.baseUrl = "https://api.gitter.im/v1/";
-    configService.tokenUri = "https://gitter.im/login/oauth/token";
-    configService.clientId = "0f3fc414587a8d31a1514e005fa157168ad8efdb";
-    configService.clientSecret = "55c361ef1de79ffef1a49a1a0bff1a7a0140799c";
-    configService.redirectUri = "http://localhost";
-    configService.authUri = "https://gitter.im/login/oauth/authorize";
-    configService.messagesLimit = 50;
-    return configService;
-});
-angular.module('modern-gitter')
-    .service('NetworkService', function () {
-    var networkService = this;
-    var networkInformation = Windows.Networking.Connectivity.NetworkInformation;
-    networkService.currentStatus = function () {
-        var internetConnectionProfile = networkInformation.getInternetConnectionProfile();
-        var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-        networkService.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-        return networkService.internetAvailable;
-    };
-    networkService.statusChanged = function (callback) {
-        networkInformation.onnetworkstatuschanged = function (ev) {
-            callback(networkService.currentStatus());
-        };
-    };
-    networkService.currentStatus();
-    return networkService;
-});
-angular.module('modern-gitter')
-    .service('OAuthService', function (ConfigService) {
-    var oauthService = this;
-    oauthService.refreshToken = '';
-    oauthService.initialize = function () {
-        oauthService.refreshToken = retrieveTokenFromVault();
-    };
-    oauthService.connect = function () {
-        oauthService.initialize();
-        return new Promise(function (done, error) {
-            if (!oauthService.refreshToken) {
-                authenticate().then(function (token) { return grant(token).then(function (accessToken) {
-                    var cred = new Windows.Security.Credentials
-                        .PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
-                    oauthService.refreshToken = accessToken.access_token;
-                    var passwordVault = new Windows.Security.Credentials.PasswordVault();
-                    passwordVault.add(cred);
-                    done(oauthService.refreshToken);
-                }); });
-            }
-            else {
-                done(oauthService.refreshToken);
-            }
-        });
-    };
-    function retrieveTokenFromVault() {
-        var passwordVault = new Windows.Security.Credentials.PasswordVault();
-        var storedToken;
-        try {
-            var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
-            storedToken = credential.password;
-        }
-        catch (e) {
-        }
-        return storedToken;
-    }
-    function grant(token) {
-        var oauthUrl = ConfigService.tokenUri;
-        var clientId = ConfigService.clientId;
-        var clientSecret = ConfigService.clientSecret;
-        var redirectUrl = ConfigService.redirectUri;
-        return WinJS.xhr({
-            type: "post",
-            url: oauthUrl,
-            data: serializeData({
-                code: token,
-                client_id: clientId,
-                client_secret: clientSecret,
-                redirect_uri: redirectUrl,
-                grant_type: 'authorization_code'
-            }),
-            headers: {
-                "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
-            }
-        }).then(function (x) { return JSON.parse(x.response); });
-    }
-    ;
-    function authenticate() {
-        return new Promise(function (complete, error) {
-            var oauthUrl = ConfigService.authUri;
-            var clientId = ConfigService.clientId;
-            var redirectUrl = ConfigService.redirectUri;
-            var requestUri = new Windows.Foundation.Uri(oauthUrl + "?client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUrl) + "&response_type=code&access_type=offline");
-            var callbackUri = new Windows.Foundation.Uri(redirectUrl);
-            Windows.Security.Authentication.Web.WebAuthenticationBroker.
-                authenticateAsync(Windows.Security.Authentication.Web.
-                WebAuthenticationOptions.none, requestUri, callbackUri)
-                .done(function (result) {
-                if (result.responseStatus === 0) {
-                    complete(result.responseData.replace('http://localhost/?code=', ''));
-                }
-                else {
-                    error(result);
-                }
-            });
-        });
-    }
-    function serializeData(data, encode) {
-        if (typeof data !== 'object') {
-            return ((data == null) ? "" : data.toString());
-        }
-        var buffer = [];
-        for (var name_1 in data) {
-            if (!data.hasOwnProperty(name_1)) {
-                continue;
-            }
-            var value = data[name_1];
-            if (!!encode) {
-                buffer.push(encodeURIComponent(name_1) + " = " + encodeURIComponent((value == null) ? "" : value));
-            }
-            else {
-                buffer.push(name_1 + "=" + (value == null ? "" : value));
-            }
-        }
-        return buffer.join("&").replace(/%20/g, "+");
-    }
-    return oauthService;
-});
-angular.module('modern-gitter')
-    .service('RealtimeApiService', function (ConfigService, OAuthService) {
-    var realtimeApiService = this;
-    realtimeApiService.initialize = function () {
-        return new Promise(function (done, error) {
-            var ClientAuthExt = function () { };
-            ClientAuthExt.prototype.outgoing = function (message, callback) {
-                if (message.channel == '/meta/handshake') {
-                    if (!message.ext) {
-                        message.ext = {};
-                    }
-                    message.ext.token = OAuthService.refreshToken;
-                }
-                callback(message);
-            };
-            ClientAuthExt.prototype.incoming = function (message, callback) {
-                if (message.channel == '/meta/handshake') {
-                    if (message.successful) {
-                        console.log('Successfuly subscribed');
-                    }
-                    else {
-                        console.log('Something went wrong: ', message.error);
-                    }
-                }
-                callback(message);
-            };
-            realtimeApiService.client = new Faye.Client('https://ws.gitter.im/faye', { timeout: 60, retry: 5, interval: 1 });
-            realtimeApiService.client.addExtension(new ClientAuthExt());
-            done();
-        });
-    };
-    realtimeApiService.subscribe = function (roomId, callback) {
-        realtimeApiService.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
-            var message = response.model;
-            callback(roomId, message);
-        });
-    };
-    return realtimeApiService;
-});
-angular.module('modern-gitter')
-    .service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
-    var roomsService = this;
-    roomsService.initialized = false;
-    roomsService.rooms = [];
-    function addRoom(room) {
-        if (room.user) {
-            room.image = room.user.avatarUrlMedium;
-        }
-        else {
-            room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
-        }
-        RealtimeApiService.subscribe(room.id, function (roomId, message) {
-            if (roomsService.onmessagereceived) {
-                roomsService.onmessagereceived(roomId, message);
-            }
-            ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
-        });
-        roomsService.rooms.push(room);
-    }
-    roomsService.initialize = function () {
-        OAuthService.connect().then(function (t) {
-            console.log('Sucessfully logged to Gitter API');
-            RealtimeApiService.initialize().then(function (t) {
-                console.log('Sucessfully subscribed to realtime API');
-                ApiService.getRooms().then(function (rooms) {
-                    for (var i = 0; i < rooms.length; i++) {
-                        addRoom(rooms[i]);
-                    }
-                    roomsService.initialized = true;
-                });
-            });
-        });
-    };
-    roomsService.selectRoom = function (room) {
-        roomsService.currentRoom = room;
-        if (roomsService.onroomselected) {
-            roomsService.onroomselected();
-        }
-    };
-    roomsService.createRoom = function (name, callback) {
-        ApiService.joinRoom(name).then(function (room) {
-            addRoom(room);
-            callback(room);
-        });
-    };
-    roomsService.createChannel = function (channel, callback) {
-        ApiService.createChannel(channel).then(function (room) {
-            addRoom(room);
-            callback(room);
-        });
-    };
-    if (NetworkService.internetAvailable) {
-        roomsService.initialize();
-    }
-    NetworkService.statusChanged(function () {
-        if (!roomsService.initialized && NetworkService.internetAvailable) {
-            roomsService.initialize();
-        }
-    });
-    return roomsService;
-});
-angular.module('modern-gitter')
-    .service('ToastNotificationService', function () {
-    var toastNotificationService = this;
-    var notifications = Windows.UI.Notifications;
-    var toastNotifier = notifications.ToastNotificationManager.createToastNotifier();
-    toastNotificationService.sendTextNotification = function (text) {
-        var template = notifications.ToastTemplateType.toastText01;
-        var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(text));
-        var toast = new notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
-    toastNotificationService.sendTitleAndTextNotification = function (title, text) {
-        var template = notifications.ToastTemplateType.toastText02;
-        var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(title));
-        toastTextElements[1].appendChild(toastXml.createTextNode(text));
-        var toast = new notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
-    toastNotificationService.sendImageAndTextNotification = function (image, text) {
-        var template = notifications.ToastTemplateType.toastImageAndText01;
-        var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
-        var toastImageElements = toastXml.getElementsByTagName('image');
-        toastImageElements[0].setAttribute('src', image);
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(text));
-        var toast = new notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
-    toastNotificationService.sendImageTitleAndTextNotification = function (image, title, text) {
-        var template = notifications.ToastTemplateType.toastImageAndText02;
-        var toastXml = notifications.ToastNotificationManager.getTemplateContent(template);
-        var toastImageElements = toastXml.getElementsByTagName('image');
-        toastImageElements[0].setAttribute('src', image);
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(title));
-        toastTextElements[1].appendChild(toastXml.createTextNode(text));
-        var toast = new notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
-    return toastNotificationService;
 });

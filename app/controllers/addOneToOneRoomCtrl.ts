@@ -21,7 +21,7 @@ angular.module('modern-gitter')
         $scope.$watch('username', function () {
             if ($scope.username && $scope.username.length > 0) {
                 ApiService.searchUsers($scope.username, 50).then(function (users) {
-                    $scope.users = users.results;
+                    $scope.users = users;
 
                     setTimeout(function () {
                         $scope.usersWinControl.forceLayout();
