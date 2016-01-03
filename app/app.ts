@@ -1,9 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
-    .config(function ($stateProvider, $urlRouterProvider) {
+    .config(function ($stateProvider: angular.ui.IStateProvider, $urlRouterProvider: angular.ui.IUrlRouterProvider) {
         $urlRouterProvider.otherwise('/home');
-
+        
         $stateProvider
             .state('home', {
                 url: '/home',

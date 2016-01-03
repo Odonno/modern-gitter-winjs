@@ -1,8 +1,9 @@
 var gulp = require('gulp'),
-    concat = require('gulp-concat');
+    concat = require('gulp-concat'),
+    ts = require('gulp-typescript');
 
 // paths
-var src = './app/**/*js';
+var src = './app/**/*.ts';
 var dest = './js';
 
 // default task
@@ -16,6 +17,10 @@ gulp.task('watch', function () {
 // create a single app.js file
 gulp.task('app-concat', function () {
     gulp.src(src)
-        .pipe(concat('app.js'))
+        .pipe(ts({
+            noImplicitAny: true,
+            removeComments: true,
+            out: 'app.js'
+        }))
         .pipe(gulp.dest(dest));
 });
