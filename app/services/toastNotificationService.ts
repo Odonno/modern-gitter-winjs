@@ -5,7 +5,7 @@ module Application.Services {
         private notifications = Windows.UI.Notifications;
         private toastNotifier = this.notifications.ToastNotificationManager.createToastNotifier();
 
-        public sendTextNotification(text) {
+        public sendTextNotification(text: string) {
             var template = this.notifications.ToastTemplateType.toastText01;
             var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
 
@@ -16,7 +16,7 @@ module Application.Services {
             this.toastNotifier.show(toast);
         };
 
-        public sendTitleAndTextNotification(title, text) {
+        public sendTitleAndTextNotification(title: string, text: string) {
             var template = this.notifications.ToastTemplateType.toastText02;
             var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
 
@@ -28,7 +28,7 @@ module Application.Services {
             this.toastNotifier.show(toast);
         };
 
-        public sendImageAndTextNotification(image, text) {
+        public sendImageAndTextNotification(image: string, text: string) {
             var template = this.notifications.ToastTemplateType.toastImageAndText01;
             var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
 
@@ -42,7 +42,7 @@ module Application.Services {
             this.toastNotifier.show(toast);
         };
 
-        public sendImageTitleAndTextNotification(image, title, text) {
+        public sendImageTitleAndTextNotification(image: string, title: string, text: string) {
             var template = this.notifications.ToastTemplateType.toastImageAndText02;
             var toastXml = this.notifications.ToastNotificationManager.getTemplateContent(template);
 
