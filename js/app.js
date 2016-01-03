@@ -1,44 +1,55 @@
-angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
-    .config(function ($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/home');
-    $stateProvider
-        .state('home', {
-        url: '/home',
-        templateUrl: 'partials/home.html',
-        controller: 'HomeCtrl'
-    })
-        .state('addRoom', {
-        url: '/addRoom',
-        views: {
-            '': {
-                templateUrl: 'partials/addRoom.html',
-                controller: 'AddRoomCtrl'
-            },
-            'repository@addRoom': {
-                templateUrl: 'partials/repository.html',
-                controller: 'AddRepositoryRoomCtrl'
-            },
-            'channel@addRoom': {
-                templateUrl: 'partials/channel.html',
-                controller: 'AddChannelRoomCtrl'
-            },
-            'oneToOne@addRoom': {
-                templateUrl: 'partials/oneToOne.html',
-                controller: 'AddOneToOneRoomCtrl'
+var Application;
+(function (Application) {
+    var Configs;
+    (function (Configs) {
+        var RoutingConfig = (function () {
+            function RoutingConfig($stateProvider, $urlRouterProvider) {
+                $urlRouterProvider.otherwise('/home');
+                $stateProvider
+                    .state('home', {
+                    url: '/home',
+                    templateUrl: 'partials/home.html',
+                    controller: 'HomeCtrl'
+                })
+                    .state('addRoom', {
+                    url: '/addRoom',
+                    views: {
+                        '': {
+                            templateUrl: 'partials/addRoom.html',
+                            controller: 'AddRoomCtrl'
+                        },
+                        'repository@addRoom': {
+                            templateUrl: 'partials/repository.html',
+                            controller: 'AddRepositoryRoomCtrl'
+                        },
+                        'channel@addRoom': {
+                            templateUrl: 'partials/channel.html',
+                            controller: 'AddChannelRoomCtrl'
+                        },
+                        'oneToOne@addRoom': {
+                            templateUrl: 'partials/oneToOne.html',
+                            controller: 'AddOneToOneRoomCtrl'
+                        }
+                    }
+                })
+                    .state('rooms', {
+                    url: '/rooms',
+                    templateUrl: 'partials/rooms.html',
+                    controller: 'RoomsCtrl'
+                })
+                    .state('room', {
+                    url: '/room',
+                    templateUrl: 'partials/room.html',
+                    controller: 'RoomCtrl'
+                });
             }
-        }
-    })
-        .state('rooms', {
-        url: '/rooms',
-        templateUrl: 'partials/rooms.html',
-        controller: 'RoomsCtrl'
-    })
-        .state('room', {
-        url: '/room',
-        templateUrl: 'partials/room.html',
-        controller: 'RoomCtrl'
-    });
-});
+            return RoutingConfig;
+        })();
+        Configs.RoutingConfig = RoutingConfig;
+    })(Configs = Application.Configs || (Application.Configs = {}));
+})(Application || (Application = {}));
+var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
+appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 angular.module('modern-gitter')
     .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
     $scope.owners = [];
