@@ -1,5 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="./configs/routing.ts"/>
+/// <reference path="./directives/ngEnter.ts"/>
 
 // create module with references
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
@@ -9,6 +10,7 @@ appModule.config(($stateProvider, $urlRouterProvider) => new Application.Configs
 
 // TODO : inject services
 
-// TODO : inject directives
-
+// inject directives
+appModule.directive('ngEnter', () => new Application.Directives.NgEnter());
+    
 // TODO : inject controllers

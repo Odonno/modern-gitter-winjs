@@ -1,16 +1,16 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-angular.module('modern-gitter')
-    .directive('ngEnter', function () {
-        return function (scope, element, attrs) {
-            element.bind("keydown keypress", function (event) {
+module Application.Directives {
+    export class NgEnter implements ng.IDirective {
+        link = (scope: ng.IScope, element: JQuery, attrs: ng.IAttributes) => {
+            element.bind("keydown keypress", function(event) {
                 if (event.which === 13) {
-                    scope.$apply(function () {
-                        scope.$eval(attrs.ngEnter);
+                    scope.$apply(function() {
+                        scope.$eval(attrs['ngEnter']);
                     });
-
                     event.preventDefault();
                 }
             });
-        };
-    });
+        }
+    }
+}

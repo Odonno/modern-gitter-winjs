@@ -48,8 +48,31 @@ var Application;
         Configs.RoutingConfig = RoutingConfig;
     })(Configs = Application.Configs || (Application.Configs = {}));
 })(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Directives;
+    (function (Directives) {
+        var NgEnter = (function () {
+            function NgEnter() {
+                this.link = function (scope, element, attrs) {
+                    element.bind("keydown keypress", function (event) {
+                        if (event.which === 13) {
+                            scope.$apply(function () {
+                                scope.$eval(attrs['ngEnter']);
+                            });
+                            event.preventDefault();
+                        }
+                    });
+                };
+            }
+            return NgEnter;
+        })();
+        Directives.NgEnter = NgEnter;
+    })(Directives = Application.Directives || (Application.Directives = {}));
+})(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
+appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 angular.module('modern-gitter')
     .controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) {
     $scope.owners = [];
@@ -233,19 +256,6 @@ angular.module('modern-gitter')
         $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
         $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
     });
-});
-angular.module('modern-gitter')
-    .directive('ngEnter', function () {
-    return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
-            if (event.which === 13) {
-                scope.$apply(function () {
-                    scope.$eval(attrs.ngEnter);
-                });
-                event.preventDefault();
-            }
-        });
-    };
 });
 angular.module('modern-gitter')
     .service('ApiService', function (ConfigService, OAuthService) {
