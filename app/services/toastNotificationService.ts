@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 angular.module('modern-gitter')
     .service('ToastNotificationService', function () {
         var toastNotificationService = this;

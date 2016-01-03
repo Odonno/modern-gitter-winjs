@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 angular.module('modern-gitter')
     .directive('ngEnter', function () {
         return function (scope, element, attrs) {

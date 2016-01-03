@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 angular.module('modern-gitter')
     .controller('RoomCtrl', function ($scope, ApiService, RoomsService) {
         // properties

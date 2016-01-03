@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 angular.module('modern-gitter')
     .service('OAuthService', function (ConfigService) {
         // based on the code of Timmy Kokke (https://github.com/sorskoot/UWP-OAuth-demo)
@@ -72,8 +74,8 @@ angular.module('modern-gitter')
                 let oauthUrl = ConfigService.authUri;
                 let clientId = ConfigService.clientId;
                 let redirectUrl = ConfigService.redirectUri;
-                let requestUri = Windows.Foundation.Uri(`${oauthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUrl) }&response_type=code&access_type=offline`);
-                let callbackUri = Windows.Foundation.Uri(redirectUrl);
+                let requestUri = new Windows.Foundation.Uri(`${oauthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUrl) }&response_type=code&access_type=offline`);
+                let callbackUri = new Windows.Foundation.Uri(redirectUrl);
 
                 Windows.Security.Authentication.Web.WebAuthenticationBroker.
                     authenticateAsync(Windows.Security.Authentication.Web.
@@ -89,7 +91,7 @@ angular.module('modern-gitter')
         }
 
         // Serialize a piece of data to a querystring
-        function serializeData(data, encode) {
+        function serializeData(data, encode?) {
             if (typeof data !== 'object') {
                 return ((data == null) ? "" : data.toString());
             }

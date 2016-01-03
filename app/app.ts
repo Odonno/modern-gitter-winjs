@@ -1,3 +1,5 @@
+/// <reference path="../typings/tsd.d.ts" />
+
 angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router'])
     .config(function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/home');

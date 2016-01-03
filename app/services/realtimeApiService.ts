@@ -1,3 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
 angular.module('modern-gitter')
     .service('RealtimeApiService', function (ConfigService, OAuthService) {
         var realtimeApiService = this;
