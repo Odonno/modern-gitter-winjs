@@ -105,6 +105,11 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* home view style */
+#home-scroll {
+	height: 100vh;
+	overflow-y: auto;
+}
+
 #me-circle {
 	width: 200px;
 	height: 200px;
