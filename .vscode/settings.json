@@ -1,0 +1,17 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "files.exclude": {
+        ".vs": true,
+        "AppPackages": true,
+        "bin": true,
+        "bld": true,
+        "BundleArtifacts": true,
+        "**.appx": true,
+        "_pkginfo.txt": true,
+        "**.sln": true,
+        "**.jsproj": true,
+        "**.user": true,
+        "**.pfx": true,
+        "Package.StoreAssociation.xml": true
+    }
+}
