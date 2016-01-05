@@ -18,6 +18,14 @@ hr {
 	max-width: 100% !important;
 }
 
+.unselectable {
+	-webkit-user-select: none;    
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
 /* split-view style */
 .win-splitviewpanetoggle {
     float: left;
