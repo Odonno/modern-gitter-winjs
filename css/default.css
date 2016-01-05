@@ -126,7 +126,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	width: 200px;
 	height: 200px;
 	margin-top: 30px;
-	margin-bottom; 20px;
+	margin-bottom: 20px;
 }
 
 #me-img {
@@ -144,6 +144,36 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 #addRoomContent {
 	height: calc(100vh - 60px);
+}
+
+/* add a room - existing room view style */
+#existingRoomsHeader {
+	max-width: 100%;
+	margin-bottom: 6px;
+}
+
+#existingRoomsListView {
+	height: calc(100vh - 220px);
+}
+
+.existing-room {
+	width: 200px;
+	height: 200px;
+	padding: 6px;
+}
+
+.existing-room-image {
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.existing-room-name {
+	margin-top: 6px !important;
+	padding-top: 0px;
+}
+
+.existing-room-description {
+	font-size: 12px;
 }
 
 /* add a room - repository view style */
@@ -313,7 +343,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 		width: 100px;
 		height: 100px;
 		margin-top: 20px;
-		margin-bottom; 10px;
+		margin-bottom: 10px;
 	}
 
 	#me-img {

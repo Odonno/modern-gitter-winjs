@@ -1,0 +1,18 @@
+<!-- search input -->
+<input id="existingRoomsHeader" type="text" placeholder="Search a room..." class="form-control" ng-model="roomname" />
+
+<!-- list view of existing rooms -->
+<win-list-view id="existingRoomsListView" item-data-source="existingRooms" selection-mode="'single'" tap-behavior="'directSelect'" selection="selection" win-control="existingRoomsWinControl">
+    <!-- room template -->
+    <win-item-template>
+        <div class="existing-room clickable">
+            <img class="existing-room-image" ng-src="{{ item.data.image }}" />
+            <h5 class="win-h5 existing-room-name">{{ item.data.name }}</h5>
+            <em class="existing-room-description">{{ item.data.topic }}</em>
+        </div>
+    </win-item-template>
+
+    <win-grid-layout orientation="'vertical'"></win-grid-layout>
+</win-list-view>
+
+<button class="btn" ng-disabled="selection.length !== 1" ng-click="createRoom()">Join room</button>

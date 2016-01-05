@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Configs;
     (function (Configs) {
@@ -17,6 +17,10 @@
                         '': {
                             templateUrl: 'partials/addRoom.html',
                             controller: 'AddRoomCtrl'
+                        },
+                        'existing@addRoom': {
+                            templateUrl: 'partials/existing.html',
+                            controller: 'AddExistingRoomCtrl'
                         },
                         'repository@addRoom': {
                             templateUrl: 'partials/repository.html',
@@ -236,6 +240,23 @@ var Application;
                         }
                     }).then(function (success) {
                         done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.searchRooms = function (query, limit) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "rooms?q=" + query + "&limit=" + limit,
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response).results);
                     });
                 });
             };
@@ -716,6 +737,50 @@ var Application;
 (function (Application) {
     var Controllers;
     (function (Controllers) {
+        var AddExistingRoomCtrl = (function () {
+            function AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
+                var _this = this;
+                this.scope = $scope;
+                this.scope.roomname = '';
+                this.scope.existingRooms = [];
+                this.scope.selection = [];
+                this.scope.createRoom = function () {
+                    var selectedRoom = _this.scope.existingRooms[_this.scope.selection[0]];
+                    RoomsService.createRoom(selectedRoom.uri, function (room) {
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name);
+                        RoomsService.selectRoom(room);
+                        $state.go('room');
+                    });
+                };
+                this.scope.$watch('roomname', function () {
+                    if (_this.scope.roomname && _this.scope.roomname.length > 0) {
+                        ApiService.searchRooms(_this.scope.roomname, 50).then(function (rooms) {
+                            _this.scope.existingRooms = rooms;
+                            console.log(rooms);
+                            for (var i = 0; i < _this.scope.existingRooms.length; i++) {
+                                if (_this.scope.existingRooms[i].user) {
+                                    _this.scope.existingRooms[i].image = _this.scope.existingRooms[i].user.avatarUrlMedium;
+                                }
+                                else {
+                                    _this.scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + _this.scope.existingRooms[i].name.split('/')[0];
+                                }
+                            }
+                            setTimeout(function () {
+                                _this.scope.existingRoomsWinControl.forceLayout();
+                            }, 500);
+                        });
+                    }
+                });
+            }
+            return AddExistingRoomCtrl;
+        })();
+        Controllers.AddExistingRoomCtrl = AddExistingRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
         var AddOneToOneRoomCtrl = (function () {
             function AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
                 var _this = this;
@@ -912,6 +977,7 @@ appModule.service('RoomsService', function (OAuthService, NetworkService, ApiSer
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
+appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });

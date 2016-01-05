@@ -18,6 +18,10 @@ module Application.Configs {
                             templateUrl: 'partials/addRoom.html',
                             controller: 'AddRoomCtrl'
                         },
+                        'existing@addRoom': {
+                            templateUrl: 'partials/existing.html',
+                            controller: 'AddExistingRoomCtrl'
+                        },
                         'repository@addRoom': {
                             templateUrl: 'partials/repository.html',
                             controller: 'AddRepositoryRoomCtrl'

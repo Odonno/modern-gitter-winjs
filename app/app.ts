@@ -14,6 +14,7 @@
 /// <reference path="./directives/ngEnter.ts"/>
 
 /// <reference path="./controllers/addChannelRoomCtrl.ts"/>
+/// <reference path="./controllers/addExistingRoomCtrl.ts"/>
 /// <reference path="./controllers/addOneToOneRoomCtrl.ts"/>
 /// <reference path="./controllers/addRepositoryRoomCtrl.ts"/>
 /// <reference path="./controllers/addRoomCtrl.ts"/>
@@ -42,6 +43,7 @@ appModule.directive('ngEnter', () => new Application.Directives.NgEnter());
     
 // inject controllers
 appModule.controller('AddChannelRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
+appModule.controller('AddExistingRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddRoomCtrl($scope));

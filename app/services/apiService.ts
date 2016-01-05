@@ -180,6 +180,22 @@ module Application.Services {
             });
         };
 
+        public searchRooms(query, limit) {
+            return new Promise<[{}]>((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: this.ConfigService.baseUrl + "rooms?q=" + query + "&limit=" + limit,
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response).results);
+                });
+            });
+        };
+
         public searchUsers(query, limit) {
             return new Promise<[{}]>((done, error) => {
                 WinJS.xhr({

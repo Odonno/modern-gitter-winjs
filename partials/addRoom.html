@@ -1,7 +1,12 @@
 ﻿<h2 id="addRoomHeader" class="win-h2 content">Join a room</h2>
 
-<!-- three ways to create a room -->
+<!-- four ways to create/join a room -->
 <win-pivot id="addRoomContent">
+    <!-- join existing room -->
+    <win-pivot-item header="'Existing'">
+        <div ui-view="existing"></div>
+    </win-pivot-item>
+    
     <!-- create from GitHub repository -->
     <win-pivot-item header="'Repository'">
         <div ui-view="repository"></div>
