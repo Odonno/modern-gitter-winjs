@@ -15,8 +15,12 @@
 
     <!-- message template -->
     <win-item-template>
-        <div ng-class="item.data.unread ? 'unread' : 'read'">
-            <div ng-bind-html="item.data.html"></div>
+        <div class="message-container clickable" ng-class="item.data.unread ? 'unread' : 'read'">
+            <img class="message-image" ng-src="{{ item.data.fromUser.avatarUrlSmall }}" />
+            <div class="message-subcontainer">
+                <div class="message-username">{{ item.data.fromUser.username }}</div>
+                <div class="message-content" ng-bind-html="item.data.html"></div>
+            </div>
         </div>
     </win-item-template>
 
