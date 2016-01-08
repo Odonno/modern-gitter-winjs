@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Configs;
     (function (Configs) {
@@ -910,31 +910,36 @@ var Application;
                         _this.scope.messages.push(message);
                     }
                 };
+                this.scope.refreshed = false;
                 ApiService.getMessages(this.scope.room.id).then(function (messages) {
                     _this.scope.messages = messages;
                     _this.scope.messagesWinControl.forceLayout();
-                    setTimeout(function () {
-                        _this.scope.messagesWinControl.ensureVisible(_this.scope.messages.length - 1);
-                        _this.scope.hideProgress = false;
-                        _this.scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
-                            var visible = ev.detail.visible;
-                            if (visible && _this.scope.messages.length > 0) {
-                                var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
-                                ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
-                                    if (beforeMessages.length === 0) {
-                                        _this.scope.hideProgress = true;
-                                        return;
-                                    }
-                                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                        _this.scope.messages.unshift(beforeMessages[i]);
-                                    }
-                                    setTimeout(function () {
-                                        _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                                    }, 250);
-                                });
-                            }
-                        };
-                    }, 500);
+                    _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
+                        if (_this.scope.messagesWinControl.loadingState === "complete" && !_this.scope.refreshed) {
+                            _this.scope.messagesWinControl.ensureVisible(_this.scope.messages.length - 1);
+                            _this.scope.hideProgress = false;
+                            _this.scope.refreshed = true;
+                            _this.scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
+                                var visible = ev.detail.visible;
+                                if (visible && _this.scope.messages.length > 0) {
+                                    var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
+                                    ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
+                                        if (!beforeMessages || beforeMessages.length <= 0) {
+                                            _this.scope.hideProgress = true;
+                                            return;
+                                        }
+                                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                            _this.scope.messages.unshift(beforeMessages[i]);
+                                        }
+                                        setTimeout(function () {
+                                            _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                                        }, 250);
+                                    });
+                                }
+                            };
+                        }
+                        ;
+                    };
                 });
             }
             return RoomCtrl;

@@ -10,7 +10,7 @@
 <win-list-view id="messagesListView" item-data-source="messages" win-control="messagesWinControl">
     <!-- header template -->
     <win-list-view-header>
-        <progress class="win-progress-bar" ng-hide="hideProgress"></progress>
+        <progress class="win-progress-bar" ng-hide="hideProgress && !refreshed"></progress>
     </win-list-view-header>
 
     <!-- message template -->
