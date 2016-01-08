@@ -4,6 +4,7 @@ module Application.Services {
     export class RoomsService {
         // properties
         public initialized = false;
+        public currentUser: any;
         public currentRoom: any;
         public rooms = [];
         public onroomselected: any;
@@ -39,7 +40,9 @@ module Application.Services {
                 }
                 
                 // send notification
-                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                if (message.user.id !== this.currentUser.id) {
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                }
             });
 
             this.rooms.push(room);
@@ -53,11 +56,15 @@ module Application.Services {
                 this.RealtimeApiService.initialize().then(t => {
                     console.log('Sucessfully subscribed to realtime API');
 
-                    this.ApiService.getRooms().then(rooms => {
-                        for (var i = 0; i < rooms.length; i++) {
-                            this.addRoom(rooms[i]);
-                        }
-                        this.initialized = true;
+                    this.ApiService.getCurrentUser().then(user => {
+                        this.currentUser = user;
+
+                        this.ApiService.getRooms().then(rooms => {
+                            for (var i = 0; i < rooms.length; i++) {
+                                this.addRoom(rooms[i]);
+                            }
+                            this.initialized = true;
+                        });
                     });
                 });
             });

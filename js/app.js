@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Configs;
     (function (Configs) {
@@ -553,7 +553,9 @@ var Application;
                     if (_this.onmessagereceived) {
                         _this.onmessagereceived(roomId, message);
                     }
-                    _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                    if (message.user.id !== _this.currentUser.id) {
+                        _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                    }
                 });
                 this.rooms.push(room);
             };
@@ -563,11 +565,14 @@ var Application;
                     console.log('Sucessfully logged to Gitter API');
                     _this.RealtimeApiService.initialize().then(function (t) {
                         console.log('Sucessfully subscribed to realtime API');
-                        _this.ApiService.getRooms().then(function (rooms) {
-                            for (var i = 0; i < rooms.length; i++) {
-                                _this.addRoom(rooms[i]);
-                            }
-                            _this.initialized = true;
+                        _this.ApiService.getCurrentUser().then(function (user) {
+                            _this.currentUser = user;
+                            _this.ApiService.getRooms().then(function (rooms) {
+                                for (var i = 0; i < rooms.length; i++) {
+                                    _this.addRoom(rooms[i]);
+                                }
+                                _this.initialized = true;
+                            });
                         });
                     });
                 });
