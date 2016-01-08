@@ -12,7 +12,7 @@
         <div ng-click="selectRoom(item.data)" class="clickable" style="padding-bottom: 6px;">
             <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
             <div class="room-tile-text">{{ item.data.name }}</div>
-            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center" style="margin-right: 12px;">
+            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center" ng-show="item.data.unreadItems > 0">
                 <span ng-show="item.data.unreadItems < 100">{{ item.data.unreadItems }}</span>
                 <span ng-hide="item.data.unreadItems < 100">*</span>
             </div>
