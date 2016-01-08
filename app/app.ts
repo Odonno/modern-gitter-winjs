@@ -18,6 +18,7 @@
 /// <reference path="./controllers/addOneToOneRoomCtrl.ts"/>
 /// <reference path="./controllers/addRepositoryRoomCtrl.ts"/>
 /// <reference path="./controllers/addRoomCtrl.ts"/>
+/// <reference path="./controllers/appCtrl.ts"/>
 /// <reference path="./controllers/homeCtrl.ts"/>
 /// <reference path="./controllers/roomCtrl.ts"/>
 /// <reference path="./controllers/roomsCtrl.ts"/>
@@ -47,6 +48,7 @@ appModule.controller('AddExistingRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddRoomCtrl($scope));
+appModule.controller('AppCtrl', ($scope) => new Application.Controllers.AppCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, RoomsService, FeatureToggleService) => new Application.Controllers.HomeCtrl($scope, RoomsService, FeatureToggleService));
 appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService));

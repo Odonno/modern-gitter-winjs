@@ -9,6 +9,7 @@ module Application.Controllers {
             
             // properties
             this.scope.hideProgress = true;
+            this.scope.refreshed = false;
             this.scope.room = RoomsService.currentRoom;
             this.scope.messages = [];
 
@@ -34,7 +35,7 @@ module Application.Controllers {
                     this.scope.messages.push(message);
                 }
             };
-            this.scope.refreshed = false;
+            
             ApiService.getMessages(this.scope.room.id).then(messages => {
                 this.scope.messages = messages;
 
