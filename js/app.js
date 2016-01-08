@@ -508,8 +508,15 @@ var Application;
             ;
             RealtimeApiService.prototype.subscribe = function (roomId, callback) {
                 this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
-                    var message = response.model;
-                    callback(roomId, message);
+                    if (response.operation === 'create') {
+                        var message = response.model;
+                        callback(roomId, message);
+                    }
+                    if (response.operation === 'patch') {
+                    }
+                    else {
+                        console.log(response);
+                    }
                 });
             };
             ;
@@ -553,7 +560,7 @@ var Application;
                     if (_this.onmessagereceived) {
                         _this.onmessagereceived(roomId, message);
                     }
-                    if (message.user.id !== _this.currentUser.id) {
+                    if (message.fromUser.id !== _this.currentUser.id) {
                         _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
                     }
                 });
@@ -761,7 +768,6 @@ var Application;
                     if (_this.scope.roomname && _this.scope.roomname.length > 0) {
                         ApiService.searchRooms(_this.scope.roomname, 50).then(function (rooms) {
                             _this.scope.existingRooms = rooms;
-                            console.log(rooms);
                             for (var i = 0; i < _this.scope.existingRooms.length; i++) {
                                 if (_this.scope.existingRooms[i].user) {
                                     _this.scope.existingRooms[i].image = _this.scope.existingRooms[i].user.avatarUrlMedium;

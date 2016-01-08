@@ -27,7 +27,6 @@ module Application.Controllers {
                 if (this.scope.roomname && this.scope.roomname.length > 0) {
                     ApiService.searchRooms(this.scope.roomname, 50).then((rooms) => {
                         this.scope.existingRooms = rooms;
-                        console.log(rooms);
 
                         for (var i = 0; i < this.scope.existingRooms.length; i++) {
                             // compute room image

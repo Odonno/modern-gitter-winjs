@@ -44,8 +44,16 @@ module Application.Services {
         public subscribe(roomId, callback) {
             // subscribe to realtime messages
             this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', (response) => {
-                var message = response.model;
-                callback(roomId, message);
+                if (response.operation === 'create') {
+                    // new message
+                    var message = response.model;
+                    callback(roomId, message);
+                }
+                if (response.operation === 'patch') {
+                    // TODO : readby event
+                } else {
+                    console.log(response);
+                }
             });
         };
     }

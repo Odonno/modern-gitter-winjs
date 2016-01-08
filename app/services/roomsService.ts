@@ -40,7 +40,7 @@ module Application.Services {
                 }
                 
                 // send notification
-                if (message.user.id !== this.currentUser.id) {
+                if (message.fromUser.id !== this.currentUser.id) {
                     this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
                 }
             });
