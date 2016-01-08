@@ -39,6 +39,9 @@ module Application.Services {
                     this.onmessagereceived(roomId, message);
                 }
                 
+                // increment unread count
+                room.unreadItems++;
+                
                 // send notification
                 if (message.fromUser.id !== this.currentUser.id) {
                     this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);

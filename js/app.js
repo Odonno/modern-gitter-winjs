@@ -560,6 +560,7 @@ var Application;
                     if (_this.onmessagereceived) {
                         _this.onmessagereceived(roomId, message);
                     }
+                    room.unreadItems++;
                     if (message.fromUser.id !== _this.currentUser.id) {
                         _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
                     }
