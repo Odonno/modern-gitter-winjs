@@ -1,4 +1,15 @@
-﻿var Application;
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        (function (MessageOperation) {
+            MessageOperation[MessageOperation["Created"] = 1] = "Created";
+            MessageOperation[MessageOperation["ReadBy"] = 2] = "ReadBy";
+        })(Models.MessageOperation || (Models.MessageOperation = {}));
+        var MessageOperation = Models.MessageOperation;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
 (function (Application) {
     var Configs;
     (function (Configs) {
@@ -509,10 +520,10 @@ var Application;
             RealtimeApiService.prototype.subscribe = function (roomId, callback) {
                 this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
                     if (response.operation === 'create') {
-                        var message = response.model;
-                        callback(roomId, message);
+                        callback(Application.Models.MessageOperation.Created, response.model);
                     }
-                    if (response.operation === 'patch') {
+                    else if (response.operation === 'patch') {
+                        callback(Application.Models.MessageOperation.ReadBy, response.model);
                     }
                     else {
                         console.log(response);
@@ -556,16 +567,21 @@ var Application;
                 else {
                     room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
                 }
-                this.RealtimeApiService.subscribe(room.id, function (roomId, message) {
-                    if (_this.onmessagereceived) {
-                        _this.onmessagereceived(roomId, message);
-                    }
-                    room.unreadItems++;
-                    if (message.fromUser.id !== _this.currentUser.id) {
-                        _this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                this.RealtimeApiService.subscribe(room.id, function (operation, content) {
+                    if (operation === Application.Models.MessageOperation.Created) {
+                        _this.receiveMessage(room, content);
                     }
                 });
                 this.rooms.push(room);
+            };
+            RoomsService.prototype.receiveMessage = function (room, message) {
+                if (this.onmessagereceived) {
+                    this.onmessagereceived(room.id, message);
+                }
+                if (message.fromUser.id !== this.currentUser.id) {
+                    room.unreadItems++;
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                }
             };
             RoomsService.prototype.initialize = function () {
                 var _this = this;

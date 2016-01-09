@@ -46,11 +46,10 @@ module Application.Services {
             this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', (response) => {
                 if (response.operation === 'create') {
                     // new message
-                    var message = response.model;
-                    callback(roomId, message);
-                }
-                if (response.operation === 'patch') {
-                    // TODO : readby event
+                    callback(Application.Models.MessageOperation.Created, response.model);
+                } else if (response.operation === 'patch') {
+                    // readby event
+                    callback(Application.Models.MessageOperation.ReadBy, response.model);
                 } else {
                     console.log(response);
                 }

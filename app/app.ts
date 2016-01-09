@@ -1,5 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
+/// <reference path="./models/messageOperation.ts"/>
+
 /// <reference path="./configs/routing.ts"/>
 
 /// <reference path="./services/apiService.ts"/>

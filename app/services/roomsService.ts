@@ -34,21 +34,27 @@ module Application.Services {
             }
                 
             // subscribe to realtime messages
-            this.RealtimeApiService.subscribe(room.id, (roomId, message) => {
-                if (this.onmessagereceived) {
-                    this.onmessagereceived(roomId, message);
-                }
-                
-                // increment unread count
-                room.unreadItems++;
-                
-                // send notification
-                if (message.fromUser.id !== this.currentUser.id) {
-                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+            this.RealtimeApiService.subscribe(room.id, (operation: Application.Models.MessageOperation, content: any) => {
+                if (operation === Application.Models.MessageOperation.Created) {
+                    this.receiveMessage(room, content);
                 }
             });
 
             this.rooms.push(room);
+        }
+
+        private receiveMessage(room, message) {
+            if (this.onmessagereceived) {
+                this.onmessagereceived(room.id, message);
+            }
+
+            if (message.fromUser.id !== this.currentUser.id) {
+                // increment unread count
+                room.unreadItems++;
+                
+                // send notification
+                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+            }
         }
 
         // public methods
