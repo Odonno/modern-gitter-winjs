@@ -54,6 +54,8 @@ module Application.Services {
                 
                 // send notification
                 this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+            } else {
+                message.unread = false;
             }
         }
 

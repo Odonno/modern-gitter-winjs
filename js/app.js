@@ -582,6 +582,9 @@ var Application;
                     room.unreadItems++;
                     this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
                 }
+                else {
+                    message.unread = false;
+                }
             };
             RoomsService.prototype.initialize = function () {
                 var _this = this;
