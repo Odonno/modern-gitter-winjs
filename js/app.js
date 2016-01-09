@@ -946,6 +946,7 @@ var Application;
         var RoomCtrl = (function () {
             function RoomCtrl($scope, ApiService, RoomsService) {
                 var _this = this;
+                this.ApiService = ApiService;
                 this.scope = $scope;
                 this.scope.hideProgress = true;
                 this.scope.refreshed = false;
@@ -974,33 +975,38 @@ var Application;
                     _this.scope.messages = messages;
                     _this.scope.messagesWinControl.forceLayout();
                     _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
-                        if (_this.scope.messagesWinControl.loadingState === "complete" && !_this.scope.refreshed) {
-                            _this.scope.messagesWinControl.ensureVisible(_this.scope.messages.length - 1);
-                            _this.scope.hideProgress = false;
-                            _this.scope.refreshed = true;
-                            _this.scope.messagesWinControl.onheadervisibilitychanged = function (ev) {
-                                var visible = ev.detail.visible;
-                                if (visible && _this.scope.messages.length > 0) {
-                                    var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
-                                    ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
-                                        if (!beforeMessages || beforeMessages.length <= 0) {
-                                            _this.scope.hideProgress = true;
-                                            return;
-                                        }
-                                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                            _this.scope.messages.unshift(beforeMessages[i]);
-                                        }
-                                        setTimeout(function () {
-                                            _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                                        }, 250);
-                                    });
-                                }
-                            };
+                        if (_this.scope.messagesWinControl.loadingState === "complete") {
+                            if (!_this.scope.refreshed) {
+                                _this.refreshListView();
+                            }
                         }
                         ;
                     };
                 });
             }
+            RoomCtrl.prototype.refreshListView = function () {
+                var _this = this;
+                this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
+                this.scope.hideProgress = false;
+                this.scope.refreshed = true;
+                this.scope.messagesWinControl.onheadervisibilitychanged = function (e) {
+                    if (e.detail.visible && _this.scope.messages.length > 0) {
+                        var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
+                        _this.ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
+                            if (!beforeMessages || beforeMessages.length <= 0) {
+                                _this.scope.hideProgress = true;
+                                return;
+                            }
+                            for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                _this.scope.messages.unshift(beforeMessages[i]);
+                            }
+                            setTimeout(function () {
+                                _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                            }, 250);
+                        });
+                    }
+                };
+            };
             return RoomCtrl;
         })();
         Controllers.RoomCtrl = RoomCtrl;
