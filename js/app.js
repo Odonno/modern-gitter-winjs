@@ -976,6 +976,9 @@ var Application;
                     _this.scope.messagesWinControl.forceLayout();
                     _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
                         if (_this.scope.messagesWinControl.loadingState === "complete") {
+                            if (_this.scope.refreshed) {
+                                _this.detectUnreadMessages();
+                            }
                             if (!_this.scope.refreshed) {
                                 _this.refreshListView();
                             }
@@ -1006,6 +1009,10 @@ var Application;
                         });
                     }
                 };
+            };
+            RoomCtrl.prototype.detectUnreadMessages = function () {
+                var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
+                var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
             };
             return RoomCtrl;
         })();

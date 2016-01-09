@@ -45,12 +45,15 @@ module Application.Controllers {
                 // wait for refresh
                 this.scope.messagesWinControl.onloadingstatechanged = (e) => {
                     if (this.scope.messagesWinControl.loadingState === "complete") {
+                        // detect visible unread messages
+                        if (this.scope.refreshed) {
+                            this.detectUnreadMessages();
+                        }
+                        
                         // refresh listview the first time
                         if (!this.scope.refreshed) {
                             this.refreshListView();
                         }
-                        
-                        // detect visible unread messages
                     };
                 };
             });
@@ -88,6 +91,11 @@ module Application.Controllers {
                     });
                 }
             }
+        }
+
+        private detectUnreadMessages() {
+            var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
+            var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
         }
     }
 }
