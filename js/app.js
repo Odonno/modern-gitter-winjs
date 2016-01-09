@@ -4,7 +4,9 @@ var Application;
     (function (Models) {
         (function (MessageOperation) {
             MessageOperation[MessageOperation["Created"] = 1] = "Created";
-            MessageOperation[MessageOperation["ReadBy"] = 2] = "ReadBy";
+            MessageOperation[MessageOperation["Updated"] = 2] = "Updated";
+            MessageOperation[MessageOperation["Deleted"] = 3] = "Deleted";
+            MessageOperation[MessageOperation["ReadBy"] = 4] = "ReadBy";
         })(Models.MessageOperation || (Models.MessageOperation = {}));
         var MessageOperation = Models.MessageOperation;
     })(Models = Application.Models || (Application.Models = {}));
@@ -521,6 +523,15 @@ var Application;
                 this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', function (response) {
                     if (response.operation === 'create') {
                         callback(Application.Models.MessageOperation.Created, response.model);
+                    }
+                    else if (response.operation === 'update') {
+                        var message = response.model;
+                        if (message.html) {
+                            callback(Application.Models.MessageOperation.Updated, response.model);
+                        }
+                        else {
+                            callback(Application.Models.MessageOperation.Deleted, response.model);
+                        }
                     }
                     else if (response.operation === 'patch') {
                         callback(Application.Models.MessageOperation.ReadBy, response.model);

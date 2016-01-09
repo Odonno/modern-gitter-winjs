@@ -47,6 +47,15 @@ module Application.Services {
                 if (response.operation === 'create') {
                     // new message
                     callback(Application.Models.MessageOperation.Created, response.model);
+                } else if (response.operation === 'update') {
+                    var message = response.model;
+                    if (message.html) {
+                        // message updated
+                        callback(Application.Models.MessageOperation.Updated, response.model);
+                    } else {
+                        // message deleted
+                        callback(Application.Models.MessageOperation.Deleted, response.model);
+                    }
                 } else if (response.operation === 'patch') {
                     // readby event
                     callback(Application.Models.MessageOperation.ReadBy, response.model);
