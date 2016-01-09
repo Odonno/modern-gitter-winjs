@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -195,6 +195,24 @@ var Application;
                         type: 'POST',
                         url: _this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
                         data: JSON.stringify({ text: text }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ;
+            ApiService.prototype.markUnreadMessages = function (userId, roomId, messageIds) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'POST',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/rooms/" + roomId + "/unreadItems",
+                        data: JSON.stringify({ chat: messageIds }),
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
@@ -621,7 +639,6 @@ var Application;
                     this.onroomselected();
                 }
             };
-            ;
             RoomsService.prototype.createRoom = function (name, callback) {
                 var _this = this;
                 this.ApiService.joinRoom(name).then(function (room) {
@@ -629,7 +646,6 @@ var Application;
                     callback(room);
                 });
             };
-            ;
             RoomsService.prototype.createChannel = function (channel, callback) {
                 var _this = this;
                 this.ApiService.createChannel(channel).then(function (room) {
@@ -637,7 +653,14 @@ var Application;
                     callback(room);
                 });
             };
-            ;
+            RoomsService.prototype.markUnreadMessages = function (messageIds) {
+                var _this = this;
+                this.ApiService.markUnreadMessages(this.currentUser.id, this.currentRoom.id, messageIds).then(function (response) {
+                    if (response) {
+                        _this.currentRoom.unreadItems -= messageIds.length;
+                    }
+                });
+            };
             return RoomsService;
         })();
         Services.RoomsService = RoomsService;
@@ -947,14 +970,15 @@ var Application;
             function RoomCtrl($scope, ApiService, RoomsService) {
                 var _this = this;
                 this.ApiService = ApiService;
+                this.RoomsService = RoomsService;
                 this.scope = $scope;
                 this.scope.hideProgress = true;
                 this.scope.refreshed = false;
-                this.scope.room = RoomsService.currentRoom;
+                this.scope.room = this.RoomsService.currentRoom;
                 this.scope.messages = [];
                 this.scope.sendMessage = function () {
                     if (_this.scope.textMessage) {
-                        ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
+                        _this.ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
                             _this.scope.textMessage = '';
                         });
                     }
@@ -966,25 +990,28 @@ var Application;
                     console.error('no room selected...');
                     return;
                 }
-                RoomsService.onmessagereceived = function (roomId, message) {
+                this.RoomsService.onmessagereceived = function (roomId, message) {
                     if (_this.scope.room && _this.scope.room.id === roomId) {
                         _this.scope.messages.push(message);
                     }
                 };
-                ApiService.getMessages(this.scope.room.id).then(function (messages) {
-                    _this.scope.messages = messages;
-                    _this.scope.messagesWinControl.forceLayout();
-                    _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
-                        if (_this.scope.messagesWinControl.loadingState === "complete") {
-                            if (_this.scope.refreshed) {
-                                _this.detectUnreadMessages();
+                this.ApiService.getCurrentUser().then(function (user) {
+                    _this.currentUser = user;
+                    _this.ApiService.getMessages(_this.scope.room.id).then(function (messages) {
+                        _this.scope.messages = messages;
+                        _this.scope.messagesWinControl.forceLayout();
+                        _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
+                            if (_this.scope.messagesWinControl.loadingState === "complete") {
+                                if (_this.scope.refreshed) {
+                                    _this.detectUnreadMessages();
+                                }
+                                if (!_this.scope.refreshed) {
+                                    _this.refreshListView();
+                                }
                             }
-                            if (!_this.scope.refreshed) {
-                                _this.refreshListView();
-                            }
-                        }
-                        ;
-                    };
+                            ;
+                        };
+                    });
                 });
             }
             RoomCtrl.prototype.refreshListView = function () {
@@ -1013,6 +1040,16 @@ var Application;
             RoomCtrl.prototype.detectUnreadMessages = function () {
                 var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
                 var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+                var messageIds = [];
+                for (var i = 0; i < this.scope.messages.length; i++) {
+                    if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
+                        messageIds.push(this.scope.messages[i].id);
+                        this.scope.messages[i].unread = false;
+                    }
+                }
+                if (messageIds.length > 0) {
+                    this.RoomsService.markUnreadMessages(messageIds);
+                }
             };
             return RoomCtrl;
         })();

@@ -86,20 +86,28 @@ module Application.Services {
             if (this.onroomselected) {
                 this.onroomselected();
             }
-        };
+        }
 
         public createRoom(name, callback) {
             this.ApiService.joinRoom(name).then(room => {
                 this.addRoom(room);
                 callback(room);
             });
-        };
+        }
 
         public createChannel(channel, callback) {
             this.ApiService.createChannel(channel).then(room => {
                 this.addRoom(room);
                 callback(room);
             });
-        };
+        }
+
+        public markUnreadMessages(messageIds: string[]) {
+            this.ApiService.markUnreadMessages(this.currentUser.id, this.currentRoom.id, messageIds).then(response => {
+                if (response) {
+                    this.currentRoom.unreadItems -= messageIds.length;
+                }
+            });
+        }
     }
 }

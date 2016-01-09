@@ -3,20 +3,21 @@
 module Application.Controllers {
     export class RoomCtrl {
         private scope: any;
+        private currentUser: any;
 
-        constructor($scope, private ApiService, RoomsService) {
+        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService) {
             this.scope = $scope;
             
             // properties
             this.scope.hideProgress = true;
             this.scope.refreshed = false;
-            this.scope.room = RoomsService.currentRoom;
+            this.scope.room = this.RoomsService.currentRoom;
             this.scope.messages = [];
 
             // methods
             this.scope.sendMessage = () => {
                 if (this.scope.textMessage) {
-                    ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
+                    this.ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
                         this.scope.textMessage = '';
                     });
                 } else {
@@ -30,33 +31,38 @@ module Application.Controllers {
                 return;
             }
 
-            RoomsService.onmessagereceived = (roomId, message) => {
+            this.RoomsService.onmessagereceived = (roomId, message) => {
                 if (this.scope.room && this.scope.room.id === roomId) {
                     this.scope.messages.push(message);
                 }
             };
 
-            ApiService.getMessages(this.scope.room.id).then(messages => {
-                this.scope.messages = messages;
+            this.ApiService.getCurrentUser().then(user => {
+                this.currentUser = user;
 
-                // refresh UI
-                this.scope.messagesWinControl.forceLayout();
+                this.ApiService.getMessages(this.scope.room.id).then(messages => {
+                    this.scope.messages = messages;
 
-                // wait for refresh
-                this.scope.messagesWinControl.onloadingstatechanged = (e) => {
-                    if (this.scope.messagesWinControl.loadingState === "complete") {
-                        // detect visible unread messages
-                        if (this.scope.refreshed) {
-                            this.detectUnreadMessages();
-                        }
+                    // refresh UI
+                    this.scope.messagesWinControl.forceLayout();
+
+                    // wait for refresh
+                    this.scope.messagesWinControl.onloadingstatechanged = (e) => {
+                        if (this.scope.messagesWinControl.loadingState === "complete") {
+                            // detect visible unread messages
+                            if (this.scope.refreshed) {
+                                this.detectUnreadMessages();
+                            }
                         
-                        // refresh listview the first time
-                        if (!this.scope.refreshed) {
-                            this.refreshListView();
-                        }
+                            // refresh listview the first time
+                            if (!this.scope.refreshed) {
+                                this.refreshListView();
+                            }
+                        };
                     };
-                };
+                });
             });
+
         }
         
         // private methods
@@ -96,6 +102,18 @@ module Application.Controllers {
         private detectUnreadMessages() {
             var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
             var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+
+            var messageIds = [];
+            for (var i = 0; i < this.scope.messages.length; i++) {
+                if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
+                    messageIds.push(this.scope.messages[i].id);
+                    this.scope.messages[i].unread = false;
+                }
+            }
+
+            if (messageIds.length > 0) {
+                this.RoomsService.markUnreadMessages(messageIds);
+            }
         }
     }
 }

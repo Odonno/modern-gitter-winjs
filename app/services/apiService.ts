@@ -93,7 +93,7 @@ module Application.Services {
             });
         };
 
-        public getMessages(roomId, beforeId) {
+        public getMessages(roomId: string, beforeId?: string) {
             return new Promise<[{}]>((done, error) => {
                 var query = '?limit=' + this.ConfigService.messagesLimit;
 
@@ -121,6 +121,23 @@ module Application.Services {
                     type: 'POST',
                     url: this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
                     data: JSON.stringify({ text: text }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        };
+
+        public markUnreadMessages(userId: string, roomId: string, messageIds: string[]) {
+            return new Promise<{}>((done, error) => {
+                WinJS.xhr({
+                    type: 'POST',
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/rooms/" + roomId + "/unreadItems",
+                    data: JSON.stringify({ chat: messageIds }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
