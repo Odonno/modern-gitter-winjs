@@ -30,6 +30,50 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
+appModule.run(['$rootScope', '$state', ($rootScope, $state) => {
+    var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+    $rootScope.states = [];
+    $rootScope.previousState;
+    $rootScope.currentState;
+
+    $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
+        $rootScope.currentState = to.name;
+
+        if (!from.name) {
+            return;
+        }
+
+        if ($rootScope.previousState !== $rootScope.currentState) {
+            $rootScope.previousState = from.name;
+            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+            
+            // add current state to history
+            $rootScope.states.push({
+                state: $rootScope.previousState,
+                params: fromParams
+            });
+        }
+    });
+
+    systemNavigationManager.onbackrequested = (args) => {
+        if ($rootScope.states.length > 0) {
+            // retrieve and remove last state from history
+            var previous = $rootScope.states.pop();
+            $rootScope.previousState = previous.state;
+            
+            // go back to previous page
+            $state.go(previous.state, previous.params);
+
+            if ($rootScope.states.length === 0) {
+                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+            }
+
+            args.handled = true;
+        } else {
+            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+        }
+    };
+}]);
 
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));

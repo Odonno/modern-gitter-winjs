@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -1081,6 +1081,40 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
+appModule.run(['$rootScope', '$state', function ($rootScope, $state) {
+        var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+        $rootScope.states = [];
+        $rootScope.previousState;
+        $rootScope.currentState;
+        $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
+            $rootScope.currentState = to.name;
+            if (!from.name) {
+                return;
+            }
+            if ($rootScope.previousState !== $rootScope.currentState) {
+                $rootScope.previousState = from.name;
+                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                $rootScope.states.push({
+                    state: $rootScope.previousState,
+                    params: fromParams
+                });
+            }
+        });
+        systemNavigationManager.onbackrequested = function (args) {
+            if ($rootScope.states.length > 0) {
+                var previous = $rootScope.states.pop();
+                $rootScope.previousState = previous.state;
+                $state.go(previous.state, previous.params);
+                if ($rootScope.states.length === 0) {
+                    systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                }
+                args.handled = true;
+            }
+            else {
+                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+            }
+        };
+    }]);
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
