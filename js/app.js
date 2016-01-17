@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -340,14 +340,7 @@ var Application;
         var FeatureToggleService = (function () {
             function FeatureToggleService() {
                 this.isWindowsApp = function () {
-                    try {
-                        if (Windows) {
-                            return true;
-                        }
-                    }
-                    catch (e) {
-                        return false;
-                    }
+                    return (typeof Windows !== 'undefined');
                 };
             }
             return FeatureToggleService;
