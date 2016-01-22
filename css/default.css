@@ -60,10 +60,6 @@ hr {
 }
 
 /* list-view style */
-.win-listview .win-listlayout .win-container {
-    height: auto;
-}
-
 html.win-hoverable .win-listview .win-itembox:hover::before,
 html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     border: none;

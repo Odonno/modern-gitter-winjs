@@ -15,7 +15,7 @@
 
     <!-- message template -->
     <win-item-template>
-        <div class="message-container clickable" ng-class="item.data.unread ? 'unread' : 'read'">
+        <div class="message-container clickable" ng-class="item.data.unread ? 'unread' : 'read'" style="height: 100px;">
             <img class="message-image" ng-src="{{ item.data.fromUser.avatarUrlSmall }}" />
             <div class="message-subcontainer">
                 <div class="message-username">{{ item.data.fromUser.username }}</div>
