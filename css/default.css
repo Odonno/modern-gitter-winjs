@@ -124,6 +124,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	margin-bottom: 12px;
 }
 
+#issues-link a {
+    color: white;
+}
+
 #me-circle {
 	width: 200px;
 	height: 200px;
