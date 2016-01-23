@@ -59,6 +59,10 @@ hr {
     display: inline-block;
 }
 
+.win-splitview-pane-hidden {
+	display: none;
+}
+
 /* list-view style */
 html.win-hoverable .win-listview .win-itembox:hover::before,
 html.win-hoverable .win-itemcontainer .win-itembox:hover::before {

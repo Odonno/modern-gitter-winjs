@@ -935,12 +935,30 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var AppCtrl = (function () {
-            function AppCtrl($scope) {
+            function AppCtrl($scope, $rootScope) {
                 var _this = this;
                 this.scope = $scope;
                 $scope.closeSplitViewToggle = function () {
                     _this.scope.splitViewWinControl.closePane();
                 };
+                $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
+                    if (!from.name || to.name === 'splashscreen') {
+                        var elements = document.getElementsByClassName('win-splitview-pane');
+                        for (var i in elements) {
+                            if (elements.hasOwnProperty(i)) {
+                                elements[i].className = 'win-splitview-pane-hidden';
+                            }
+                        }
+                    }
+                    else {
+                        var elements = document.getElementsByClassName('win-splitview-pane-hidden');
+                        for (var i in elements) {
+                            if (elements.hasOwnProperty(i)) {
+                                elements[i].className = 'win-splitview-pane';
+                            }
+                        }
+                    }
+                });
             }
             return AppCtrl;
         })();
@@ -1170,7 +1188,7 @@ appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });
-appModule.controller('AppCtrl', function ($scope) { return new Application.Controllers.AppCtrl($scope); });
+appModule.controller('AppCtrl', function ($scope, $rootScope) { return new Application.Controllers.AppCtrl($scope, $rootScope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });
