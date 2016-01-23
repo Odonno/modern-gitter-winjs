@@ -12,9 +12,9 @@ module Application.Services {
 
         constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
             // initialize service 
-            if (this.NetworkService.internetAvailable) {
-                this.initialize();
-            }
+            // if (this.NetworkService.internetAvailable) {
+            //     this.initialize();
+            // }
 
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
@@ -60,7 +60,13 @@ module Application.Services {
         }
 
         // public methods
-        public initialize() {
+        public initialize(callback?) {
+            if (this.initialized) {
+                if (callback) {
+                    callback();
+                }
+            }
+
             this.OAuthService.connect().then(t => {
                 console.log('Sucessfully logged to Gitter API');
 
@@ -75,6 +81,9 @@ module Application.Services {
                                 this.addRoom(rooms[i]);
                             }
                             this.initialized = true;
+                            if (callback) {
+                                callback();
+                            }
                         });
                     });
                 });

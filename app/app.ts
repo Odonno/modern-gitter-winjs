@@ -24,6 +24,7 @@
 /// <reference path="./controllers/homeCtrl.ts"/>
 /// <reference path="./controllers/roomCtrl.ts"/>
 /// <reference path="./controllers/roomsCtrl.ts"/>
+/// <reference path="./controllers/splashscreenCtrl.ts"/>
 
 // create module with references
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
@@ -39,7 +40,7 @@ appModule.run(['$rootScope', '$state', ($rootScope, $state) => {
     $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
         $rootScope.currentState = to.name;
 
-        if (!from.name) {
+        if (!from.name || from.name === 'splashscreen') {
             return;
         }
 
@@ -98,3 +99,4 @@ appModule.controller('AppCtrl', ($scope) => new Application.Controllers.AppCtrl(
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService));
 appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService));
+appModule.controller('SplashscreenCtrl', ($scope, $state, RoomsService) => new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService));

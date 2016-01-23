@@ -129,6 +129,7 @@
     <Content Include="partials\repository.html" />
     <Content Include="partials\room.html" />
     <Content Include="partials\rooms.html" />
+    <Content Include="partials\splashscreen.html" />
     <None Include="modern-gitter_StoreKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />
     <None Include="modern-gitter_TemporaryKey.pfx" />

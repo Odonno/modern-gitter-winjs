@@ -3,9 +3,14 @@
 module Application.Configs {
     export class RoutingConfig {
         constructor($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) {
-            $urlRouterProvider.otherwise('/home');
+            $urlRouterProvider.otherwise('/splashscreen');
 
             $stateProvider
+                .state('splashscreen', {
+                    url: '/splashscreen',
+                    templateUrl: 'partials/splashscreen.html',
+                    controller: 'SplashscreenCtrl'
+                })
                 .state('home', {
                     url: '/home',
                     templateUrl: 'partials/home.html',

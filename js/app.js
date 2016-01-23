@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -17,8 +17,13 @@ var Application;
     (function (Configs) {
         var RoutingConfig = (function () {
             function RoutingConfig($stateProvider, $urlRouterProvider) {
-                $urlRouterProvider.otherwise('/home');
+                $urlRouterProvider.otherwise('/splashscreen');
                 $stateProvider
+                    .state('splashscreen', {
+                    url: '/splashscreen',
+                    templateUrl: 'partials/splashscreen.html',
+                    controller: 'SplashscreenCtrl'
+                })
                     .state('home', {
                     url: '/home',
                     templateUrl: 'partials/home.html',
@@ -575,9 +580,6 @@ var Application;
                 this.ToastNotificationService = ToastNotificationService;
                 this.initialized = false;
                 this.rooms = [];
-                if (this.NetworkService.internetAvailable) {
-                    this.initialize();
-                }
                 this.NetworkService.statusChanged(function () {
                     if (!_this.initialized && _this.NetworkService.internetAvailable) {
                         _this.initialize();
@@ -611,8 +613,13 @@ var Application;
                     message.unread = false;
                 }
             };
-            RoomsService.prototype.initialize = function () {
+            RoomsService.prototype.initialize = function (callback) {
                 var _this = this;
+                if (this.initialized) {
+                    if (callback) {
+                        callback();
+                    }
+                }
                 this.OAuthService.connect().then(function (t) {
                     console.log('Sucessfully logged to Gitter API');
                     _this.RealtimeApiService.initialize().then(function (t) {
@@ -624,6 +631,9 @@ var Application;
                                     _this.addRoom(rooms[i]);
                                 }
                                 _this.initialized = true;
+                                if (callback) {
+                                    callback();
+                                }
                             });
                         });
                     });
@@ -1094,6 +1104,22 @@ var Application;
         Controllers.RoomsCtrl = RoomsCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var SplashscreenCtrl = (function () {
+            function SplashscreenCtrl($scope, $state, RoomsService) {
+                this.scope = $scope;
+                RoomsService.initialize(function () {
+                    $state.go('home');
+                });
+            }
+            return SplashscreenCtrl;
+        })();
+        Controllers.SplashscreenCtrl = SplashscreenCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.run(['$rootScope', '$state', function ($rootScope, $state) {
@@ -1103,7 +1129,7 @@ appModule.run(['$rootScope', '$state', function ($rootScope, $state) {
         $rootScope.currentState;
         $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
             $rootScope.currentState = to.name;
-            if (!from.name) {
+            if (!from.name || from.name === 'splashscreen') {
                 return;
             }
             if ($rootScope.previousState !== $rootScope.currentState) {
@@ -1148,3 +1174,4 @@ appModule.controller('AppCtrl', function ($scope) { return new Application.Contr
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });
+appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService); });
