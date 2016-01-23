@@ -937,26 +937,24 @@ var Application;
         var AppCtrl = (function () {
             function AppCtrl($scope, $rootScope) {
                 var _this = this;
+                this.invertCssClass = function (oldClass, newCLass) {
+                    var elements = document.getElementsByClassName(oldClass);
+                    for (var i in elements) {
+                        if (elements.hasOwnProperty(i)) {
+                            elements[i].className = newCLass;
+                        }
+                    }
+                };
                 this.scope = $scope;
                 $scope.closeSplitViewToggle = function () {
                     _this.scope.splitViewWinControl.closePane();
                 };
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
                     if (!from.name || to.name === 'splashscreen') {
-                        var elements = document.getElementsByClassName('win-splitview-pane');
-                        for (var i in elements) {
-                            if (elements.hasOwnProperty(i)) {
-                                elements[i].className = 'win-splitview-pane-hidden';
-                            }
-                        }
+                        _this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
                     }
                     else {
-                        var elements = document.getElementsByClassName('win-splitview-pane-hidden');
-                        for (var i in elements) {
-                            if (elements.hasOwnProperty(i)) {
-                                elements[i].className = 'win-splitview-pane';
-                            }
-                        }
+                        _this.invertCssClass('win-splitview-pane-hidden', 'win-splitview-pane');
                     }
                 });
             }

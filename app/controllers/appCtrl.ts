@@ -18,22 +18,21 @@ module Application.Controllers {
             $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
                 if (!from.name || to.name === 'splashscreen') {
                     // hide pane splitview
-                    var elements = document.getElementsByClassName('win-splitview-pane');
-                    for (var i in elements) {
-                        if (elements.hasOwnProperty(i)) {
-                            elements[i].className = 'win-splitview-pane-hidden';
-                        }
-                    }
+                    this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
                 } else {
                     // make visible pane splitview
-                    var elements = document.getElementsByClassName('win-splitview-pane-hidden');
-                    for (var i in elements) {
-                        if (elements.hasOwnProperty(i)) {
-                            elements[i].className = 'win-splitview-pane';
-                        }
-                    }
+                    this.invertCssClass('win-splitview-pane-hidden', 'win-splitview-pane');
                 }
             });
         }
+
+        private invertCssClass = (oldClass: string, newCLass: string) => {
+            var elements = document.getElementsByClassName(oldClass);
+            for (var i in elements) {
+                if (elements.hasOwnProperty(i)) {
+                    elements[i].className = newCLass;
+                }
+            }
+        };
     }
 }
