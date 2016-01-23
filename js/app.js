@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -341,6 +341,9 @@ var Application;
             function FeatureToggleService() {
                 this.isWindowsApp = function () {
                     return (typeof Windows !== 'undefined');
+                };
+                this.isMyImageShown = function () {
+                    return false;
                 };
             }
             return FeatureToggleService;
@@ -949,6 +952,7 @@ var Application;
                 else {
                     this.scope.appVersion = 'web';
                 }
+                this.scope.showMyImage = FeatureToggleService.isMyImageShown();
             }
             return HomeCtrl;
         })();

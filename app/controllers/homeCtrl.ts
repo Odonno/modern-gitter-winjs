@@ -16,6 +16,8 @@ module Application.Controllers {
             } else {
                 this.scope.appVersion = 'web';
             }
+            
+            this.scope.showMyImage = FeatureToggleService.isMyImageShown();
         }
     }
 }

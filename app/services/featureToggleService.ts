@@ -5,5 +5,9 @@ module Application.Services {
         public isWindowsApp = () => {
             return (typeof Windows !== 'undefined');
         };
+        
+        public isMyImageShown = () => {
+            return false;
+        }
     }
 }
