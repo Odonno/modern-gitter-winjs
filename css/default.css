@@ -120,6 +120,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 #app-version {
+    margin-top: 12px;
 	margin-bottom: 12px;
 }
 

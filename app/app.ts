@@ -95,6 +95,6 @@ appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddRoomCtrl($scope));
 appModule.controller('AppCtrl', ($scope) => new Application.Controllers.AppCtrl($scope));
-appModule.controller('HomeCtrl', ($scope, RoomsService, FeatureToggleService) => new Application.Controllers.HomeCtrl($scope, RoomsService, FeatureToggleService));
+appModule.controller('HomeCtrl', ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService));
 appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService));

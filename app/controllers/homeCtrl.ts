@@ -4,7 +4,7 @@ module Application.Controllers {
     export class HomeCtrl {
         private scope: any;
 
-        constructor($scope, RoomsService, FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor($scope, $state, RoomsService, FeatureToggleService: Application.Services.FeatureToggleService, ToastNotificationService: Application.Services.ToastNotificationService) {
             this.scope = $scope;
             
             // properties
@@ -16,8 +16,33 @@ module Application.Controllers {
             } else {
                 this.scope.appVersion = 'web';
             }
-            
+
             this.scope.showMyImage = FeatureToggleService.isMyImageShown();
+            
+            // methods
+            this.scope.goToJoinRoomPage = () => {
+                $state.go('addRoom');
+            };
+
+            this.scope.chatWithUs = () => {
+                var roomName = 'Odonno/Modern-Gitter';
+
+                // go to existing room if we already joined it
+                for (var i = 0; i < RoomsService.rooms.length; i++) {
+                    if (RoomsService.rooms[i].name === roomName) {
+                        RoomsService.selectRoom(RoomsService.rooms[i]);
+                        $state.go('room');
+                        return;
+                    }
+                }
+                
+                // join the room
+                RoomsService.createRoom(roomName, (room) => {
+                    ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name);
+                    RoomsService.selectRoom(room);
+                    $state.go('room');
+                });
+            };
         }
     }
 }
