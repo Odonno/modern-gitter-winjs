@@ -116,6 +116,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 #home-scroll {
 	height: 100vh;
 	overflow-y: auto;
+    background-image: url(/assets/background.jpg);
 }
 
 #app-version {
