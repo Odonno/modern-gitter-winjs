@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <Content Include="assets\background.jpg" />
+    <Content Include="assets\logo.white.png" />
     <Content Include="assets\me.png" />
     <Content Include="default.html" />
     <Content Include="dist\angular-sanitize\angular-sanitize.js" />

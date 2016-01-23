@@ -116,6 +116,30 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	margin: auto;
 }
 
+/* splashscreen view style */
+#splashscreen-container {
+    position: relative;
+    height: 100vh;
+}
+
+#splashscreen-subcontainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -50px;
+}
+
+#splashscreen-logo {
+    max-width: 128px;
+    max-height: 128px
+}
+
+#splashscreen-progress {
+    margin-top: 20px;
+    margin-left: 40px;
+}
+
 /* home view style */
 #home-scroll {
 	height: 100vh;

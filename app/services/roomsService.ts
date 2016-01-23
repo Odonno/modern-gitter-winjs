@@ -11,11 +11,6 @@ module Application.Services {
         public onmessagereceived: any;
 
         constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
-            // initialize service 
-            // if (this.NetworkService.internetAvailable) {
-            //     this.initialize();
-            // }
-
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
                 if (!this.initialized && this.NetworkService.internetAvailable) {
