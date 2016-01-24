@@ -21,6 +21,7 @@
 /// <reference path="./controllers/addRepositoryRoomCtrl.ts"/>
 /// <reference path="./controllers/addRoomCtrl.ts"/>
 /// <reference path="./controllers/appCtrl.ts"/>
+/// <reference path="./controllers/errorCtrl.ts"/>
 /// <reference path="./controllers/homeCtrl.ts"/>
 /// <reference path="./controllers/roomCtrl.ts"/>
 /// <reference path="./controllers/roomsCtrl.ts"/>
@@ -31,7 +32,7 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.run(['$rootScope', '$state', ($rootScope, $state) => {
+appModule.run(($rootScope, $state, RoomsService: Application.Services.RoomsService, FeatureToggleService: Application.Services.FeatureToggleService) => {
     var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
     $rootScope.states = [];
     $rootScope.previousState;
@@ -40,8 +41,19 @@ appModule.run(['$rootScope', '$state', ($rootScope, $state) => {
     $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
         $rootScope.currentState = to.name;
 
+        // remove navigation stack if we are before the home page (start app / splashscreen)
         if (!from.name || from.name === 'splashscreen') {
             return;
+        }
+
+        // handle error when there is no selected room
+        if (FeatureToggleService.isErrorHandled()) {
+            if (to.name === 'room' && !RoomsService.currentRoom) {
+                $state.go('error');
+            }
+            if (to.name === 'error') {
+                return;
+            }
         }
 
         if ($rootScope.previousState !== $rootScope.currentState) {
@@ -96,6 +108,7 @@ appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddRoomCtrl($scope));
 appModule.controller('AppCtrl', ($scope, $rootScope) => new Application.Controllers.AppCtrl($scope, $rootScope));
+appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService));
 appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService));

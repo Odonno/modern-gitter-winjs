@@ -8,6 +8,10 @@ module Application.Services {
         
         public isMyImageShown = () => {
             return false;
-        }
+        };
+        
+        public isErrorHandled = () => {
+            return false;
+        };
     }
 }

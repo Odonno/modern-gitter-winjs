@@ -6,6 +6,11 @@ module Application.Configs {
             $urlRouterProvider.otherwise('/splashscreen');
 
             $stateProvider
+                .state('error', {
+                    url: '/error',
+                    templateUrl: 'partials/error.html',
+                    controller: 'ErrorCtrl'
+                })
                 .state('splashscreen', {
                     url: '/splashscreen',
                     templateUrl: 'partials/splashscreen.html',

@@ -19,6 +19,11 @@ var Application;
             function RoutingConfig($stateProvider, $urlRouterProvider) {
                 $urlRouterProvider.otherwise('/splashscreen');
                 $stateProvider
+                    .state('error', {
+                    url: '/error',
+                    templateUrl: 'partials/error.html',
+                    controller: 'ErrorCtrl'
+                })
                     .state('splashscreen', {
                     url: '/splashscreen',
                     templateUrl: 'partials/splashscreen.html',
@@ -348,6 +353,9 @@ var Application;
                     return (typeof Windows !== 'undefined');
                 };
                 this.isMyImageShown = function () {
+                    return false;
+                };
+                this.isErrorHandled = function () {
                     return false;
                 };
             }
@@ -967,6 +975,19 @@ var Application;
 (function (Application) {
     var Controllers;
     (function (Controllers) {
+        var ErrorCtrl = (function () {
+            function ErrorCtrl($scope) {
+                this.scope = $scope;
+            }
+            return ErrorCtrl;
+        })();
+        Controllers.ErrorCtrl = ErrorCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
         var HomeCtrl = (function () {
             function HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) {
                 this.scope = $scope;
@@ -1138,40 +1159,48 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.run(['$rootScope', '$state', function ($rootScope, $state) {
-        var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
-        $rootScope.states = [];
-        $rootScope.previousState;
-        $rootScope.currentState;
-        $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
-            $rootScope.currentState = to.name;
-            if (!from.name || from.name === 'splashscreen') {
+appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) {
+    var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+    $rootScope.states = [];
+    $rootScope.previousState;
+    $rootScope.currentState;
+    $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
+        $rootScope.currentState = to.name;
+        if (!from.name || from.name === 'splashscreen') {
+            return;
+        }
+        if (FeatureToggleService.isErrorHandled()) {
+            if (to.name === 'room' && !RoomsService.currentRoom) {
+                $state.go('error');
+            }
+            if (to.name === 'error') {
                 return;
             }
-            if ($rootScope.previousState !== $rootScope.currentState) {
-                $rootScope.previousState = from.name;
-                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
-                $rootScope.states.push({
-                    state: $rootScope.previousState,
-                    params: fromParams
-                });
-            }
-        });
-        systemNavigationManager.onbackrequested = function (args) {
-            if ($rootScope.states.length > 0) {
-                var previous = $rootScope.states.pop();
-                $rootScope.previousState = previous.state;
-                $state.go(previous.state, previous.params);
-                if ($rootScope.states.length === 0) {
-                    systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                }
-                args.handled = true;
-            }
-            else {
+        }
+        if ($rootScope.previousState !== $rootScope.currentState) {
+            $rootScope.previousState = from.name;
+            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+            $rootScope.states.push({
+                state: $rootScope.previousState,
+                params: fromParams
+            });
+        }
+    });
+    systemNavigationManager.onbackrequested = function (args) {
+        if ($rootScope.states.length > 0) {
+            var previous = $rootScope.states.pop();
+            $rootScope.previousState = previous.state;
+            $state.go(previous.state, previous.params);
+            if ($rootScope.states.length === 0) {
                 systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
             }
-        };
-    }]);
+            args.handled = true;
+        }
+        else {
+            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+        }
+    };
+});
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
@@ -1187,6 +1216,7 @@ appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });
 appModule.controller('AppCtrl', function ($scope, $rootScope) { return new Application.Controllers.AppCtrl($scope, $rootScope); });
+appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });

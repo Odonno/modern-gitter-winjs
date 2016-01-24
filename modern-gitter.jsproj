@@ -124,6 +124,7 @@
     <Content Include="css\default.css" />
     <Content Include="partials\addRoom.html" />
     <Content Include="partials\channel.html" />
+    <Content Include="partials\error.html" />
     <Content Include="partials\existing.html" />
     <Content Include="partials\home.html" />
     <Content Include="partials\oneToOne.html" />
