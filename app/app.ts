@@ -46,8 +46,9 @@ appModule.run(($rootScope, $state, RoomsService: Application.Services.RoomsServi
             return;
         }
 
-        // handle error when there is no selected room
+        // handle error on navigation
         if (FeatureToggleService.isErrorHandled()) {
+            // navigate to error page when there is no selected room
             if (to.name === 'room' && !RoomsService.currentRoom) {
                 $state.go('error');
             }
@@ -72,6 +73,15 @@ appModule.run(($rootScope, $state, RoomsService: Application.Services.RoomsServi
         if ($rootScope.states.length > 0) {
             // retrieve and remove last state from history
             var previous = $rootScope.states.pop();
+            
+            // handle error on navigation
+            if (FeatureToggleService.isErrorHandled()) {
+                // remove error page from navigation stack if there is a current room now
+                while (previous.state === 'error' && RoomsService.currentRoom) {
+                    previous = $rootScope.states.pop();
+                }
+            }
+            
             $rootScope.previousState = previous.state;
             
             // go back to previous page

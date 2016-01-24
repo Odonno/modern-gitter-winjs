@@ -1186,6 +1186,11 @@ appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) 
     systemNavigationManager.onbackrequested = function (args) {
         if ($rootScope.states.length > 0) {
             var previous = $rootScope.states.pop();
+            if (FeatureToggleService.isErrorHandled()) {
+                while (previous.state === 'error' && RoomsService.currentRoom) {
+                    previous = $rootScope.states.pop();
+                }
+            }
             $rootScope.previousState = previous.state;
             $state.go(previous.state, previous.params);
             if ($rootScope.states.length === 0) {
