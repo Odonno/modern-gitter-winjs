@@ -1,4 +1,4 @@
-;(function() {
+﻿;(function() {
 /**
  * @ngdoc module
  * @name ui-listView
