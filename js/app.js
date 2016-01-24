@@ -1000,9 +1000,6 @@ var Application;
                     this.scope.appVersion = 'web';
                 }
                 this.scope.showMyImage = FeatureToggleService.isMyImageShown();
-                this.scope.goToJoinRoomPage = function () {
-                    $state.go('addRoom');
-                };
                 this.scope.chatWithUs = function () {
                     var roomName = 'Odonno/Modern-Gitter';
                     for (var i = 0; i < RoomsService.rooms.length; i++) {

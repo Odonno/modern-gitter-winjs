@@ -20,10 +20,6 @@ module Application.Controllers {
             this.scope.showMyImage = FeatureToggleService.isMyImageShown();
             
             // methods
-            this.scope.goToJoinRoomPage = () => {
-                $state.go('addRoom');
-            };
-
             this.scope.chatWithUs = () => {
                 var roomName = 'Odonno/Modern-Gitter';
 
