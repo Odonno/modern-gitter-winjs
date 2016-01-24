@@ -1,6 +1,13 @@
 
 # Created by https://www.gitignore.io/api/node,visualstudio
 
+### Bower ###
+bower_components
+.bower-cache
+.bower-registry
+.bower-tmp
+
+
 ### Node ###
 # Logs
 logs

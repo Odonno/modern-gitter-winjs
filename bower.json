@@ -1,0 +1,11 @@
+{
+  "name": "modern-gitter-winjs",
+  "description": "",
+  "authors": [
+    "Odonno"
+  ],
+  "homepage": "https://github.com/Odonno/modern-gitter-winjs",
+  "dependencies": {
+    "ui-listView": "~0.0.8"
+  }
+}

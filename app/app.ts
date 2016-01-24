@@ -28,7 +28,7 @@
 /// <reference path="./controllers/splashscreenCtrl.ts"/>
 
 // create module with references
-var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
+var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router', 'ui-listView']);
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
@@ -120,6 +120,6 @@ appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddR
 appModule.controller('AppCtrl', ($scope, $rootScope) => new Application.Controllers.AppCtrl($scope, $rootScope));
 appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService));
-appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService));
+appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService, FeatureToggleService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, FeatureToggleService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService));
 appModule.controller('SplashscreenCtrl', ($scope, $state, RoomsService) => new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService));

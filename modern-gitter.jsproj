@@ -71,6 +71,8 @@
     <Content Include="dist\angular-winjs\angular-winjs.js" />
     <Content Include="dist\angular\angular.js" />
     <Content Include="dist\faye\faye-browser.js" />
+    <Content Include="dist\ui-listview\ui-listview.css" />
+    <Content Include="dist\ui-listview\ui-listView.js" />
     <Content Include="dist\winjs\css\ui-dark.css" />
     <Content Include="dist\winjs\css\ui-dark.min.css" />
     <Content Include="dist\winjs\css\ui-light.css" />

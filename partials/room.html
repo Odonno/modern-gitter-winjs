@@ -6,8 +6,8 @@
     </div>
 </div>
 
-<!-- list view of messages -->
-<win-list-view id="messagesListView" item-data-source="messages" win-control="messagesWinControl">
+<!-- list view of messages (WinJS implementation) -->
+<win-list-view id="messagesListView" ng-show="useWinjsListView" item-data-source="messages" win-control="messagesWinControl">
     <!-- header template -->
     <win-list-view-header>
         <progress class="win-progress-bar" ng-hide="hideProgress && !refreshed"></progress>
@@ -26,6 +26,16 @@
 
     <win-list-layout></win-list-layout>
 </win-list-view>
+<!-- list view of messages (ui-listview implementation) -->
+<div id="messagesListView" ng-hide="useWinjsListView" ui-list-view="message in messages">
+    <div class="message-container clickable" ng-class="message.unread ? 'unread' : 'read'">
+        <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
+        <div class="message-subcontainer">
+            <div class="message-username">{{ message.fromUser.username }}</div>
+            <div class="message-content" ng-bind-html="message.html"></div>
+        </div>
+    </div>
+</div>
 
 <hr />
 

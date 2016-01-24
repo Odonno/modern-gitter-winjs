@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -357,6 +357,9 @@ var Application;
                 };
                 this.isErrorHandled = function () {
                     return true;
+                };
+                this.useWinjsListView = function () {
+                    return false;
                 };
             }
             return FeatureToggleService;
@@ -1026,11 +1029,13 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var RoomCtrl = (function () {
-            function RoomCtrl($scope, ApiService, RoomsService) {
+            function RoomCtrl($scope, ApiService, RoomsService, FeatureToggleService) {
                 var _this = this;
                 this.ApiService = ApiService;
                 this.RoomsService = RoomsService;
+                this.FeatureToggleService = FeatureToggleService;
                 this.scope = $scope;
+                this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
                 this.scope.hideProgress = true;
                 this.scope.refreshed = false;
                 this.scope.room = this.RoomsService.currentRoom;
@@ -1059,17 +1064,21 @@ var Application;
                     _this.ApiService.getMessages(_this.scope.room.id).then(function (messages) {
                         _this.scope.messages = messages;
                         _this.scope.messagesWinControl.forceLayout();
-                        _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
-                            if (_this.scope.messagesWinControl.loadingState === "complete") {
-                                if (_this.scope.refreshed) {
-                                    _this.detectUnreadMessages();
+                        if (_this.FeatureToggleService.useWinjsListView()) {
+                            _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
+                                if (_this.scope.messagesWinControl.loadingState === "complete") {
+                                    if (_this.scope.refreshed) {
+                                        _this.detectUnreadMessages();
+                                    }
+                                    if (!_this.scope.refreshed) {
+                                        _this.refreshListView();
+                                    }
                                 }
-                                if (!_this.scope.refreshed) {
-                                    _this.refreshListView();
-                                }
-                            }
-                            ;
-                        };
+                                ;
+                            };
+                        }
+                        else {
+                        }
                     });
                 });
             }
@@ -1154,7 +1163,7 @@ var Application;
         Controllers.SplashscreenCtrl = SplashscreenCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
-var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router']);
+var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router', 'ui-listView']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) {
     var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
@@ -1220,6 +1229,6 @@ appModule.controller('AddRoomCtrl', function ($scope) { return new Application.C
 appModule.controller('AppCtrl', function ($scope, $rootScope) { return new Application.Controllers.AppCtrl($scope, $rootScope); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
-appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService); });
+appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService); });

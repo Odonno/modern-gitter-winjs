@@ -5,10 +5,11 @@ module Application.Controllers {
         private scope: any;
         private currentUser: any;
 
-        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService) {
+        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService, private FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
             
             // properties
+            this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
             this.scope.hideProgress = true;
             this.scope.refreshed = false;
             this.scope.room = this.RoomsService.currentRoom;
@@ -42,24 +43,28 @@ module Application.Controllers {
 
                 this.ApiService.getMessages(this.scope.room.id).then(messages => {
                     this.scope.messages = messages;
-
+                    
                     // refresh UI
                     this.scope.messagesWinControl.forceLayout();
 
-                    // wait for refresh
-                    this.scope.messagesWinControl.onloadingstatechanged = (e) => {
-                        if (this.scope.messagesWinControl.loadingState === "complete") {
-                            // detect visible unread messages
-                            if (this.scope.refreshed) {
-                                this.detectUnreadMessages();
-                            }
+                    if (this.FeatureToggleService.useWinjsListView()) {
+                        // wait for refresh
+                        this.scope.messagesWinControl.onloadingstatechanged = (e) => {
+                            if (this.scope.messagesWinControl.loadingState === "complete") {
+                                // detect visible unread messages
+                                if (this.scope.refreshed) {
+                                    this.detectUnreadMessages();
+                                }
                         
-                            // refresh listview the first time
-                            if (!this.scope.refreshed) {
-                                this.refreshListView();
-                            }
+                                // refresh listview the first time
+                                if (!this.scope.refreshed) {
+                                    this.refreshListView();
+                                }
+                            };
                         };
-                    };
+                    } else {
+
+                    }
                 });
             });
 
