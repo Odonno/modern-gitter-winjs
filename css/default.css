@@ -352,7 +352,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     background-color: #f2f2f2;
 }
 
-#messagesListView {
+.messages-list-view {
     height: calc(100vh - 120px - 60px);
 }
 

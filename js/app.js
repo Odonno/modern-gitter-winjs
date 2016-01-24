@@ -1036,6 +1036,7 @@ var Application;
                 this.FeatureToggleService = FeatureToggleService;
                 this.scope = $scope;
                 this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
+                this.scope.listOptions = {};
                 this.scope.hideProgress = true;
                 this.scope.refreshed = false;
                 this.scope.room = this.RoomsService.currentRoom;
@@ -1070,8 +1071,8 @@ var Application;
                     _this.currentUser = user;
                     _this.ApiService.getMessages(_this.scope.room.id).then(function (messages) {
                         _this.scope.messages = messages;
-                        _this.scope.messagesWinControl.forceLayout();
                         if (_this.FeatureToggleService.useWinjsListView()) {
+                            _this.scope.messagesWinControl.forceLayout();
                             _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
                                 if (_this.scope.messagesWinControl.loadingState === "complete") {
                                     if (_this.scope.refreshed) {
@@ -1081,10 +1082,17 @@ var Application;
                                         _this.refreshListView();
                                     }
                                 }
-                                ;
                             };
                         }
                         else {
+                            var listview = document.getElementById('customMessagesListView');
+                            var scrollToBottomInterval = setInterval(function () {
+                                var lastScrollTop = listview.scrollTop;
+                                listview.scrollTop += 500;
+                                if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
+                                    clearInterval(scrollToBottomInterval);
+                                }
+                            }, 50);
                         }
                     });
                 });

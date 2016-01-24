@@ -10,6 +10,7 @@ module Application.Controllers {
             
             // properties
             this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
+            this.scope.listOptions = {};
             this.scope.hideProgress = true;
             this.scope.refreshed = false;
             this.scope.room = this.RoomsService.currentRoom;
@@ -23,7 +24,7 @@ module Application.Controllers {
                 if (this.scope.sendingMessage) {
                     return false;
                 }
-                
+
                 if (this.scope.textMessage) {
                     this.scope.sendingMessage = true;
                     this.ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
@@ -52,11 +53,11 @@ module Application.Controllers {
 
                 this.ApiService.getMessages(this.scope.room.id).then(messages => {
                     this.scope.messages = messages;
-                    
-                    // refresh UI
-                    this.scope.messagesWinControl.forceLayout();
 
                     if (this.FeatureToggleService.useWinjsListView()) {
+                        // refresh UI
+                        this.scope.messagesWinControl.forceLayout();
+                        
                         // wait for refresh
                         this.scope.messagesWinControl.onloadingstatechanged = (e) => {
                             if (this.scope.messagesWinControl.loadingState === "complete") {
@@ -69,10 +70,19 @@ module Application.Controllers {
                                 if (!this.scope.refreshed) {
                                     this.refreshListView();
                                 }
-                            };
+                            }
                         };
                     } else {
+                        var listview = document.getElementById('customMessagesListView');
 
+                        var scrollToBottomInterval = setInterval(() => {
+                            var lastScrollTop = listview.scrollTop;
+                            listview.scrollTop += 500;
+                            
+                            if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
+                                clearInterval(scrollToBottomInterval);
+                            }
+                        }, 50);
                     }
                 });
             });
