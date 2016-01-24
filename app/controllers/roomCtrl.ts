@@ -44,7 +44,11 @@ module Application.Controllers {
 
             this.RoomsService.onmessagereceived = (roomId, message) => {
                 if (this.scope.room && this.scope.room.id === roomId) {
-                    this.scope.messages.push(message);
+                    if (this.FeatureToggleService.useWinjsListView()) {
+                        this.scope.messages.push(message);
+                    } else {
+                        this.scope.messages.unshift(message);
+                    }
                 }
             };
 

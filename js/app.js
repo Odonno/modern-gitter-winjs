@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -1064,7 +1064,12 @@ var Application;
                 }
                 this.RoomsService.onmessagereceived = function (roomId, message) {
                     if (_this.scope.room && _this.scope.room.id === roomId) {
-                        _this.scope.messages.push(message);
+                        if (_this.FeatureToggleService.useWinjsListView()) {
+                            _this.scope.messages.push(message);
+                        }
+                        else {
+                            _this.scope.messages.unshift(message);
+                        }
                     }
                 };
                 this.ApiService.getCurrentUser().then(function (user) {
