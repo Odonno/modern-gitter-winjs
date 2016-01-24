@@ -96,7 +96,7 @@ appModule.run(($rootScope, $state, RoomsService: Application.Services.RoomsServi
             systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
         }
     };
-}]);
+});
 
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));

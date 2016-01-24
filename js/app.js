@@ -1040,10 +1040,17 @@ var Application;
                 this.scope.refreshed = false;
                 this.scope.room = this.RoomsService.currentRoom;
                 this.scope.messages = [];
+                this.scope.textMessage = '';
+                this.scope.sendingMessage = false;
                 this.scope.sendMessage = function () {
+                    if (_this.scope.sendingMessage) {
+                        return false;
+                    }
                     if (_this.scope.textMessage) {
+                        _this.scope.sendingMessage = true;
                         _this.ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
                             _this.scope.textMessage = '';
+                            _this.scope.sendingMessage = false;
                         });
                     }
                     else {

@@ -14,12 +14,21 @@ module Application.Controllers {
             this.scope.refreshed = false;
             this.scope.room = this.RoomsService.currentRoom;
             this.scope.messages = [];
+            this.scope.textMessage = '';
+            this.scope.sendingMessage = false;
 
             // methods
             this.scope.sendMessage = () => {
+                // do not send the same message multiple times
+                if (this.scope.sendingMessage) {
+                    return false;
+                }
+                
                 if (this.scope.textMessage) {
+                    this.scope.sendingMessage = true;
                     this.ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
                         this.scope.textMessage = '';
+                        this.scope.sendingMessage = false;
                     });
                 } else {
                     console.error('textMessage is empty');
