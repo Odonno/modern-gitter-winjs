@@ -29,6 +29,7 @@ module Application.Controllers {
                     this.scope.sendingMessage = true;
                     this.ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
                         this.scope.textMessage = '';
+                        this.scope.$apply();
                         this.scope.sendingMessage = false;
                     });
                 } else {

@@ -1051,6 +1051,7 @@ var Application;
                         _this.scope.sendingMessage = true;
                         _this.ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
                             _this.scope.textMessage = '';
+                            _this.scope.$apply();
                             _this.scope.sendingMessage = false;
                         });
                     }
