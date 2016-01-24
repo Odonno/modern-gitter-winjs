@@ -1092,8 +1092,16 @@ var Application;
                                 listview.scrollTop += 500;
                                 if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
                                     clearInterval(scrollToBottomInterval);
+                                    _this.scope.loaded = true;
                                 }
                             }, 50);
+                            listview.onscroll = function () {
+                                if (!_this.FeatureToggleService.useWinjsListView()) {
+                                    if (_this.scope.loaded) {
+                                        _this.detectUnreadMessages();
+                                    }
+                                }
+                            };
                         }
                     });
                 });
@@ -1122,8 +1130,16 @@ var Application;
                 };
             };
             RoomCtrl.prototype.detectUnreadMessages = function () {
-                var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
-                var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+                var firstIndex, lastIndex;
+                if (this.FeatureToggleService.useWinjsListView()) {
+                    firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
+                    lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+                }
+                else {
+                    var range = this.scope.listOptions.range;
+                    firstIndex = range.index;
+                    lastIndex = range.index + range.length;
+                }
                 var messageIds = [];
                 for (var i = 0; i < this.scope.messages.length; i++) {
                     if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {

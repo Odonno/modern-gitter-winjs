@@ -75,7 +75,7 @@ module Application.Controllers {
                     } else {
                         // refresh fix layout to display custom listview
                         this.scope.fixWinControl.forceLayout();
-                        
+
                         var listview = document.getElementById('customMessagesListView');
 
                         // scroll to bottom when we load the page
@@ -85,12 +85,21 @@ module Application.Controllers {
 
                             if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
                                 clearInterval(scrollToBottomInterval);
+                                this.scope.loaded = true;
                             }
                         }, 50);
+
+                        // detect scroll to detect unread message on view
+                        listview.onscroll = () => {
+                            if (!this.FeatureToggleService.useWinjsListView()) {
+                                if (this.scope.loaded) {
+                                    this.detectUnreadMessages();
+                                }
+                            }
+                        };
                     }
                 });
             });
-
         }
         
         // private methods
@@ -128,9 +137,18 @@ module Application.Controllers {
         }
 
         private detectUnreadMessages() {
-            var firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
-            var lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+            var firstIndex: number, lastIndex: number;
 
+            if (this.FeatureToggleService.useWinjsListView()) {
+                firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
+                lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
+            } else {
+                var range = this.scope.listOptions.range;
+                firstIndex = range.index;
+                lastIndex = range.index + range.length;
+            }
+
+            // retrieve id of unread messages that user watch
             var messageIds = [];
             for (var i = 0; i < this.scope.messages.length; i++) {
                 if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
@@ -139,6 +157,7 @@ module Application.Controllers {
                 }
             }
 
+            // if there is at least 1 unread message, mark them as read
             if (messageIds.length > 0) {
                 this.RoomsService.markUnreadMessages(messageIds);
             }
