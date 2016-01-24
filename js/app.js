@@ -356,7 +356,7 @@ var Application;
                     return false;
                 };
                 this.isErrorHandled = function () {
-                    return false;
+                    return true;
                 };
             }
             return FeatureToggleService;

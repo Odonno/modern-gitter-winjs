@@ -11,7 +11,7 @@ module Application.Services {
         };
         
         public isErrorHandled = () => {
-            return false;
+            return true;
         };
     }
 }

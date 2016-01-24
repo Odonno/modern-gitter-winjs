@@ -116,6 +116,21 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	margin: auto;
 }
 
+/* error view style */
+#error-container {
+    position: relative;
+    height: 100vh;
+}
+
+#error-subcontainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -50px;
+    text-align: center;
+}
+
 /* splashscreen view style */
 #splashscreen-container {
     position: relative;
@@ -128,6 +143,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     left: 50%;
     transform: translate(-50%, -50%);
     margin-top: -50px;
+    text-align: center;
 }
 
 #splashscreen-logo {
