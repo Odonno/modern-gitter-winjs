@@ -11,7 +11,7 @@ module Application.Controllers {
             // properties
             this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
             this.scope.listOptions = {};
-            this.scope.hideProgress = true;
+            this.scope.hideProgress = this.FeatureToggleService.useWinjsListView() ? true : false;
             this.scope.refreshed = false;
             this.scope.room = this.RoomsService.currentRoom;
             this.scope.messages = [];
@@ -52,7 +52,12 @@ module Application.Controllers {
                 this.currentUser = user;
 
                 this.ApiService.getMessages(this.scope.room.id).then(messages => {
-                    this.scope.messages = messages;
+                    //this.scope.messages = messages;
+                    this.scope.messages = [];
+                    for (var i = 0; i < messages.length; i++) {
+                        this.scope.messages.unshift(messages[i]);
+                    }
+
 
                     if (this.FeatureToggleService.useWinjsListView()) {
                         // refresh UI
@@ -78,23 +83,15 @@ module Application.Controllers {
 
                         var listview = document.getElementById('customMessagesListView');
 
-                        // scroll to bottom when we load the page
-                        var scrollToBottomInterval = setInterval(() => {
-                            var lastScrollTop = listview.scrollTop;
-                            listview.scrollTop += 500;
-
-                            if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
-                                clearInterval(scrollToBottomInterval);
-                                this.scope.loaded = true;
-                            }
-                        }, 50);
-
-                        // detect scroll to detect unread message on view
+                        // each time user scroll
                         listview.onscroll = () => {
-                            if (!this.FeatureToggleService.useWinjsListView()) {
-                                if (this.scope.loaded) {
-                                    this.detectUnreadMessages();
-                                }
+                            // detect scroll to detect unread message on view
+                            this.detectUnreadMessages();
+                                
+                            // detect if we are at the top of the list (load more messages)
+                            var range = this.scope.listOptions.range;
+                            if (range && range.index + range.length === range.total) {
+                                this.loadMoreItems();
                             }
                         };
                     }
@@ -104,34 +101,36 @@ module Application.Controllers {
         
         // private methods
         private refreshListView() {
-            // scroll down to the last message
-            this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
-            this.scope.hideProgress = false;
-            this.scope.refreshed = true;
+            if (this.FeatureToggleService.useWinjsListView()) {
+                // scroll down to the last message
+                this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
+                this.scope.hideProgress = false;
+                this.scope.refreshed = true;
 
-            this.scope.messagesWinControl.onheadervisibilitychanged = (e) => {
-                // when we hit the top of the list
-                if (e.detail.visible && this.scope.messages.length > 0) {
-                    // retrieve index of message that was visible before the load of new messages
-                    var lastVisible = this.scope.messagesWinControl.indexOfLastVisible;
+                this.scope.messagesWinControl.onheadervisibilitychanged = (e) => {
+                    // when we hit the top of the list
+                    if (e.detail.visible && this.scope.messages.length > 0) {
+                        // retrieve index of message that was visible before the load of new messages
+                        var lastVisible = this.scope.messagesWinControl.indexOfLastVisible;
 
-                    // load more messages
-                    this.ApiService.getMessages(this.scope.room.id, this.scope.messages[0].id).then(beforeMessages => {
-                        if (!beforeMessages || beforeMessages.length <= 0) {
-                            // no more message to load
-                            this.scope.hideProgress = true;
-                            return;
-                        }
+                        // load more messages
+                        this.ApiService.getMessages(this.scope.room.id, this.scope.messages[0].id).then(beforeMessages => {
+                            if (!beforeMessages || beforeMessages.length <= 0) {
+                                // no more message to load
+                                this.scope.hideProgress = true;
+                                return;
+                            }
 
-                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                            this.scope.messages.unshift(beforeMessages[i]);
-                        }
+                            for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                this.scope.messages.unshift(beforeMessages[i]);
+                            }
 
-                        // scroll again to stay where the user was (reading message)
-                        setTimeout(() => {
-                            this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                        }, 250);
-                    });
+                            // scroll again to stay where the user was (reading message)
+                            setTimeout(() => {
+                                this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                            }, 250);
+                        });
+                    }
                 }
             }
         }
@@ -160,6 +159,39 @@ module Application.Controllers {
             // if there is at least 1 unread message, mark them as read
             if (messageIds.length > 0) {
                 this.RoomsService.markUnreadMessages(messageIds);
+            }
+        }
+
+        private loadMoreItems() {
+            if (!this.FeatureToggleService.useWinjsListView()) {
+                var listview = document.getElementById('customMessagesListView');
+                var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
+
+                if (this.scope.hideProgress) {
+                    return;
+                }
+
+                this.scope.hideProgress = true;
+                
+                // load more messages
+                var olderMessage = this.scope.messages[this.scope.messages.length - 1];
+                this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(beforeMessages => {
+                    if (!beforeMessages || beforeMessages.length <= 0) {
+                        // no more message to load
+                        return;
+                    }
+
+                    // push old messages to the top
+                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                        this.scope.messages.push(beforeMessages[i]);
+                    }
+
+                    setTimeout(() => {
+                        var newScrollHeight = this.scope.listOptions.listView.getScrollHeight();
+                        listview.scrollTop += newScrollHeight - lastScrollHeight;
+                        this.scope.hideProgress = false;
+                    }, 250);
+                });
             }
         }
     }

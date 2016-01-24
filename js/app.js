@@ -1037,7 +1037,7 @@ var Application;
                 this.scope = $scope;
                 this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
                 this.scope.listOptions = {};
-                this.scope.hideProgress = true;
+                this.scope.hideProgress = this.FeatureToggleService.useWinjsListView() ? true : false;
                 this.scope.refreshed = false;
                 this.scope.room = this.RoomsService.currentRoom;
                 this.scope.messages = [];
@@ -1070,7 +1070,10 @@ var Application;
                 this.ApiService.getCurrentUser().then(function (user) {
                     _this.currentUser = user;
                     _this.ApiService.getMessages(_this.scope.room.id).then(function (messages) {
-                        _this.scope.messages = messages;
+                        _this.scope.messages = [];
+                        for (var i = 0; i < messages.length; i++) {
+                            _this.scope.messages.unshift(messages[i]);
+                        }
                         if (_this.FeatureToggleService.useWinjsListView()) {
                             _this.scope.messagesWinControl.forceLayout();
                             _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
@@ -1087,19 +1090,11 @@ var Application;
                         else {
                             _this.scope.fixWinControl.forceLayout();
                             var listview = document.getElementById('customMessagesListView');
-                            var scrollToBottomInterval = setInterval(function () {
-                                var lastScrollTop = listview.scrollTop;
-                                listview.scrollTop += 500;
-                                if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
-                                    clearInterval(scrollToBottomInterval);
-                                    _this.scope.loaded = true;
-                                }
-                            }, 50);
                             listview.onscroll = function () {
-                                if (!_this.FeatureToggleService.useWinjsListView()) {
-                                    if (_this.scope.loaded) {
-                                        _this.detectUnreadMessages();
-                                    }
+                                _this.detectUnreadMessages();
+                                var range = _this.scope.listOptions.range;
+                                if (range && range.index + range.length === range.total) {
+                                    _this.loadMoreItems();
                                 }
                             };
                         }
@@ -1108,26 +1103,28 @@ var Application;
             }
             RoomCtrl.prototype.refreshListView = function () {
                 var _this = this;
-                this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
-                this.scope.hideProgress = false;
-                this.scope.refreshed = true;
-                this.scope.messagesWinControl.onheadervisibilitychanged = function (e) {
-                    if (e.detail.visible && _this.scope.messages.length > 0) {
-                        var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
-                        _this.ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
-                            if (!beforeMessages || beforeMessages.length <= 0) {
-                                _this.scope.hideProgress = true;
-                                return;
-                            }
-                            for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                _this.scope.messages.unshift(beforeMessages[i]);
-                            }
-                            setTimeout(function () {
-                                _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                            }, 250);
-                        });
-                    }
-                };
+                if (this.FeatureToggleService.useWinjsListView()) {
+                    this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
+                    this.scope.hideProgress = false;
+                    this.scope.refreshed = true;
+                    this.scope.messagesWinControl.onheadervisibilitychanged = function (e) {
+                        if (e.detail.visible && _this.scope.messages.length > 0) {
+                            var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
+                            _this.ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
+                                if (!beforeMessages || beforeMessages.length <= 0) {
+                                    _this.scope.hideProgress = true;
+                                    return;
+                                }
+                                for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                    _this.scope.messages.unshift(beforeMessages[i]);
+                                }
+                                setTimeout(function () {
+                                    _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
+                                }, 250);
+                            });
+                        }
+                    };
+                }
             };
             RoomCtrl.prototype.detectUnreadMessages = function () {
                 var firstIndex, lastIndex;
@@ -1149,6 +1146,31 @@ var Application;
                 }
                 if (messageIds.length > 0) {
                     this.RoomsService.markUnreadMessages(messageIds);
+                }
+            };
+            RoomCtrl.prototype.loadMoreItems = function () {
+                var _this = this;
+                if (!this.FeatureToggleService.useWinjsListView()) {
+                    var listview = document.getElementById('customMessagesListView');
+                    var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
+                    if (this.scope.hideProgress) {
+                        return;
+                    }
+                    this.scope.hideProgress = true;
+                    var olderMessage = this.scope.messages[this.scope.messages.length - 1];
+                    this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(function (beforeMessages) {
+                        if (!beforeMessages || beforeMessages.length <= 0) {
+                            return;
+                        }
+                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                            _this.scope.messages.push(beforeMessages[i]);
+                        }
+                        setTimeout(function () {
+                            var newScrollHeight = _this.scope.listOptions.listView.getScrollHeight();
+                            listview.scrollTop += newScrollHeight - lastScrollHeight;
+                            _this.scope.hideProgress = false;
+                        }, 250);
+                    });
                 }
             };
             return RoomCtrl;
