@@ -1085,6 +1085,7 @@ var Application;
                             };
                         }
                         else {
+                            _this.scope.fixWinControl.forceLayout();
                             var listview = document.getElementById('customMessagesListView');
                             var scrollToBottomInterval = setInterval(function () {
                                 var lastScrollTop = listview.scrollTop;

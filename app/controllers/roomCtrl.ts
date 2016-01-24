@@ -73,12 +73,16 @@ module Application.Controllers {
                             }
                         };
                     } else {
+                        // refresh fix layout to display custom listview
+                        this.scope.fixWinControl.forceLayout();
+                        
                         var listview = document.getElementById('customMessagesListView');
 
+                        // scroll to bottom when we load the page
                         var scrollToBottomInterval = setInterval(() => {
                             var lastScrollTop = listview.scrollTop;
                             listview.scrollTop += 500;
-                            
+
                             if (listview.scrollTop > 0 && listview.scrollTop === lastScrollTop) {
                                 clearInterval(scrollToBottomInterval);
                             }
