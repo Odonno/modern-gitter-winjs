@@ -85,6 +85,14 @@ module Application.Services {
             });
         }
 
+        public getRoom(name: string) {
+            for (var i = 0; i < this.rooms.length; i++) {
+                if (this.rooms[i].name === name) {
+                    return this.rooms[i];
+                }
+            }            
+        }
+
         public selectRoom(room) {
             this.currentRoom = room;
             if (this.onroomselected) {

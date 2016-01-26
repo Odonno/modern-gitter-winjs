@@ -4,8 +4,13 @@ module Application.Controllers {
     export class RoomsCtrl {
         private scope: any;
 
-        constructor($scope, $filter, $state, RoomsService) {
+        constructor($scope, $filter, $state, RoomsService: Application.Services.RoomsService, LocalSettingsService: Application.Services.LocalSettingsService, FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
+            
+            // update local storage
+            if (FeatureToggleService.isFirstPageLoadedByStorage()) {
+                LocalSettingsService.setValue('lastPage', 'rooms');
+            }
             
             // properties
             this.scope.rooms = RoomsService.rooms;

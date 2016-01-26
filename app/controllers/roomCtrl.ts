@@ -5,9 +5,9 @@ module Application.Controllers {
         private scope: any;
         private currentUser: any;
 
-        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService, private FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService, private LocalSettingsService: Application.Services.LocalSettingsService, private FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
-            
+
             // properties
             this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
             this.scope.listOptions = {};
@@ -41,6 +41,12 @@ module Application.Controllers {
             if (!this.scope.room) {
                 console.error('no room selected...');
                 return;
+            }
+
+            if (FeatureToggleService.isFirstPageLoadedByStorage()) {
+                // update local storage
+                this.LocalSettingsService.setValue('lastPage', 'room');
+                this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
             }
 
             this.RoomsService.onmessagereceived = (roomId, message) => {

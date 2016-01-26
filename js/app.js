@@ -361,10 +361,36 @@ var Application;
                 this.useWinjsListView = function () {
                     return false;
                 };
+                this.isFirstPageLoadedByStorage = function () {
+                    return true;
+                };
             }
             return FeatureToggleService;
         })();
         Services.FeatureToggleService = FeatureToggleService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var LocalSettingsService = (function () {
+            function LocalSettingsService() {
+                var _this = this;
+                this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
+                this.getValue = function (key) {
+                    return _this.localSettings.values[key];
+                };
+                this.setValue = function (key, value) {
+                    _this.localSettings.values[key] = value;
+                };
+                this.deleteValue = function (key) {
+                    _this.localSettings.values.remove(key);
+                };
+            }
+            return LocalSettingsService;
+        })();
+        Services.LocalSettingsService = LocalSettingsService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
 var Application;
@@ -649,6 +675,13 @@ var Application;
                         });
                     });
                 });
+            };
+            RoomsService.prototype.getRoom = function (name) {
+                for (var i = 0; i < this.rooms.length; i++) {
+                    if (this.rooms[i].name === name) {
+                        return this.rooms[i];
+                    }
+                }
             };
             RoomsService.prototype.selectRoom = function (room) {
                 this.currentRoom = room;
@@ -1029,10 +1062,11 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var RoomCtrl = (function () {
-            function RoomCtrl($scope, ApiService, RoomsService, FeatureToggleService) {
+            function RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) {
                 var _this = this;
                 this.ApiService = ApiService;
                 this.RoomsService = RoomsService;
+                this.LocalSettingsService = LocalSettingsService;
                 this.FeatureToggleService = FeatureToggleService;
                 this.scope = $scope;
                 this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
@@ -1062,6 +1096,10 @@ var Application;
                 if (!this.scope.room) {
                     console.error('no room selected...');
                     return;
+                }
+                if (FeatureToggleService.isFirstPageLoadedByStorage()) {
+                    this.LocalSettingsService.setValue('lastPage', 'room');
+                    this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
                 }
                 this.RoomsService.onmessagereceived = function (roomId, message) {
                     if (_this.scope.room && _this.scope.room.id === roomId) {
@@ -1189,9 +1227,12 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var RoomsCtrl = (function () {
-            function RoomsCtrl($scope, $filter, $state, RoomsService) {
+            function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
                 var _this = this;
                 this.scope = $scope;
+                if (FeatureToggleService.isFirstPageLoadedByStorage()) {
+                    LocalSettingsService.setValue('lastPage', 'rooms');
+                }
                 this.scope.rooms = RoomsService.rooms;
                 this.scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
@@ -1212,10 +1253,29 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var SplashscreenCtrl = (function () {
-            function SplashscreenCtrl($scope, $state, RoomsService) {
+            function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
                 this.scope = $scope;
                 RoomsService.initialize(function () {
-                    $state.go('home');
+                    if (FeatureToggleService.isFirstPageLoadedByStorage()) {
+                        var lastPage = LocalSettingsService.getValue('lastPage');
+                        var lastRoom = LocalSettingsService.getValue('lastRoom');
+                        if (lastPage === 'room' && lastRoom) {
+                            RoomsService.onroomselected = function () {
+                                $state.go('room');
+                            };
+                            var room = RoomsService.getRoom(lastRoom);
+                            RoomsService.selectRoom(room);
+                        }
+                        else if (lastPage === 'rooms') {
+                            $state.go('rooms');
+                        }
+                        else {
+                            $state.go('home');
+                        }
+                    }
+                    else {
+                        $state.go('home');
+                    }
                 });
             }
             return SplashscreenCtrl;
@@ -1275,6 +1335,7 @@ appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) 
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
+appModule.service('LocalSettingsService', function () { return new Application.Services.LocalSettingsService(); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
@@ -1289,6 +1350,6 @@ appModule.controller('AddRoomCtrl', function ($scope) { return new Application.C
 appModule.controller('AppCtrl', function ($scope, $rootScope) { return new Application.Controllers.AppCtrl($scope, $rootScope); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
-appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, FeatureToggleService); });
-appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService); });
-appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService); });
+appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
+appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
+appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
