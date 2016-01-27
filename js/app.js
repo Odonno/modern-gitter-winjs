@@ -1290,53 +1290,7 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router', 'ui-listView']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) {
-    var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
-    $rootScope.states = [];
-    $rootScope.previousState;
-    $rootScope.currentState;
-    $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
-        $rootScope.currentState = to.name;
-        if (!from.name || from.name === 'splashscreen') {
-            return;
-        }
-        if (FeatureToggleService.isErrorHandled()) {
-            if (to.name === 'room' && !RoomsService.currentRoom) {
-                $state.go('error');
-            }
-            if (to.name === 'error') {
-                return;
-            }
-        }
-        if ($rootScope.previousState !== $rootScope.currentState) {
-            $rootScope.previousState = from.name;
-            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
-            $rootScope.states.push({
-                state: $rootScope.previousState,
-                params: fromParams
-            });
-        }
-    });
-    systemNavigationManager.onbackrequested = function (args) {
-        if ($rootScope.states.length > 0) {
-            var previous = $rootScope.states.pop();
-            if (FeatureToggleService.isErrorHandled()) {
-                while (previous.state === 'error' && RoomsService.currentRoom) {
-                    previous = $rootScope.states.pop();
-                }
-            }
-            $rootScope.previousState = previous.state;
-            $state.go(previous.state, previous.params);
-            if ($rootScope.states.length === 0) {
-                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-            }
-            args.handled = true;
-        }
-        else {
-            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-        }
-    };
-});
+appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
@@ -1358,3 +1312,60 @@ appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, Feature
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
+var Application;
+(function (Application) {
+    var Configs;
+    (function (Configs) {
+        var NavigationConfig = (function () {
+            function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
+                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                $rootScope.states = [];
+                $rootScope.previousState;
+                $rootScope.currentState;
+                $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
+                    $rootScope.currentState = to.name;
+                    if (!from.name || from.name === 'splashscreen') {
+                        return;
+                    }
+                    if (FeatureToggleService.isErrorHandled()) {
+                        if (to.name === 'room' && !RoomsService.currentRoom) {
+                            $state.go('error');
+                        }
+                        if (to.name === 'error') {
+                            return;
+                        }
+                    }
+                    if ($rootScope.previousState !== $rootScope.currentState) {
+                        $rootScope.previousState = from.name;
+                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                        $rootScope.states.push({
+                            state: $rootScope.previousState,
+                            params: fromParams
+                        });
+                    }
+                });
+                systemNavigationManager.onbackrequested = function (args) {
+                    if ($rootScope.states.length > 0) {
+                        var previous = $rootScope.states.pop();
+                        if (FeatureToggleService.isErrorHandled()) {
+                            while (previous.state === 'error' && RoomsService.currentRoom) {
+                                previous = $rootScope.states.pop();
+                            }
+                        }
+                        $rootScope.previousState = previous.state;
+                        $state.go(previous.state, previous.params);
+                        if ($rootScope.states.length === 0) {
+                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                        }
+                        args.handled = true;
+                    }
+                    else {
+                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                    }
+                };
+            }
+            return NavigationConfig;
+        })();
+        Configs.NavigationConfig = NavigationConfig;
+    })(Configs = Application.Configs || (Application.Configs = {}));
+})(Application || (Application = {}));
