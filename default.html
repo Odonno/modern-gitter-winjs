@@ -39,7 +39,8 @@
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
                         data-win-options="{ splitView: select('.splitView') }"></button>
-                <div class="split-view-title">Modern Gitter</div>
+                <span class="split-view-title" ng-show="showAppNameInSplitView">Modern Gitter</span>
+                <span style="left: 50px; vertical-align: middle; display: inline-block; margin-bottom: 32px;" ng-hide="showAppNameInSplitView"></span>
             </div>
 
             <div class="split-view-commands">

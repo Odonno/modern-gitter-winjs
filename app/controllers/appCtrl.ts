@@ -4,10 +4,11 @@ module Application.Controllers {
     export class AppCtrl {
         private scope: any;
 
-        constructor($scope, $rootScope) {
+        constructor($scope, $rootScope, FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
             
             // properties
+            this.scope.showAppNameInSplitView = FeatureToggleService.isSplitviewAppNameShowed();
             
             // methods
             $scope.closeSplitViewToggle = () => {

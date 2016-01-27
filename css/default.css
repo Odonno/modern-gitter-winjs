@@ -37,6 +37,7 @@ hr {
 
 .split-view-header {
     white-space: nowrap;
+    display: block;
 }
 
 .split-view-commands {
@@ -52,9 +53,9 @@ hr {
 }
 
 .split-view-title {
-    font-size: 25px;
+    font-size: 22px;
     left: 50px;
-    margin-top: 6px;
+    margin-top: 10px;
     vertical-align: middle;
     display: inline-block;
 }

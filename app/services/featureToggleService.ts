@@ -17,9 +17,13 @@ module Application.Services {
         public useWinjsListView = () => {
             return false;
         };
-        
+
         public isFirstPageLoadedByStorage = () => {
             return true;
+        };
+        
+        public isSplitviewAppNameShowed = () => {
+            return false;
         };
     }
 }
