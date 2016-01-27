@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -655,7 +655,12 @@ var Application;
                 if (this.initialized) {
                     if (callback) {
                         callback();
+                        return;
                     }
+                }
+                if (!this.NetworkService.internetAvailable) {
+                    callback();
+                    return;
                 }
                 this.OAuthService.connect().then(function (t) {
                     console.log('Sucessfully logged to Gitter API');

@@ -59,7 +59,13 @@ module Application.Services {
             if (this.initialized) {
                 if (callback) {
                     callback();
+                    return;
                 }
+            }
+            
+            if (!this.NetworkService.internetAvailable) {
+                callback();
+                return;
             }
 
             this.OAuthService.connect().then(t => {
