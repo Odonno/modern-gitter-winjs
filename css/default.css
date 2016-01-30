@@ -386,7 +386,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     padding-left: 12px;
     display: inline-block;
     vertical-align: top;
-    width: calc(100vw - 130px);
+    width: calc(100vw - 120px);
 }
 
 .message-username {
@@ -397,6 +397,9 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 .message-content {
     margin-top: 3px;
+}
+.message-content img {
+    max-width: 100%;
 }
 
 .unread {
