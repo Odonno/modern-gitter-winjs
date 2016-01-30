@@ -414,6 +414,7 @@ var Application;
     (function (Services) {
         var FeatureToggleService = (function () {
             function FeatureToggleService() {
+                var _this = this;
                 this.isWindowsApp = function () {
                     return (typeof Windows !== 'undefined');
                 };
@@ -436,7 +437,7 @@ var Application;
                     return false;
                 };
                 this.isNotificationBackgroundTasksEnabled = function () {
-                    return false;
+                    return _this.isDebugMode();
                 };
             }
             return FeatureToggleService;

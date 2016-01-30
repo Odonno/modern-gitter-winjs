@@ -31,7 +31,7 @@ module Application.Services {
         };
 
         public isNotificationBackgroundTasksEnabled = () => {
-            return false;
+            return this.isDebugMode();
         };
     }
 }
