@@ -4,7 +4,7 @@ module Application.Controllers {
     export class SplashscreenCtrl {
         private scope: any;
 
-        constructor($scope, $state, RoomsService: Application.Services.RoomsService, LocalSettingsService: Application.Services.LocalSettingsService, FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor($scope, $state, RoomsService: Application.Services.RoomsService, LocalSettingsService: Application.Services.LocalSettingsService, BackgroundTaskService: Application.Services.BackgroundTaskService, FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
             
             // initialize controller
@@ -32,6 +32,22 @@ module Application.Controllers {
                     }
                 } else {
                     $state.go('home');
+                }
+                
+                if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
+                    // retrieve version saved of background task
+                    var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                    
+                    if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
+                        // unregister existing background tasks
+                        BackgroundTaskService.unregisterAll();
+                        
+                        // register newest version
+                        BackgroundTaskService.registerAll();
+                        
+                        // save version in local storage
+                        LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
+                    }
                 }
             });
         }

@@ -13,6 +13,7 @@ module Application.Services {
                 name: 'UnreadMentionsNotificationsBackgroundTask'
             }
         ];
+        public currentVersion = 'v0.1';
         
         // private methods
         private register(taskEntryPoint: string, taskName: string, trigger, condition, cancelOnConditionLoss?: boolean) {

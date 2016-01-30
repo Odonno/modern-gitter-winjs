@@ -340,6 +340,7 @@ var Application;
                         name: 'UnreadMentionsNotificationsBackgroundTask'
                     }
                 ];
+                this.currentVersion = 'v0.1';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 Windows.ApplicationModel.Background.BackgroundExecutionManager.requestAccessAsync();
@@ -1332,7 +1333,7 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var SplashscreenCtrl = (function () {
-            function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
+            function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
                 this.scope = $scope;
                 RoomsService.initialize(function () {
                     if (FeatureToggleService.isFirstPageLoadedByStorage()) {
@@ -1354,6 +1355,14 @@ var Application;
                     }
                     else {
                         $state.go('home');
+                    }
+                    if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
+                        var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                        if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
+                            BackgroundTaskService.unregisterAll();
+                            BackgroundTaskService.registerAll();
+                            LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
+                        }
                     }
                 });
             }
@@ -1386,7 +1395,7 @@ appModule.controller('ErrorCtrl', function ($scope) { return new Application.Con
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
-appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
+appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
 var Application;
 (function (Application) {
     var Configs;
