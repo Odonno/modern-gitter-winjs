@@ -6,6 +6,10 @@ module Application.Services {
             return (typeof Windows !== 'undefined');
         };
 
+        public isDebugMode = () => {
+            return (typeof Debug !== 'undefined');
+        };
+
         public isMyImageShown = () => {
             return false;
         };
@@ -21,8 +25,12 @@ module Application.Services {
         public isFirstPageLoadedByStorage = () => {
             return true;
         };
-        
+
         public isSplitviewAppNameShowed = () => {
+            return false;
+        };
+
+        public isNotificationBackgroundTasksEnabled = () => {
             return false;
         };
     }

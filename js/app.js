@@ -352,6 +352,9 @@ var Application;
                 this.isWindowsApp = function () {
                     return (typeof Windows !== 'undefined');
                 };
+                this.isDebugMode = function () {
+                    return (typeof Debug !== 'undefined');
+                };
                 this.isMyImageShown = function () {
                     return false;
                 };
@@ -365,6 +368,9 @@ var Application;
                     return true;
                 };
                 this.isSplitviewAppNameShowed = function () {
+                    return false;
+                };
+                this.isNotificationBackgroundTasksEnabled = function () {
                     return false;
                 };
             }
