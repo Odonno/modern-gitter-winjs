@@ -328,6 +328,70 @@ var Application;
 (function (Application) {
     var Services;
     (function (Services) {
+        var BackgroundTaskService = (function () {
+            function BackgroundTaskService() {
+                this.tasks = [
+                    {
+                        namespace: 'modern_gitter_tasks',
+                        name: 'UnreadItemsNotificationsBackgroundTask'
+                    },
+                    {
+                        namespace: 'modern_gitter_tasks',
+                        name: 'UnreadMentionsNotificationsBackgroundTask'
+                    }
+                ];
+            }
+            BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
+                Windows.ApplicationModel.Background.BackgroundExecutionManager.requestAccessAsync();
+                var builder = new Windows.ApplicationModel.Background.BackgroundTaskBuilder();
+                builder.name = taskName;
+                builder.taskEntryPoint = taskEntryPoint;
+                builder.setTrigger(trigger);
+                if (condition !== null) {
+                    builder.addCondition(condition);
+                    if (cancelOnConditionLoss) {
+                        builder.cancelOnConditionLoss = cancelOnConditionLoss;
+                    }
+                }
+                var task = builder.register();
+            };
+            ;
+            BackgroundTaskService.prototype.unregister = function (taskName) {
+                var iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
+                var hasCurrent = iteration.hasCurrent;
+                while (hasCurrent) {
+                    var current = iteration.current.value;
+                    if (current.name === taskName) {
+                        current.unregister(true);
+                    }
+                    hasCurrent = iteration.moveNext();
+                }
+            };
+            BackgroundTaskService.prototype.registerAll = function () {
+                for (var i = 0; i < this.tasks.length; i++) {
+                    var entryPoint = this.tasks[i].namespace + '.' + this.tasks[i].name;
+                    var taskName = this.tasks[i].name;
+                    var trigger = new Windows.ApplicationModel.Background.TimeTrigger(15, false);
+                    var condition = new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable);
+                    this.register(entryPoint, taskName, trigger, condition);
+                }
+            };
+            ;
+            BackgroundTaskService.prototype.unregisterAll = function () {
+                for (var i = 0; i < this.tasks.length; i++) {
+                    this.unregister(this.tasks[i].name);
+                }
+            };
+            ;
+            return BackgroundTaskService;
+        })();
+        Services.BackgroundTaskService = BackgroundTaskService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
         var ConfigService = (function () {
             function ConfigService() {
                 this.baseUrl = "https://api.gitter.im/v1/";
@@ -1302,6 +1366,7 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
+appModule.service('BackgroundTaskService', function () { return new Application.Services.BackgroundTaskService(); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
 appModule.service('LocalSettingsService', function () { return new Application.Services.LocalSettingsService(); });

@@ -5,6 +5,7 @@
 /// <reference path="./configs/routing.ts"/>
 
 /// <reference path="./services/apiService.ts"/>
+/// <reference path="./services/backgroundTaskService.ts"/>
 /// <reference path="./services/configService.ts"/>
 /// <reference path="./services/featureToggleService.ts"/>
 /// <reference path="./services/localSettingsService.ts"/>
@@ -37,6 +38,7 @@ appModule.run(($rootScope, $state, RoomsService, FeatureToggleService) => new Ap
 
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
+appModule.service('BackgroundTaskService', () => new Application.Services.BackgroundTaskService());
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
 appModule.service('FeatureToggleService', () => new Application.Services.FeatureToggleService());
 appModule.service('LocalSettingsService', () => new Application.Services.LocalSettingsService());
