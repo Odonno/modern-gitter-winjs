@@ -12,9 +12,13 @@
         <div ng-click="selectRoom(item.data)" class="clickable" style="padding-bottom: 6px;">
             <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
             <div class="room-tile-text">{{ item.data.name }}</div>
-            <div class="room-tile-badge circle circle-20 circle-dark circle-center text-center" ng-show="item.data.unreadItems > 0">
-                <span ng-show="item.data.unreadItems < 100">{{ item.data.unreadItems }}</span>
-                <span ng-hide="item.data.unreadItems < 100">*</span>
+            <div class="room-tile-badge text-center">
+                <span class="label label-danger" style="background-color: #D02E00; margin-left: 6px;" ng-if="item.data.mentions > 0">
+                    {{ item.data.mentions >= 100 ? '99+' : item.data.mentions }} mention<span ng-if="item.data.mentions > 1">s</span>
+                </span>
+                <span class="label label-info" style="background-color: #0078D7; margin-left: 6px;" ng-if="item.data.unreadItems > 0">
+                    {{ item.data.unreadItems >= 100 ? '99+' : item.data.unreadItems }} new
+                </span>
             </div>
         </div>
     </win-item-template>
