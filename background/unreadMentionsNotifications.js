@@ -27,6 +27,7 @@
         close();
     }
 
+    // execute or not the backgroudn task
     if (!cancel) {
         doWork();
     } else {

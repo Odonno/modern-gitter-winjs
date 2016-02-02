@@ -65,6 +65,8 @@
     <Content Include="assets\background.jpg" />
     <Content Include="assets\logo.white.png" />
     <Content Include="assets\me.png" />
+    <Content Include="background\unreadItemsNotifications.js" />
+    <Content Include="background\unreadMentionsNotifications.js" />
     <Content Include="default.html" />
     <Content Include="dist\angular-sanitize\angular-sanitize.js" />
     <Content Include="dist\angular-ui-router\angular-ui-router.js" />
