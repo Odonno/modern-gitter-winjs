@@ -3,25 +3,37 @@
 module Application.Services {
     export class BackgroundTaskService {
         // properties
-        private tasks = [
-            {
-                entryPoint: 'modern_gitter_tasks.UnreadItemsNotificationsBackgroundTask',
-                name: 'UnreadItemsNotificationsBackgroundTask'
-            },
-            {
-                entryPoint: 'modern_gitter_tasks.UnreadMentionsNotificationsBackgroundTask',
-                name: 'UnreadMentionsNotificationsBackgroundTask'
-            },
-            {
-                entryPoint: 'background\\unreadItemsNotifications.js',
-                name: 'unreadItemsNotifications'
-            },
-            {
-                entryPoint: 'background\\unreadMentionsNotifications.js',
-                name: 'unreadMentionsNotifications'
+        private tasks = [];
+        public currentVersion: string;
+        
+        // constructor
+        constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
+            if (FeatureToggleService.isJsBackgroundTasks()) {
+                this.tasks = [
+                    {
+                        entryPoint: 'background\\unreadItemsNotifications.js',
+                        name: 'unreadItemsNotifications'
+                    },
+                    {
+                        entryPoint: 'background\\unreadMentionsNotifications.js',
+                        name: 'unreadMentionsNotifications'
+                    }
+                ];
+                this.currentVersion = 'v0.1-js';
+            } else {
+                this.tasks = [
+                    {
+                        entryPoint: 'modern_gitter_tasks.UnreadItemsNotificationsBackgroundTask',
+                        name: 'UnreadItemsNotificationsBackgroundTask'
+                    },
+                    {
+                        entryPoint: 'modern_gitter_tasks.UnreadMentionsNotificationsBackgroundTask',
+                        name: 'UnreadMentionsNotificationsBackgroundTask'
+                    }
+                ];
+                this.currentVersion = 'v0.1';
             }
-        ];
-        public currentVersion = 'v0.1';
+        }
         
         // private methods
         private register(taskEntryPoint: string, taskName: string, trigger, condition, cancelOnConditionLoss?: boolean) {

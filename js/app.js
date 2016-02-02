@@ -329,26 +329,34 @@ var Application;
     var Services;
     (function (Services) {
         var BackgroundTaskService = (function () {
-            function BackgroundTaskService() {
-                this.tasks = [
-                    {
-                        entryPoint: 'modern_gitter_tasks.UnreadItemsNotificationsBackgroundTask',
-                        name: 'UnreadItemsNotificationsBackgroundTask'
-                    },
-                    {
-                        entryPoint: 'modern_gitter_tasks.UnreadMentionsNotificationsBackgroundTask',
-                        name: 'UnreadMentionsNotificationsBackgroundTask'
-                    },
-                    {
-                        entryPoint: 'background\\unreadItemsNotifications.js',
-                        name: 'unreadItemsNotifications'
-                    },
-                    {
-                        entryPoint: 'background\\unreadMentionsNotifications.js',
-                        name: 'unreadMentionsNotifications'
-                    }
-                ];
-                this.currentVersion = 'v0.1';
+            function BackgroundTaskService(FeatureToggleService) {
+                this.tasks = [];
+                if (FeatureToggleService.isJsBackgroundTasks()) {
+                    this.tasks = [
+                        {
+                            entryPoint: 'background\\unreadItemsNotifications.js',
+                            name: 'unreadItemsNotifications'
+                        },
+                        {
+                            entryPoint: 'background\\unreadMentionsNotifications.js',
+                            name: 'unreadMentionsNotifications'
+                        }
+                    ];
+                    this.currentVersion = 'v0.1-js';
+                }
+                else {
+                    this.tasks = [
+                        {
+                            entryPoint: 'modern_gitter_tasks.UnreadItemsNotificationsBackgroundTask',
+                            name: 'UnreadItemsNotificationsBackgroundTask'
+                        },
+                        {
+                            entryPoint: 'modern_gitter_tasks.UnreadMentionsNotificationsBackgroundTask',
+                            name: 'UnreadMentionsNotificationsBackgroundTask'
+                        }
+                    ];
+                    this.currentVersion = 'v0.1';
+                }
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 if (this.isRegistered(taskName)) {
@@ -459,6 +467,9 @@ var Application;
                 };
                 this.isNotificationBackgroundTasksEnabled = function () {
                     return _this.isDebugMode();
+                };
+                this.isJsBackgroundTasks = function () {
+                    return true;
                 };
             }
             return FeatureToggleService;
