@@ -96,16 +96,27 @@
         }
 
         if (room.unreadItems > 0) {
+            // compute room image
+            if (room.user) {
+                room.image = room.user.avatarUrlMedium;
+            } else {
+                room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+            }
+
             // show notifications (toast notifications)
-            sendTitleAndTextNotification("New messages", room.name + ": " + room.unreadItems + " unread messages");
+            sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages");
             localSettings.values[id] = room.unreadItems;
         }
     }
 
-    function sendTitleAndTextNotification(title, text) {
+    function sendImageTitleAndTextNotification(image, title, text) {
         var toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
-        var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
+
+        var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
         var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
+
+        var toastImageElements = toastXml.getElementsByTagName('image');
+        toastImageElements[0].setAttribute('src', image);
 
         var toastTextElements = toastXml.getElementsByTagName('text');
         toastTextElements[0].appendChild(toastXml.createTextNode(title));
@@ -113,7 +124,7 @@
 
         var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
         toastNotifier.show(toast);
-    }
+    };
 
     // execute or not the backgroudn task
     if (!cancel) {

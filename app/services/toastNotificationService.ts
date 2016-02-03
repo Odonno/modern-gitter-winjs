@@ -19,7 +19,7 @@ module Application.Services {
 
             var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
             this.toastNotifier.show(toast);
-        };
+        }
 
         public sendTitleAndTextNotification(title: string, text: string) {
             var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
@@ -31,7 +31,7 @@ module Application.Services {
 
             var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
             this.toastNotifier.show(toast);
-        };
+        }
 
         public sendImageAndTextNotification(image: string, text: string) {
             var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
@@ -45,7 +45,7 @@ module Application.Services {
 
             var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
             this.toastNotifier.show(toast);
-        };
+        }
 
         public sendImageTitleAndTextNotification(image: string, title: string, text: string) {
             var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
@@ -60,6 +60,6 @@ module Application.Services {
 
             var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
             this.toastNotifier.show(toast);
-        };
+        }
     }
 }

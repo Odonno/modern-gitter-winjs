@@ -846,7 +846,6 @@ var Application;
                 var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
-            ;
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text) {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
                 var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
@@ -856,7 +855,6 @@ var Application;
                 var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
-            ;
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text) {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
                 var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
@@ -867,7 +865,6 @@ var Application;
                 var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
-            ;
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text) {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
                 var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
@@ -879,7 +876,6 @@ var Application;
                 var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
                 this.toastNotifier.show(toast);
             };
-            ;
             return ToastNotificationService;
         })();
         Services.ToastNotificationService = ToastNotificationService;
