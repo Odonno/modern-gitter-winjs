@@ -6,6 +6,7 @@
 
     // get information about the current instance of the background task
     var cancel = false;
+    var token = '';
     var backgroundTaskInstance = Windows.UI.WebUI.WebUIBackgroundTaskInstance.current;
 
     // associate a cancellation handler with the background task
@@ -21,7 +22,7 @@
         var settings = Windows.Storage.ApplicationData.current.localSettings;
 
         // you need to be authenticated first to get current notifications
-        var token = retrieveTokenFromVault();
+        token = retrieveTokenFromVault();
 
         if (token) {
             // retrieve every room of current user
@@ -97,8 +98,8 @@
 
         if (room.unreadItems > 0) {
             // compute room image
-            if (room.user) {
-                room.image = room.user.avatarUrlMedium;
+            if (room.fromUser) {
+                room.image = room.fromUser.avatarUrlMedium;
             } else {
                 room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
             }
@@ -126,7 +127,7 @@
         toastNotifier.show(toast);
     };
 
-    // execute or not the backgroudn task
+    // execute or not the background task
     if (!cancel) {
         doWork();
     } else {
