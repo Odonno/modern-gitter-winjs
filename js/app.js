@@ -1,4 +1,4 @@
-var Application;
+﻿var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -466,7 +466,7 @@ var Application;
                     return false;
                 };
                 this.isNotificationBackgroundTasksEnabled = function () {
-                    return _this.isDebugMode();
+                    return _this.isWindowsApp() && _this.isJsBackgroundTasks();
                 };
                 this.isJsBackgroundTasks = function () {
                     return true;
