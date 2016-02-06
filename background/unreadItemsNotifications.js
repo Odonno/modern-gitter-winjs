@@ -105,27 +105,32 @@
             }
 
             // show notifications (toast notifications)
-            sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages");
+            sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", 'action=viewRoom&roomId=' + room.id);
             localSettings.values[id] = room.unreadItems;
         }
     }
 
-    function sendImageTitleAndTextNotification(image, title, text) {
+    function sendImageTitleAndTextNotification(image, title, text, args) {
+        // create toast content
+        var toast = '<toast launch="' + args + '">'
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text>' + title + '</text>'
+                    + '<text>' + text + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '</toast>';
+
+        // generate XML from toast content
+        var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
+        toastXml.loadXml(toast);
+
+        // create toast notification and display it
+        var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
         var toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
-
-        var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
-        var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-
-        var toastImageElements = toastXml.getElementsByTagName('image');
-        toastImageElements[0].setAttribute('src', image);
-
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(title));
-        toastTextElements[1].appendChild(toastXml.createTextNode(text));
-
-        var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
+        toastNotifier.show(toastNotification);
+    }
 
     // execute or not the background task
     if (!cancel) {

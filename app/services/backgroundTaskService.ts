@@ -19,7 +19,7 @@ module Application.Services {
                         name: 'unreadMentionsNotifications'
                     }
                 ];
-                this.currentVersion = 'v0.1-js';
+                this.currentVersion = 'v0.2-js';
             } else {
                 this.tasks = [
                     {

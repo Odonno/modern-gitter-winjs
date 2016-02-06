@@ -158,9 +158,14 @@
             var localSettings = Windows.Storage.ApplicationData.current.localSettings;
 
             if (!localSettings.values[id]) {
-                // TODO : add ability to answer to the message directly inside notification
+                // add ability to answer to the message directly inside notification
+                var replyOptions = {
+                    args: 'action=reply&roomId=' + room.id,
+                    text: '@' + message.fromUser.username + ' '
+                };
+
                 // show notifications (toast notifications)
-                sendImageTitleAndTextNotification(room.image, message.fromUser.username + " mentioned you", message.text);
+                sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, 'action=viewRoom&roomId=' + room.id, replyOptions);
                 localSettings.values[id] = true;
             }
 
@@ -168,22 +173,31 @@
         });
     }
 
-    function sendImageTitleAndTextNotification(image, title, text) {
+    function sendImageTitleAndTextNotificationWithReply(image, title, text, args, replyOptions) {
+        // create toast content
+        var toast = '<toast launch="' + args + '">'
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text>' + title + '</text>'
+                    + '<text>' + text + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '<actions>'
+                    + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
+                    + '<action activationType="background" content="reply" arguments="' + replyOptions.args + '" hint-inputId="message" />'
+                    + '</actions>'
+                    + '</toast>';
+
+        // generate XML from toast content
+        var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
+        toastXml.loadXml(toast);
+
+        // create toast notification and display it
+        var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
         var toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
-
-        var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
-        var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-
-        var toastImageElements = toastXml.getElementsByTagName('image');
-        toastImageElements[0].setAttribute('src', image);
-
-        var toastTextElements = toastXml.getElementsByTagName('text');
-        toastTextElements[0].appendChild(toastXml.createTextNode(title));
-        toastTextElements[1].appendChild(toastXml.createTextNode(text));
-
-        var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-        toastNotifier.show(toast);
-    };
+        toastNotifier.show(toastNotification);
+    }
 
     // execute or not the background task
     if (!cancel) {
