@@ -25,10 +25,34 @@
         token = retrieveTokenFromVault();
 
         if (token) {
-            // TODO : retrieve room id and text message
+            var details = backgroundTaskInstancet.triggerDetails;
+            if (details) {
+                var args = details.argument;
+                var userInput = details.userInput;
 
-            // TODO : send the message
+                // retrieve room id and text message
+                var roomId = getQueryValue(args, 'roomId');
+                var text = userInput['message'];
 
+                // send the message
+                WinJS.xhr({
+                    type: 'POST',
+                    url: "https://api.gitter.im/v1/rooms/" + room.id + "/chatMessages",
+                    data: JSON.stringify({ text: text }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    }
+                }).then((success) => {
+                    // record information in LocalSettings to communicate with the app
+                    key = backgroundTaskInstance.task.taskId.toString();
+                    settings.values[key] = "Succeeded";
+
+                    // background task must call close when it is done
+                    close();
+                });
+            }
         } else {
             // record information in LocalSettings to communicate with the app
             key = backgroundTaskInstance.task.taskId.toString();
@@ -52,6 +76,16 @@
         }
 
         return storedToken;
+    }
+
+    function getQueryValue(query, key) {
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (pair[0] == key) {
+                return pair[1];
+            }
+        }
     }
 
     // execute or not the background task

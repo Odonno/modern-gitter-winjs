@@ -351,7 +351,7 @@ var Application;
                         condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
                     }
                 ];
-                this.currentVersion = 'v0.4';
+                this.currentVersion = 'v0.5';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 if (this.isRegistered(taskName)) {
