@@ -12,7 +12,7 @@ Modern Gitter contains a small set of features that directly target Gitter API. 
 * Search among your current rooms
 * Chat in realtime (see & send messages)
 * Receive realtime notifications (in-app notifications)
-* [TODO] Receive delayed notifications (toasts notifications : unread items and mentions)
+* Receive delayed notifications (toasts notifications : unread items and mentions)
 
 ## Frameworks
 
