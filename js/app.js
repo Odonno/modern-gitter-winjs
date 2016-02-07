@@ -334,33 +334,49 @@ var Application;
                 this.tasks = [
                     {
                         entryPoint: 'background\\unreadItemsNotifications.js',
-                        name: 'unreadItemsNotifications'
+                        name: 'unreadItemsNotifications',
+                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
                     },
                     {
                         entryPoint: 'background\\unreadMentionsNotifications.js',
-                        name: 'unreadMentionsNotifications'
+                        name: 'unreadMentionsNotifications',
+                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                    },
+                    {
+                        entryPoint: 'background\\notificationAction.js',
+                        name: 'notificationAction',
+                        trigger: new Windows.ApplicationModel.Background.ToastNotificationActionTrigger(),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
                     }
                 ];
-                this.currentVersion = 'v0.3';
+                this.currentVersion = 'v0.4';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 if (this.isRegistered(taskName)) {
+                    console.error('task already registered...');
                     return;
                 }
-                Windows.ApplicationModel.Background.BackgroundExecutionManager.requestAccessAsync();
-                var builder = new Windows.ApplicationModel.Background.BackgroundTaskBuilder();
-                builder.name = taskName;
-                builder.taskEntryPoint = taskEntryPoint;
-                builder.setTrigger(trigger);
-                if (condition !== null) {
-                    builder.addCondition(condition);
-                    if (cancelOnConditionLoss) {
-                        builder.cancelOnConditionLoss = cancelOnConditionLoss;
+                Windows.ApplicationModel.Background.BackgroundExecutionManager.requestAccessAsync().then(function (status) {
+                    if (status === Windows.ApplicationModel.Background.BackgroundAccessStatus.denied ||
+                        status === Windows.ApplicationModel.Background.BackgroundAccessStatus.unspecified) {
+                        console.error('task do not have access...');
+                        return;
                     }
-                }
-                var task = builder.register();
+                    var builder = new Windows.ApplicationModel.Background.BackgroundTaskBuilder();
+                    builder.name = taskName;
+                    builder.taskEntryPoint = taskEntryPoint;
+                    builder.setTrigger(trigger);
+                    if (condition) {
+                        builder.addCondition(condition);
+                        if (cancelOnConditionLoss) {
+                            builder.cancelOnConditionLoss = cancelOnConditionLoss;
+                        }
+                    }
+                    var task = builder.register();
+                });
             };
-            ;
             BackgroundTaskService.prototype.unregister = function (taskName) {
                 var iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
                 var hasCurrent = iteration.hasCurrent;
@@ -374,11 +390,7 @@ var Application;
             };
             BackgroundTaskService.prototype.registerAll = function () {
                 for (var i = 0; i < this.tasks.length; i++) {
-                    var entryPoint = this.tasks[i].entryPoint;
-                    var taskName = this.tasks[i].name;
-                    var trigger = new Windows.ApplicationModel.Background.TimeTrigger(15, false);
-                    var condition = new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable);
-                    this.register(entryPoint, taskName, trigger, condition);
+                    this.register(this.tasks[i].entryPoint, this.tasks[i].name, this.tasks[i].trigger, this.tasks[i].condition);
                 }
             };
             BackgroundTaskService.prototype.unregisterAll = function () {
