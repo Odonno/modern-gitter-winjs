@@ -106,8 +106,8 @@
 
     function createNotification(userId, room, onRoomNotified) {
         // compute room image
-        if (room.fromUser) {
-            room.image = room.fromUser.avatarUrlMedium;
+        if (room.user) {
+            room.image = room.user.avatarUrlMedium;
         } else {
             room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
         }

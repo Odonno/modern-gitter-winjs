@@ -28,7 +28,7 @@ module Application.Services {
                     condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
                 }
             ];
-            this.currentVersion = 'v0.5';
+            this.currentVersion = 'v0.6';
         }
         
         // private methods
