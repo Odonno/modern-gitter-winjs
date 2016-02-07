@@ -25,7 +25,7 @@
         token = retrieveTokenFromVault();
 
         if (token) {
-            var details = backgroundTaskInstancet.triggerDetails;
+            var details = backgroundTaskInstance.triggerDetails;
             if (details) {
                 var args = details.argument;
                 var userInput = details.userInput;
