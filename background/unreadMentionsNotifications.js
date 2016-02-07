@@ -160,12 +160,13 @@
             if (!localSettings.values[id]) {
                 // add ability to answer to the message directly inside notification
                 var replyOptions = {
-                    args: 'action=reply&roomId=' + room.id,
-                    text: '@' + message.fromUser.username + ' '
+                    args: 'action=reply&amp;roomId=' + room.id,
+                    text: '@' + message.fromUser.username + ' ',
+                    image: 'assets/icons/send.png'
                 };
 
                 // show notifications (toast notifications)
-                sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, 'action=viewRoom&roomId=' + room.id, replyOptions);
+                sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, 'action=viewRoom&amp;roomId=' + room.id, replyOptions);
                 localSettings.values[id] = true;
             }
 
@@ -185,7 +186,7 @@
                     + '</visual>'
                     + '<actions>'
                     + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
-                    + '<action activationType="background" content="reply" arguments="' + replyOptions.args + '" hint-inputId="message" />'
+                    + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + replyOptions.args + '" />'
                     + '</actions>'
                     + '</toast>';
 

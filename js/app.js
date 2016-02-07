@@ -342,7 +342,7 @@ var Application;
                             name: 'unreadMentionsNotifications'
                         }
                     ];
-                    this.currentVersion = 'v0.2-js';
+                    this.currentVersion = 'v0.3-js';
                 }
                 else {
                     this.tasks = [
