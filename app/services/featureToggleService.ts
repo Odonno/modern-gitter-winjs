@@ -31,11 +31,7 @@ module Application.Services {
         };
 
         public isNotificationBackgroundTasksEnabled = () => {
-            return this.isWindowsApp() && this.isJsBackgroundTasks();
-        };
-
-        public isJsBackgroundTasks = () => {
-            return true;
+            return this.isWindowsApp();
         };
     }
 }

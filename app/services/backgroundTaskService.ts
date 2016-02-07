@@ -8,31 +8,17 @@ module Application.Services {
         
         // constructor
         constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
-            if (FeatureToggleService.isJsBackgroundTasks()) {
-                this.tasks = [
-                    {
-                        entryPoint: 'background\\unreadItemsNotifications.js',
-                        name: 'unreadItemsNotifications'
-                    },
-                    {
-                        entryPoint: 'background\\unreadMentionsNotifications.js',
-                        name: 'unreadMentionsNotifications'
-                    }
-                ];
-                this.currentVersion = 'v0.3-js';
-            } else {
-                this.tasks = [
-                    {
-                        entryPoint: 'modern_gitter_tasks.UnreadItemsNotificationsBackgroundTask',
-                        name: 'UnreadItemsNotificationsBackgroundTask'
-                    },
-                    {
-                        entryPoint: 'modern_gitter_tasks.UnreadMentionsNotificationsBackgroundTask',
-                        name: 'UnreadMentionsNotificationsBackgroundTask'
-                    }
-                ];
-                this.currentVersion = 'v0.1';
-            }
+            this.tasks = [
+                {
+                    entryPoint: 'background\\unreadItemsNotifications.js',
+                    name: 'unreadItemsNotifications'
+                },
+                {
+                    entryPoint: 'background\\unreadMentionsNotifications.js',
+                    name: 'unreadMentionsNotifications'
+                }
+            ];
+            this.currentVersion = 'v0.3';
         }
         
         // private methods
