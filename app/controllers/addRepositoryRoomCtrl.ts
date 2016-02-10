@@ -14,7 +14,7 @@ module Application.Controllers {
             this.scope.createRoom = () => {
                 var repository = this.scope.repositoriesWithoutRoom[this.scope.selection[0]];
                 RoomsService.createRoom(repository.uri, (room) => {
-                    ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
+                    ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&amp;roomId=' + room.id);
                     RoomsService.selectRoom(room);
                     $state.go('room');
                 });

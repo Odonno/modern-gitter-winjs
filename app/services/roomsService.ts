@@ -48,7 +48,7 @@ module Application.Services {
                 room.unreadItems++;
                 
                 // send notification
-                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&amp;roomId=' + room.id);
             } else {
                 message.unread = false;
             }

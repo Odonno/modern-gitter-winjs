@@ -748,7 +748,7 @@ var Application;
                 }
                 if (message.fromUser.id !== this.currentUser.id) {
                     room.unreadItems++;
-                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text);
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&amp;roomId=' + room.id);
                 }
                 else {
                     message.unread = false;
@@ -986,7 +986,7 @@ var Application;
                 };
                 this.scope.createRoom = function () {
                     RoomsService.createChannel(_this.scope.channel, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created');
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created', 'action=viewRoom&amp;roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
@@ -1029,7 +1029,7 @@ var Application;
                 this.scope.createRoom = function () {
                     var selectedRoom = _this.scope.existingRooms[_this.scope.selection[0]];
                     RoomsService.createRoom(selectedRoom.uri, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name);
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&amp;roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
@@ -1072,7 +1072,7 @@ var Application;
                 this.scope.createRoom = function () {
                     var selectedUser = _this.scope.users[_this.scope.selection[0]];
                     RoomsService.createRoom(selectedUser.username, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name);
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&amp;roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
@@ -1105,7 +1105,7 @@ var Application;
                 this.scope.createRoom = function () {
                     var repository = _this.scope.repositoriesWithoutRoom[_this.scope.selection[0]];
                     RoomsService.createRoom(repository.uri, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created');
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&amp;roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
@@ -1213,7 +1213,7 @@ var Application;
                         }
                     }
                     RoomsService.createRoom(roomName, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name);
+                        ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&amp;roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
