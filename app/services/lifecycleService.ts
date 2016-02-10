@@ -5,6 +5,7 @@ module Application.Services {
         // properties
         private app = WinJS.Application;
         private activation = Windows.ApplicationModel.Activation;
+        public ontoast: { (action: string, data?: any): void; };
 
         constructor() {
             this.app.onactivated = function(args) {
@@ -27,7 +28,11 @@ module Application.Services {
 
                     if (action == 'viewRoom') {
                         var roomId = this.getQueryValue(toastQuery, 'roomId');
+                        
                         // TODO : navigate to room
+                        if (this.ontoast) {
+                            this.ontoast(action, { room: roomId });
+                        }
                     }
                 }
             };

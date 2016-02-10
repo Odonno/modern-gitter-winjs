@@ -7,8 +7,8 @@ module Application.Services {
         public currentUser: any;
         public currentRoom: any;
         public rooms = [];
-        public onroomselected: any;
-        public onmessagereceived: any;
+        public onroomselected: { (): void; };
+        public onmessagereceived: { (roomId: string, message: any): void; };
 
         constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
             // check when internet status changed

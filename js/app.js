@@ -16,7 +16,7 @@ var Application;
     var Configs;
     (function (Configs) {
         var NavigationConfig = (function () {
-            function NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) {
+            function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
                 var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
                 $rootScope.states = [];
                 $rootScope.previousState;
@@ -552,6 +552,9 @@ var Application;
                         var action = this.getQueryValue(toastQuery, 'action');
                         if (action == 'viewRoom') {
                             var roomId = this.getQueryValue(toastQuery, 'roomId');
+                            if (this.ontoast) {
+                                this.ontoast(action, { room: roomId });
+                            }
                         }
                     }
                 };
@@ -1559,7 +1562,7 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router', 'ui-listView']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.run(function ($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService); });
+appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });

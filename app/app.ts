@@ -36,7 +36,7 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.run(($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService));
+appModule.run(($rootScope, $state, RoomsService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService));
 
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
