@@ -2,12 +2,14 @@
 
 /// <reference path="./models/messageOperation.ts"/>
 
+/// <reference path="./configs/navigation.ts"/>
 /// <reference path="./configs/routing.ts"/>
 
 /// <reference path="./services/apiService.ts"/>
 /// <reference path="./services/backgroundTaskService.ts"/>
 /// <reference path="./services/configService.ts"/>
 /// <reference path="./services/featureToggleService.ts"/>
+/// <reference path="./services/lifecycleService.ts"/>
 /// <reference path="./services/localSettingsService.ts"/>
 /// <reference path="./services/networkService.ts"/>
 /// <reference path="./services/oauthService.ts"/>
@@ -34,13 +36,14 @@ var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.rout
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.run(($rootScope, $state, RoomsService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService));
+appModule.run(($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService));
 
 // inject services
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
 appModule.service('FeatureToggleService', () => new Application.Services.FeatureToggleService());
+appModule.service('LifecycleService', () => new Application.Services.LifecycleService());
 appModule.service('LocalSettingsService', () => new Application.Services.LocalSettingsService());
 appModule.service('NetworkService', (FeatureToggleService) => new Application.Services.NetworkService(FeatureToggleService));
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));

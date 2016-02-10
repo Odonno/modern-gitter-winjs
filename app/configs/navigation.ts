@@ -2,7 +2,7 @@
 
 module Application.Configs {
     export class NavigationConfig {
-        constructor($rootScope, $state, RoomsService: Application.Services.RoomsService, FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor($rootScope, $state, RoomsService: Application.Services.RoomsService, LifecycleService: Application.Services.LifecycleService, FeatureToggleService: Application.Services.FeatureToggleService) {
             var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
             $rootScope.states = [];
             $rootScope.previousState;

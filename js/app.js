@@ -15,6 +15,63 @@ var Application;
 (function (Application) {
     var Configs;
     (function (Configs) {
+        var NavigationConfig = (function () {
+            function NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) {
+                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                $rootScope.states = [];
+                $rootScope.previousState;
+                $rootScope.currentState;
+                $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
+                    $rootScope.currentState = to.name;
+                    if (!from.name || from.name === 'splashscreen') {
+                        return;
+                    }
+                    if (FeatureToggleService.isErrorHandled()) {
+                        if (to.name === 'room' && !RoomsService.currentRoom) {
+                            $state.go('error');
+                        }
+                        if (to.name === 'error') {
+                            return;
+                        }
+                    }
+                    if ($rootScope.previousState !== $rootScope.currentState) {
+                        $rootScope.previousState = from.name;
+                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                        $rootScope.states.push({
+                            state: $rootScope.previousState,
+                            params: fromParams
+                        });
+                    }
+                });
+                systemNavigationManager.onbackrequested = function (args) {
+                    if ($rootScope.states.length > 0) {
+                        var previous = $rootScope.states.pop();
+                        if (FeatureToggleService.isErrorHandled()) {
+                            while (previous.state === 'error' && RoomsService.currentRoom) {
+                                previous = $rootScope.states.pop();
+                            }
+                        }
+                        $rootScope.previousState = previous.state;
+                        $state.go(previous.state, previous.params);
+                        if ($rootScope.states.length === 0) {
+                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                        }
+                        args.handled = true;
+                    }
+                    else {
+                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                    }
+                };
+            }
+            return NavigationConfig;
+        })();
+        Configs.NavigationConfig = NavigationConfig;
+    })(Configs = Application.Configs || (Application.Configs = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Configs;
+    (function (Configs) {
         var RoutingConfig = (function () {
             function RoutingConfig($stateProvider, $urlRouterProvider) {
                 $urlRouterProvider.otherwise('/splashscreen');
@@ -472,6 +529,48 @@ var Application;
             return FeatureToggleService;
         })();
         Services.FeatureToggleService = FeatureToggleService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var LifecycleService = (function () {
+            function LifecycleService() {
+                this.app = WinJS.Application;
+                this.activation = Windows.ApplicationModel.Activation;
+                this.app.onactivated = function (args) {
+                    if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch) {
+                        if (args.detail.previousExecutionState !== Windows.ApplicationModel.Activation.ApplicationExecutionState.terminated) {
+                        }
+                        else {
+                        }
+                        args.setPromise(WinJS.UI.processAll());
+                    }
+                    if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.toastNotification) {
+                        var toastQuery = args.detail.argument;
+                        var action = this.getQueryValue(toastQuery, 'action');
+                        if (action == 'viewRoom') {
+                            var roomId = this.getQueryValue(toastQuery, 'roomId');
+                        }
+                    }
+                };
+                this.app.oncheckpoint = function (args) {
+                };
+                this.app.start();
+            }
+            LifecycleService.prototype.getQueryValue = function (query, key) {
+                var vars = query.split('&');
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    if (pair[0] == key) {
+                        return pair[1];
+                    }
+                }
+            };
+            return LifecycleService;
+        })();
+        Services.LifecycleService = LifecycleService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
 var Application;
@@ -1460,11 +1559,12 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['winjs', 'ngSanitize', 'ui.router', 'ui-listView']);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
+appModule.run(function ($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, LifecycleService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
+appModule.service('LifecycleService', function () { return new Application.Services.LifecycleService(); });
 appModule.service('LocalSettingsService', function () { return new Application.Services.LocalSettingsService(); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
@@ -1483,60 +1583,3 @@ appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, Feature
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
-var Application;
-(function (Application) {
-    var Configs;
-    (function (Configs) {
-        var NavigationConfig = (function () {
-            function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
-                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
-                $rootScope.states = [];
-                $rootScope.previousState;
-                $rootScope.currentState;
-                $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
-                    $rootScope.currentState = to.name;
-                    if (!from.name || from.name === 'splashscreen') {
-                        return;
-                    }
-                    if (FeatureToggleService.isErrorHandled()) {
-                        if (to.name === 'room' && !RoomsService.currentRoom) {
-                            $state.go('error');
-                        }
-                        if (to.name === 'error') {
-                            return;
-                        }
-                    }
-                    if ($rootScope.previousState !== $rootScope.currentState) {
-                        $rootScope.previousState = from.name;
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
-                        $rootScope.states.push({
-                            state: $rootScope.previousState,
-                            params: fromParams
-                        });
-                    }
-                });
-                systemNavigationManager.onbackrequested = function (args) {
-                    if ($rootScope.states.length > 0) {
-                        var previous = $rootScope.states.pop();
-                        if (FeatureToggleService.isErrorHandled()) {
-                            while (previous.state === 'error' && RoomsService.currentRoom) {
-                                previous = $rootScope.states.pop();
-                            }
-                        }
-                        $rootScope.previousState = previous.state;
-                        $state.go(previous.state, previous.params);
-                        if ($rootScope.states.length === 0) {
-                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                        }
-                        args.handled = true;
-                    }
-                    else {
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                    }
-                };
-            }
-            return NavigationConfig;
-        })();
-        Configs.NavigationConfig = NavigationConfig;
-    })(Configs = Application.Configs || (Application.Configs = {}));
-})(Application || (Application = {}));
