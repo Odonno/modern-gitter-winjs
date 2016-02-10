@@ -33,5 +33,9 @@ module Application.Services {
         public isNotificationBackgroundTasksEnabled = () => {
             return this.isWindowsApp();
         };
+
+        public isLaunchHandled = () => {
+            return false;
+        };
     }
 }
