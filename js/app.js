@@ -961,8 +961,8 @@ var Application;
                     var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
                     var toastTextElements = toastXml.getElementsByTagName('text');
                     toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                    var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toast);
+                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                    this.toastNotifier.show(toastNotification);
                 }
             };
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text, args) {
@@ -983,8 +983,8 @@ var Application;
                     var toastTextElements = toastXml.getElementsByTagName('text');
                     toastTextElements[0].appendChild(toastXml.createTextNode(title));
                     toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                    var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toast);
+                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                    this.toastNotifier.show(toastNotification);
                 }
             };
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text, args) {
@@ -1007,8 +1007,8 @@ var Application;
                     toastImageElements[0].setAttribute('src', image);
                     var toastTextElements = toastXml.getElementsByTagName('text');
                     toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                    var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toast);
+                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                    this.toastNotifier.show(toastNotification);
                 }
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text, args) {
@@ -1032,8 +1032,8 @@ var Application;
                     var toastTextElements = toastXml.getElementsByTagName('text');
                     toastTextElements[0].appendChild(toastXml.createTextNode(title));
                     toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                    var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toast);
+                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                    this.toastNotifier.show(toastNotification);
                 }
             };
             return ToastNotificationService;

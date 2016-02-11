@@ -40,8 +40,8 @@ module Application.Services {
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(text));
 
-                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                this.toastNotifier.show(toast);
+                var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toastNotification);
             }
         }
 
@@ -64,8 +64,8 @@ module Application.Services {
                 toastTextElements[0].appendChild(toastXml.createTextNode(title));
                 toastTextElements[1].appendChild(toastXml.createTextNode(text));
 
-                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                this.toastNotifier.show(toast);
+                var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toastNotification);
             }
         }
 
@@ -91,8 +91,8 @@ module Application.Services {
                 var toastTextElements = toastXml.getElementsByTagName('text');
                 toastTextElements[0].appendChild(toastXml.createTextNode(text));
 
-                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                this.toastNotifier.show(toast);
+                var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toastNotification);
             }
         }
 
@@ -119,8 +119,8 @@ module Application.Services {
                 toastTextElements[0].appendChild(toastXml.createTextNode(title));
                 toastTextElements[1].appendChild(toastXml.createTextNode(text));
 
-                var toast = new Windows.UI.Notifications.ToastNotification(toastXml);
-                this.toastNotifier.show(toast);
+                var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                this.toastNotifier.show(toastNotification);
             }
         }
     }

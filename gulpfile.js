@@ -18,7 +18,7 @@ gulp.task('watch', function () {
 gulp.task('app-concat', function () {
     gulp.src(src)
         .pipe(ts({
-            noImplicitAny: true,
+            noImplicitAny: false,
             removeComments: true,
             out: 'app.js'
         }))
