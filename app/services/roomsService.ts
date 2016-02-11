@@ -10,13 +10,21 @@ module Application.Services {
         public onroomselected: { (): void; };
         public onmessagereceived: { (roomId: string, message: any): void; };
 
-        constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService) {
+        constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService, private LifecycleService: Application.Services.LifecycleService) {
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
                 if (!this.initialized && this.NetworkService.internetAvailable) {
                     this.initialize();
                 }
             });
+
+            // detect when we received a toast action
+            this.LifecycleService.ontoast = (action, data) => {
+                if (action === 'viewRoom') {
+                    var roomToView = this.getRoomById(data.roomId);
+                    this.selectRoom(roomToView);
+                }
+            };
         }
 
         // private methods
@@ -25,7 +33,7 @@ module Application.Services {
             if (room.user) {
                 room.image = room.user.avatarUrlMedium;
             } else {
-                room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+                room.image = 'https://avatars.githubusercontent.com/' + room.name.split('/')[0];
             }
                 
             // subscribe to realtime messages
@@ -62,7 +70,7 @@ module Application.Services {
                     return;
                 }
             }
-            
+
             if (!this.NetworkService.internetAvailable) {
                 callback();
                 return;
@@ -78,9 +86,12 @@ module Application.Services {
                         this.currentUser = user;
 
                         this.ApiService.getRooms().then(rooms => {
+                            // import all rooms from API
                             for (var i = 0; i < rooms.length; i++) {
                                 this.addRoom(rooms[i]);
                             }
+                            
+                            // service is now initialized
                             this.initialized = true;
                             if (callback) {
                                 callback();
@@ -91,12 +102,20 @@ module Application.Services {
             });
         }
 
+        public getRoomById(id: string) {
+            for (var i = 0; i < this.rooms.length; i++) {
+                if (this.rooms[i].id === id) {
+                    return this.rooms[i];
+                }
+            }
+        }
+
         public getRoom(name: string) {
             for (var i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].name === name) {
                     return this.rooms[i];
                 }
-            }            
+            }
         }
 
         public selectRoom(room) {

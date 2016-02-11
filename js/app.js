@@ -523,7 +523,7 @@ var Application;
                     return _this.isWindowsApp();
                 };
                 this.isLaunchHandled = function () {
-                    return false;
+                    return true;
                 };
             }
             return FeatureToggleService;
@@ -814,13 +814,14 @@ var Application;
     var Services;
     (function (Services) {
         var RoomsService = (function () {
-            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) {
+            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) {
                 var _this = this;
                 this.OAuthService = OAuthService;
                 this.NetworkService = NetworkService;
                 this.ApiService = ApiService;
                 this.RealtimeApiService = RealtimeApiService;
                 this.ToastNotificationService = ToastNotificationService;
+                this.LifecycleService = LifecycleService;
                 this.initialized = false;
                 this.rooms = [];
                 this.NetworkService.statusChanged(function () {
@@ -828,6 +829,12 @@ var Application;
                         _this.initialize();
                     }
                 });
+                this.LifecycleService.ontoast = function (action, data) {
+                    if (action === 'viewRoom') {
+                        var roomToView = _this.getRoomById(data.roomId);
+                        _this.selectRoom(roomToView);
+                    }
+                };
             }
             RoomsService.prototype.addRoom = function (room) {
                 var _this = this;
@@ -835,7 +842,7 @@ var Application;
                     room.image = room.user.avatarUrlMedium;
                 }
                 else {
-                    room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
+                    room.image = 'https://avatars.githubusercontent.com/' + room.name.split('/')[0];
                 }
                 this.RealtimeApiService.subscribe(room.id, function (operation, content) {
                     if (operation === Application.Models.MessageOperation.Created) {
@@ -886,6 +893,13 @@ var Application;
                         });
                     });
                 });
+            };
+            RoomsService.prototype.getRoomById = function (id) {
+                for (var i = 0; i < this.rooms.length; i++) {
+                    if (this.rooms[i].id === id) {
+                        return this.rooms[i];
+                    }
+                }
             };
             RoomsService.prototype.getRoom = function (name) {
                 for (var i = 0; i < this.rooms.length; i++) {
@@ -1572,7 +1586,7 @@ appModule.service('LocalSettingsService', function () { return new Application.S
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
-appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService); });
+appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });

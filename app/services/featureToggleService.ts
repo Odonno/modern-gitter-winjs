@@ -35,7 +35,7 @@ module Application.Services {
         };
 
         public isLaunchHandled = () => {
-            return false;
+            return true;
         };
     }
 }
