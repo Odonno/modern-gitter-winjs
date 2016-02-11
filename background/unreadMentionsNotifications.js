@@ -24,17 +24,6 @@
         // you need to be authenticated first to get current notifications
         token = retrieveTokenFromVault();
 
-        ///
-        var replyOptions = {
-            args: 'action=reply&amp;roomId=' + '123',
-            text: '@' + 'x' + ' ',
-            image: 'assets/icons/send.png'
-        };
-
-        // show notifications (toast notifications)
-        sendImageTitleAndTextNotificationWithReply('', 'lool' + " mentioned you", 'A message', 'action=viewRoom&amp;roomId=' + '123', replyOptions);
-        ///
-
         if (token) {
             // retrieve every room of current user
             WinJS.xhr({
