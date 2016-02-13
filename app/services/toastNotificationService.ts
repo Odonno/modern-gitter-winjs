@@ -24,7 +24,7 @@ module Application.Services {
         // public methods
         public sendTextNotification(text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<text></text>'
@@ -47,7 +47,7 @@ module Application.Services {
 
         public sendTitleAndTextNotification(title: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<text>' + title + '</text>'
@@ -71,7 +71,7 @@ module Application.Services {
 
         public sendImageAndTextNotification(image: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -98,7 +98,7 @@ module Application.Services {
 
         public sendImageTitleAndTextNotification(image: string, title: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<image placement="appLogoOverride" src="' + image + '" />'

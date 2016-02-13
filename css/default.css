@@ -344,7 +344,22 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* room view style */
-.room-topic {
+#roomBlockImage {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#roomImage {
+    max-height: 50px;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+
+#roomBlockHeader {
+    display: inline-block;
+}
+
+#roomTopic {
     padding-top: 6px;
 }
 

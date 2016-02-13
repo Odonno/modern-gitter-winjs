@@ -960,7 +960,7 @@ var Application;
             };
             ToastNotificationService.prototype.sendTextNotification = function (text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<text></text>'
@@ -981,7 +981,7 @@ var Application;
             };
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<text>' + title + '</text>'
@@ -1003,7 +1003,7 @@ var Application;
             };
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -1027,7 +1027,7 @@ var Application;
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = args ? '<toast launch="' + args + '">' : '<toast>'
+                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<image placement="appLogoOverride" src="' + image + '" />'
