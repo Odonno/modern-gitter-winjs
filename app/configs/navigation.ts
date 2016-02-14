@@ -7,6 +7,7 @@ module Application.Configs {
             $rootScope.states = [];
             $rootScope.previousState;
             $rootScope.currentState;
+            $rootScope.isBack = false;
 
             $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
                 $rootScope.currentState = to.name;
@@ -27,7 +28,9 @@ module Application.Configs {
                     }
                 }
 
-                if ($rootScope.previousState !== $rootScope.currentState) {
+                if ($rootScope.isBack) {
+                    $rootScope.isBack = false;
+                } else {
                     $rootScope.previousState = from.name;
                     systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
             
@@ -41,6 +44,9 @@ module Application.Configs {
 
             systemNavigationManager.onbackrequested = (args) => {
                 if ($rootScope.states.length > 0) {
+                    // is back active
+                    $rootScope.isBack = true;
+                    
                     // retrieve and remove last state from history
                     var previous = $rootScope.states.pop();
             
