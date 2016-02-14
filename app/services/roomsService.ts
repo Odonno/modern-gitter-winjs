@@ -50,18 +50,38 @@ module Application.Services {
             if (this.onmessagereceived) {
                 this.onmessagereceived(room.id, message);
             }
-
-            if (message.fromUser.id !== this.currentUser.id && !room.lurk) {
+            
+            // no notification if it's our own message
+            if (message.fromUser.id === this.currentUser.id) {
+                message.unread = false;
+                return;
+            }
+            
+            // push unread message
+            if (!room.lurk) {
                 // increment unread count
                 room.unreadItems++;
                 
                 // send notification
                 this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
-            } else {
-                message.unread = false;
             }
             
-            // TODO : push mention (count + notification)
+            // for each mention contained in the message
+            for (var i = 0; i < message.mentions.length; i++) {
+                // push mention (count + notification)
+                if (message.mentions[i].userId === this.currentUser.id) {
+                    // increment mentions count
+                    room.mentions++;
+                
+                    // send notification
+                    var replyOptions = {
+                        args: 'action=reply&roomId=' + room.id,
+                        text: '@' + message.fromUser.username + ' ',
+                        image: 'assets/icons/send.png'
+                    };
+                    this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                }
+            }
         }
 
         // public methods

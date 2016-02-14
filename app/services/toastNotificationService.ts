@@ -127,5 +127,25 @@ module Application.Services {
                 this.toastNotifier.show(toastNotification);
             }
         }
+
+        public sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: any, args?: string) {
+            if (this.FeatureToggleService.isLaunchHandled()) {
+                var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text>' + title + '</text>'
+                    + '<text>' + text + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '<actions>'
+                    + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
+                    + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + replyOptions.args + '" />'
+                    + '</actions>'
+                    + '</toast>';
+                toast = toast.replace(/&/g, '&amp;');
+                this.sendGenericToast(toast);
+            }
+        }
     }
 }

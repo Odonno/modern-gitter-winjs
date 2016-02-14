@@ -860,12 +860,24 @@ var Application;
                 if (this.onmessagereceived) {
                     this.onmessagereceived(room.id, message);
                 }
-                if (message.fromUser.id !== this.currentUser.id && !room.lurk) {
+                if (message.fromUser.id === this.currentUser.id) {
+                    message.unread = false;
+                    return;
+                }
+                if (!room.lurk) {
                     room.unreadItems++;
                     this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
                 }
-                else {
-                    message.unread = false;
+                for (var i = 0; i < message.mentions.length; i++) {
+                    if (message.mentions[i].userId === this.currentUser.id) {
+                        room.mentions++;
+                        var replyOptions = {
+                            args: 'action=reply&roomId=' + room.id,
+                            text: '@' + message.fromUser.username + ' ',
+                            image: 'assets/icons/send.png'
+                        };
+                        this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                    }
                 }
             };
             RoomsService.prototype.initialize = function (callback) {
@@ -1057,6 +1069,25 @@ var Application;
                     toastTextElements[1].appendChild(toastXml.createTextNode(text));
                     var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
                     this.toastNotifier.show(toastNotification);
+                }
+            };
+            ToastNotificationService.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, args) {
+                if (this.FeatureToggleService.isLaunchHandled()) {
+                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                        + '<visual>'
+                        + '<binding template="ToastGeneric">'
+                        + '<image placement="appLogoOverride" src="' + image + '" />'
+                        + '<text>' + title + '</text>'
+                        + '<text>' + text + '</text>'
+                        + '</binding>'
+                        + '</visual>'
+                        + '<actions>'
+                        + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
+                        + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + replyOptions.args + '" />'
+                        + '</actions>'
+                        + '</toast>';
+                    toast = toast.replace(/&/g, '&amp;');
+                    this.sendGenericToast(toast);
                 }
             };
             return ToastNotificationService;

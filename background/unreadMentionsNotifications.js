@@ -166,7 +166,7 @@
                 };
 
                 // show notifications (toast notifications)
-                sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, 'action=viewRoom&roomId=' + room.id, replyOptions);
+                sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
                 localSettings.values[id] = true;
             }
 
@@ -174,7 +174,7 @@
         });
     }
 
-    function sendImageTitleAndTextNotificationWithReply(image, title, text, args, replyOptions) {
+    function sendImageTitleAndTextNotificationWithReply(image, title, text, replyOptions, args) {
         // create toast content
         var toast = '<toast launch="' + args + '">'
                     + '<visual>'
