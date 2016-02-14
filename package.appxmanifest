@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="49142DavidBOTTIAU.ModernGitter" Version="2.2.46.0" Publisher="CN=519CD1E7-EAA2-4CE2-92D3-BDEE98B243DC" />
+  <Identity Name="49142DavidBOTTIAU.ModernGitter" Version="2.2.47.0" Publisher="CN=519CD1E7-EAA2-4CE2-92D3-BDEE98B243DC" />
   <mp:PhoneIdentity PhoneProductId="6cfc89ab-9b56-486d-84e3-4b5ae25dd50f" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Modern Gitter</DisplayName>
@@ -29,9 +29,9 @@
         <uap:Rule Match="ms-appx-web:///" Type="include" WindowsRuntimeAccess="all" />
       </uap:ApplicationContentUriRules>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" StartPage="background\unreadMentionsNotifications.js">
+        <Extension Category="windows.backgroundTasks" StartPage="background\notificationAction.js">
           <BackgroundTasks>
-            <Task Type="timer" />
+            <Task Type="systemEvent" />
           </BackgroundTasks>
         </Extension>
         <Extension Category="windows.backgroundTasks" StartPage="background\unreadItemsNotifications.js">
@@ -39,9 +39,9 @@
             <Task Type="timer" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" StartPage="background\notificationAction.js">
+        <Extension Category="windows.backgroundTasks" StartPage="background\unreadMentionsNotifications.js">
           <BackgroundTasks>
-            <Task Type="systemEvent" />
+            <Task Type="timer" />
           </BackgroundTasks>
         </Extension>
       </Extensions>
