@@ -51,7 +51,7 @@ module Application.Services {
                 this.onmessagereceived(room.id, message);
             }
 
-            if (message.fromUser.id !== this.currentUser.id) {
+            if (message.fromUser.id !== this.currentUser.id && !room.lurk) {
                 // increment unread count
                 room.unreadItems++;
                 
@@ -60,6 +60,8 @@ module Application.Services {
             } else {
                 message.unread = false;
             }
+            
+            // TODO : push mention (count + notification)
         }
 
         // public methods

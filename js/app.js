@@ -860,7 +860,7 @@ var Application;
                 if (this.onmessagereceived) {
                     this.onmessagereceived(room.id, message);
                 }
-                if (message.fromUser.id !== this.currentUser.id) {
+                if (message.fromUser.id !== this.currentUser.id && !room.lurk) {
                     room.unreadItems++;
                     this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
                 }
