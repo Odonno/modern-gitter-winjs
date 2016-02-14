@@ -16,7 +16,7 @@ module Application.Controllers {
             this.scope.createRoom = () => {
                 var selectedRoom = this.scope.existingRooms[this.scope.selection[0]];
                 RoomsService.createRoom(selectedRoom.uri, (room) => {
-                    ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&amp;roomId=' + room.id);
+                    ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
                     $state.go('room');
                 });

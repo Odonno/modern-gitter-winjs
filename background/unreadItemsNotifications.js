@@ -105,7 +105,7 @@
             }
 
             // show notifications (toast notifications)
-            sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", 'action=viewRoom&amp;roomId=' + room.id);
+            sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", 'action=viewRoom&roomId=' + room.id);
             localSettings.values[id] = room.unreadItems;
         }
     }
@@ -121,6 +121,7 @@
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
+        toast = toast.replace(/&/g, '&amp;');
 
         // generate XML from toast content
         var toastXml = new Windows.Data.Xml.Dom.XmlDocument();

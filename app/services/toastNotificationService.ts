@@ -32,6 +32,7 @@ module Application.Services {
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
+                toast = toast.replace(/&/g, '&amp;');
                 this.sendGenericToast(toast);
             } else {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastText01;
@@ -55,6 +56,7 @@ module Application.Services {
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
+                toast = toast.replace(/&/g, '&amp;');
                 this.sendGenericToast(toast);
             } else {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
@@ -80,6 +82,7 @@ module Application.Services {
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
+                toast = toast.replace(/&/g, '&amp;');
                 this.sendGenericToast(toast);
             } else {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
@@ -107,6 +110,7 @@ module Application.Services {
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
+                toast = toast.replace(/&/g, '&amp;');
                 this.sendGenericToast(toast);
             } else {
                 var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;

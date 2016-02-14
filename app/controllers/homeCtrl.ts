@@ -34,7 +34,7 @@ module Application.Controllers {
                 
                 // join the room
                 RoomsService.createRoom(roomName, (room) => {
-                    ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&amp;roomId=' + room.id);
+                    ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
                     $state.go('room');
                 });
