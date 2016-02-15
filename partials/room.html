@@ -19,7 +19,10 @@
     <div class="message-container clickable" ng-class="message.unread ? 'unread' : 'read'" style="transform: rotateX(180deg);">
         <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
         <div class="message-subcontainer">
-            <div class="message-username">{{ message.fromUser.username }}</div>
+            <div class="message-username">
+                <span>{{ message.fromUser.username }}</span>
+                <span style="font-size: 12px;">{{ message.sent | timeAgo }}</span>
+            </div>
             <div class="message-content" ng-bind-html="message.html"></div>
         </div>
     </div>
