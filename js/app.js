@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -514,9 +514,6 @@ var Application;
                 };
                 this.isErrorHandled = function () {
                     return true;
-                };
-                this.useWinjsListView = function () {
-                    return false;
                 };
                 this.isFirstPageLoadedByStorage = function () {
                     return true;
@@ -1392,9 +1389,8 @@ var Application;
                 this.LocalSettingsService = LocalSettingsService;
                 this.FeatureToggleService = FeatureToggleService;
                 this.scope = $scope;
-                this.scope.useWinjsListView = this.FeatureToggleService.useWinjsListView();
                 this.scope.listOptions = {};
-                this.scope.hideProgress = this.FeatureToggleService.useWinjsListView() ? true : false;
+                this.scope.hideProgress = false;
                 this.scope.refreshed = false;
                 this.scope.room = this.RoomsService.currentRoom;
                 this.scope.messages = [];
@@ -1426,12 +1422,7 @@ var Application;
                 }
                 this.RoomsService.onmessagereceived = function (roomId, message) {
                     if (_this.scope.room && _this.scope.room.id === roomId) {
-                        if (_this.FeatureToggleService.useWinjsListView()) {
-                            _this.scope.messages.push(message);
-                        }
-                        else {
-                            _this.scope.messages.unshift(message);
-                        }
+                        _this.scope.messages.unshift(message);
                     }
                 };
                 this.ApiService.getCurrentUser().then(function (user) {
@@ -1441,69 +1432,23 @@ var Application;
                         for (var i = 0; i < messages.length; i++) {
                             _this.scope.messages.unshift(messages[i]);
                         }
-                        if (_this.FeatureToggleService.useWinjsListView()) {
-                            _this.scope.messagesWinControl.forceLayout();
-                            _this.scope.messagesWinControl.onloadingstatechanged = function (e) {
-                                if (_this.scope.messagesWinControl.loadingState === "complete") {
-                                    if (_this.scope.refreshed) {
-                                        _this.detectUnreadMessages();
-                                    }
-                                    if (!_this.scope.refreshed) {
-                                        _this.refreshListView();
-                                    }
-                                }
-                            };
-                        }
-                        else {
-                            _this.scope.fixWinControl.forceLayout();
-                            var listview = document.getElementById('customMessagesListView');
-                            listview.onscroll = function () {
-                                _this.detectUnreadMessages();
-                                var range = _this.scope.listOptions.range;
-                                if (range && range.index + range.length === range.total) {
-                                    _this.loadMoreItems();
-                                }
-                            };
-                        }
+                        _this.scope.fixWinControl.forceLayout();
+                        var listview = document.getElementById('customMessagesListView');
+                        listview.onscroll = function () {
+                            _this.detectUnreadMessages();
+                            var range = _this.scope.listOptions.range;
+                            if (range && range.index + range.length === range.total) {
+                                _this.loadMoreItems();
+                            }
+                        };
                     });
                 });
             }
-            RoomCtrl.prototype.refreshListView = function () {
-                var _this = this;
-                if (this.FeatureToggleService.useWinjsListView()) {
-                    this.scope.messagesWinControl.ensureVisible(this.scope.messages.length - 1);
-                    this.scope.hideProgress = false;
-                    this.scope.refreshed = true;
-                    this.scope.messagesWinControl.onheadervisibilitychanged = function (e) {
-                        if (e.detail.visible && _this.scope.messages.length > 0) {
-                            var lastVisible = _this.scope.messagesWinControl.indexOfLastVisible;
-                            _this.ApiService.getMessages(_this.scope.room.id, _this.scope.messages[0].id).then(function (beforeMessages) {
-                                if (!beforeMessages || beforeMessages.length <= 0) {
-                                    _this.scope.hideProgress = true;
-                                    return;
-                                }
-                                for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                                    _this.scope.messages.unshift(beforeMessages[i]);
-                                }
-                                setTimeout(function () {
-                                    _this.scope.messagesWinControl.ensureVisible(lastVisible + beforeMessages.length);
-                                }, 250);
-                            });
-                        }
-                    };
-                }
-            };
             RoomCtrl.prototype.detectUnreadMessages = function () {
                 var firstIndex, lastIndex;
-                if (this.FeatureToggleService.useWinjsListView()) {
-                    firstIndex = this.scope.messagesWinControl.indexOfFirstVisible;
-                    lastIndex = this.scope.messagesWinControl.indexOfLastVisible;
-                }
-                else {
-                    var range = this.scope.listOptions.range;
-                    firstIndex = range.index;
-                    lastIndex = range.index + range.length;
-                }
+                var range = this.scope.listOptions.range;
+                firstIndex = range.index;
+                lastIndex = range.index + range.length;
                 var messageIds = [];
                 for (var i = 0; i < this.scope.messages.length; i++) {
                     if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
@@ -1517,28 +1462,26 @@ var Application;
             };
             RoomCtrl.prototype.loadMoreItems = function () {
                 var _this = this;
-                if (!this.FeatureToggleService.useWinjsListView()) {
-                    var listview = document.getElementById('customMessagesListView');
-                    var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
-                    if (this.scope.hideProgress) {
+                var listview = document.getElementById('customMessagesListView');
+                var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
+                if (this.scope.hideProgress) {
+                    return;
+                }
+                this.scope.hideProgress = true;
+                var olderMessage = this.scope.messages[this.scope.messages.length - 1];
+                this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(function (beforeMessages) {
+                    if (!beforeMessages || beforeMessages.length <= 0) {
                         return;
                     }
-                    this.scope.hideProgress = true;
-                    var olderMessage = this.scope.messages[this.scope.messages.length - 1];
-                    this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(function (beforeMessages) {
-                        if (!beforeMessages || beforeMessages.length <= 0) {
-                            return;
-                        }
-                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                            _this.scope.messages.push(beforeMessages[i]);
-                        }
-                        setTimeout(function () {
-                            var newScrollHeight = _this.scope.listOptions.listView.getScrollHeight();
-                            listview.scrollTop += newScrollHeight - lastScrollHeight;
-                            _this.scope.hideProgress = false;
-                        }, 250);
-                    });
-                }
+                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                        _this.scope.messages.push(beforeMessages[i]);
+                    }
+                    setTimeout(function () {
+                        var newScrollHeight = _this.scope.listOptions.listView.getScrollHeight();
+                        listview.scrollTop += newScrollHeight - lastScrollHeight;
+                        _this.scope.hideProgress = false;
+                    }, 250);
+                });
             };
             return RoomCtrl;
         })();

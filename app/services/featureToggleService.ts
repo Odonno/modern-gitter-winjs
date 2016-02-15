@@ -18,10 +18,6 @@ module Application.Services {
             return true;
         };
 
-        public useWinjsListView = () => {
-            return false;
-        };
-
         public isFirstPageLoadedByStorage = () => {
             return true;
         };

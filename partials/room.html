@@ -12,30 +12,10 @@
 </div>
 
 <!-- fix to make ui-listview working -->
-<win-list-view id="fixListView" ng-hide="useWinjsListView" win-control="fixWinControl" style="height: 0;"></win-list-view>
+<win-list-view id="fixListView" win-control="fixWinControl" style="height: 0;"></win-list-view>
 
-<!-- list view of messages (WinJS implementation) -->
-<win-list-view id="winjsMessagesListView" class="messages-list-view" ng-show="useWinjsListView" item-data-source="messages" win-control="messagesWinControl">
-    <!-- header template -->
-    <win-list-view-header>
-        <progress class="win-progress-bar" ng-hide="hideProgress && !refreshed"></progress>
-    </win-list-view-header>
-
-    <!-- message template -->
-    <win-item-template>
-        <div class="message-container clickable" ng-class="item.data.unread ? 'unread' : 'read'" style="height: 100px;">
-            <img class="message-image" ng-src="{{ item.data.fromUser.avatarUrlSmall }}" />
-            <div class="message-subcontainer">
-                <div class="message-username">{{ item.data.fromUser.username }}</div>
-                <div class="message-content" ng-bind-html="item.data.html"></div>
-            </div>
-        </div>
-    </win-item-template>
-
-    <win-list-layout></win-list-layout>
-</win-list-view>
 <!-- list view of messages (ui-listview implementation) -->
-<div id="customMessagesListView" class="messages-list-view" ng-hide="useWinjsListView" ui-list-view="message in messages" options="listOptions" style="transform: rotateX(180deg);">
+<div id="customMessagesListView" class="messages-list-view" ui-list-view="message in messages" options="listOptions" style="transform: rotateX(180deg);">
     <div class="message-container clickable" ng-class="message.unread ? 'unread' : 'read'" style="transform: rotateX(180deg);">
         <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
         <div class="message-subcontainer">
