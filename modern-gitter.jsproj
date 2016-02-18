@@ -70,6 +70,9 @@
     <Content Include="background\unreadItemsNotifications.js" />
     <Content Include="background\unreadMentionsNotifications.js" />
     <Content Include="default.html" />
+    <Content Include="dist\angular-emoji\emoji.min.css" />
+    <Content Include="dist\angular-emoji\emoji.min.js" />
+    <Content Include="dist\angular-emoji\emoji.png" />
     <Content Include="dist\angular-sanitize\angular-sanitize.js" />
     <Content Include="dist\angular-timeago\angular-timeago.js" />
     <Content Include="dist\angular-ui-router\angular-ui-router.js" />
