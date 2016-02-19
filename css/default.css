@@ -344,9 +344,14 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* room view style */
-#roomBlockImage {
-    display: inline-block;
-    vertical-align: top;
+#roomDescription {
+    height: 100px;
+    background-color: #f2f2f2;
+}
+
+#roomDescription .content {
+    display: flex;
+    align-items: flex-start;
 }
 
 #roomImage {
@@ -355,21 +360,18 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     margin-right: 10px;
 }
 
-#roomBlockHeader {
-    display: inline-block;
-}
-
 #roomTopic {
     padding-top: 6px;
-}
-
-#roomDescription {
-    height: 120px;
-    background-color: #f2f2f2;
+    width: calc(100vw - 150px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .messages-list-view {
-    height: calc(100vh - 120px - 60px);
+    height: calc(100vh - 100px - 60px);
 }
 
 #textMessage {
@@ -408,6 +410,11 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     opacity: 0.5;
     font-weight: 600;
     color: #333;
+}
+
+.message-timestamp {
+    float: right;
+    font-size: 12px;
 }
 
 .message-content {
