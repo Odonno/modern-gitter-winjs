@@ -42,11 +42,9 @@ module Application.Controllers {
                 return;
             }
 
-            if (FeatureToggleService.isFirstPageLoadedByStorage()) {
-                // update local storage
-                this.LocalSettingsService.setValue('lastPage', 'room');
-                this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
-            }
+            // update local storage
+            this.LocalSettingsService.setValue('lastPage', 'room');
+            this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
 
             this.RoomsService.onmessagereceived = (roomId, message) => {
                 if (this.scope.room && this.scope.room.id === roomId) {

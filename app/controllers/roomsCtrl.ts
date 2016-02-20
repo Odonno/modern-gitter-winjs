@@ -8,9 +8,7 @@ module Application.Controllers {
             this.scope = $scope;
             
             // update local storage
-            if (FeatureToggleService.isFirstPageLoadedByStorage()) {
-                LocalSettingsService.setValue('lastPage', 'rooms');
-            }
+            LocalSettingsService.setValue('lastPage', 'rooms');
             
             // properties
             this.scope.rooms = RoomsService.rooms;

@@ -11,6 +11,10 @@ module Application.Services {
             return (typeof Debug !== 'undefined');
         };
         
+        public isNotificationBackgroundTasksEnabled = () => {
+            return this.isWindowsApp();
+        };
+        
         // TODO : Permission Toggles
 
         // Experiment Toggles
@@ -18,16 +22,8 @@ module Application.Services {
             return false;
         };
 
-        public isFirstPageLoadedByStorage = () => {
-            return true;
-        };
-
         public isSplitviewAppNameShowed = () => {
             return false;
-        };
-
-        public isNotificationBackgroundTasksEnabled = () => {
-            return this.isWindowsApp();
         };
 
         public isLaunchHandled = () => {

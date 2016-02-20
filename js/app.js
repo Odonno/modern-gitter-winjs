@@ -505,17 +505,14 @@ var Application;
                 this.isDebugMode = function () {
                     return (typeof Debug !== 'undefined');
                 };
+                this.isNotificationBackgroundTasksEnabled = function () {
+                    return _this.isWindowsApp();
+                };
                 this.isMyImageShown = function () {
                     return false;
                 };
-                this.isFirstPageLoadedByStorage = function () {
-                    return true;
-                };
                 this.isSplitviewAppNameShowed = function () {
                     return false;
-                };
-                this.isNotificationBackgroundTasksEnabled = function () {
-                    return _this.isWindowsApp();
                 };
                 this.isLaunchHandled = function () {
                     return true;
@@ -1409,10 +1406,8 @@ var Application;
                     console.error('no room selected...');
                     return;
                 }
-                if (FeatureToggleService.isFirstPageLoadedByStorage()) {
-                    this.LocalSettingsService.setValue('lastPage', 'room');
-                    this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
-                }
+                this.LocalSettingsService.setValue('lastPage', 'room');
+                this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
                 this.RoomsService.onmessagereceived = function (roomId, message) {
                     if (_this.scope.room && _this.scope.room.id === roomId) {
                         _this.scope.messages.unshift(message);
@@ -1489,9 +1484,7 @@ var Application;
             function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
                 var _this = this;
                 this.scope = $scope;
-                if (FeatureToggleService.isFirstPageLoadedByStorage()) {
-                    LocalSettingsService.setValue('lastPage', 'rooms');
-                }
+                LocalSettingsService.setValue('lastPage', 'rooms');
                 this.scope.rooms = RoomsService.rooms;
                 this.scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
@@ -1515,22 +1508,17 @@ var Application;
             function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
                 this.scope = $scope;
                 RoomsService.initialize(function () {
-                    if (FeatureToggleService.isFirstPageLoadedByStorage()) {
-                        var lastPage = LocalSettingsService.getValue('lastPage');
-                        var lastRoom = LocalSettingsService.getValue('lastRoom');
-                        if (lastPage === 'room' && lastRoom) {
-                            RoomsService.onroomselected = function () {
-                                $state.go('room');
-                            };
-                            var room = RoomsService.getRoom(lastRoom);
-                            RoomsService.selectRoom(room);
-                        }
-                        else if (lastPage === 'rooms') {
-                            $state.go('rooms');
-                        }
-                        else {
-                            $state.go('home');
-                        }
+                    var lastPage = LocalSettingsService.getValue('lastPage');
+                    var lastRoom = LocalSettingsService.getValue('lastRoom');
+                    if (lastPage === 'room' && lastRoom) {
+                        RoomsService.onroomselected = function () {
+                            $state.go('room');
+                        };
+                        var room = RoomsService.getRoom(lastRoom);
+                        RoomsService.selectRoom(room);
+                    }
+                    else if (lastPage === 'rooms') {
+                        $state.go('rooms');
                     }
                     else {
                         $state.go('home');
