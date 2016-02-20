@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -27,13 +27,11 @@ var Application;
                     if (!from.name || from.name === 'splashscreen') {
                         return;
                     }
-                    if (FeatureToggleService.isErrorHandled()) {
-                        if (to.name === 'room' && !RoomsService.currentRoom) {
-                            $state.go('error');
-                        }
-                        if (to.name === 'error') {
-                            return;
-                        }
+                    if (to.name === 'room' && !RoomsService.currentRoom) {
+                        $state.go('error');
+                    }
+                    if (to.name === 'error') {
+                        return;
                     }
                     if ($rootScope.isBack) {
                         $rootScope.isBack = false;
@@ -51,10 +49,8 @@ var Application;
                     if ($rootScope.states.length > 0) {
                         $rootScope.isBack = true;
                         var previous = $rootScope.states.pop();
-                        if (FeatureToggleService.isErrorHandled()) {
-                            while (previous.state === 'error' && RoomsService.currentRoom) {
-                                previous = $rootScope.states.pop();
-                            }
+                        while (previous.state === 'error' && RoomsService.currentRoom) {
+                            previous = $rootScope.states.pop();
                         }
                         $rootScope.previousState = previous.state;
                         $state.go(previous.state, previous.params);
@@ -511,9 +507,6 @@ var Application;
                 };
                 this.isMyImageShown = function () {
                     return false;
-                };
-                this.isErrorHandled = function () {
-                    return true;
                 };
                 this.isFirstPageLoadedByStorage = function () {
                     return true;

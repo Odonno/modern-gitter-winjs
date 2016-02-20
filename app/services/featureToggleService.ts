@@ -2,6 +2,7 @@
 
 module Application.Services {
     export class FeatureToggleService {
+        // Deployment Toggles
         public isWindowsApp = () => {
             return (typeof Windows !== 'undefined');
         };
@@ -9,13 +10,12 @@ module Application.Services {
         public isDebugMode = () => {
             return (typeof Debug !== 'undefined');
         };
+        
+        // TODO : Permission Toggles
 
+        // Experiment Toggles
         public isMyImageShown = () => {
             return false;
-        };
-
-        public isErrorHandled = () => {
-            return true;
         };
 
         public isFirstPageLoadedByStorage = () => {
