@@ -508,9 +508,6 @@ var Application;
                 this.isNotificationBackgroundTasksEnabled = function () {
                     return _this.isWindowsApp();
                 };
-                this.isMyImageShown = function () {
-                    return false;
-                };
                 this.isSplitviewAppNameShowed = function () {
                     return false;
                 };
@@ -1345,7 +1342,6 @@ var Application;
                 else {
                     this.scope.appVersion = 'web';
                 }
-                this.scope.showMyImage = FeatureToggleService.isMyImageShown();
                 this.scope.chatWithUs = function () {
                     var roomName = 'Odonno/Modern-Gitter';
                     for (var i = 0; i < RoomsService.rooms.length; i++) {

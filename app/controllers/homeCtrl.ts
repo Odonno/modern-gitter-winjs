@@ -17,8 +17,6 @@ module Application.Controllers {
                 this.scope.appVersion = 'web';
             }
 
-            this.scope.showMyImage = FeatureToggleService.isMyImageShown();
-            
             // methods
             this.scope.chatWithUs = () => {
                 var roomName = 'Odonno/Modern-Gitter';

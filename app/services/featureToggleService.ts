@@ -18,10 +18,6 @@ module Application.Services {
         // TODO : Permission Toggles
 
         // Experiment Toggles
-        public isMyImageShown = () => {
-            return false;
-        };
-
         public isSplitviewAppNameShowed = () => {
             return false;
         };
