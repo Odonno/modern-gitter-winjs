@@ -78,6 +78,8 @@
     <Content Include="dist\angular-winjs\angular-winjs.js" />
     <Content Include="dist\angular\angular.js" />
     <Content Include="dist\faye\faye-browser.js" />
+    <Content Include="dist\modern-gitter\app.js" />
+    <Content Include="dist\modern-gitter\app.css" />
     <Content Include="dist\ui-listview\ui-listview.css" />
     <Content Include="dist\ui-listview\ui-listView.js" />
     <Content Include="dist\winjs\css\ui-dark.css" />
@@ -128,8 +130,6 @@
     <Content Include="images\scale-400\Wide310x150Logo.png" />
     <Content Include="images\Square44x44Logo.targetsize-256.png" />
     <Content Include="images\Square44x44Logo.targetsize-48.png" />
-    <Content Include="js\app.js" />
-    <Content Include="css\default.css" />
     <Content Include="partials\addRoom.html" />
     <Content Include="partials\channel.html" />
     <Content Include="partials\error.html" />

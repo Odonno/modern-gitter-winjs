@@ -33,6 +33,6 @@
 <!-- actions (send message) -->
 <div id="actions">
     <button id="sendFiles" class="btn btn-link btn-icon no-outline" disabled>&#xE16C;</button>
-    <input id="textMessage" type="text" ng-model="textMessage" placeholder="Enter your text here..." ng-enter="sendMessage()" />
+    <textarea id="textMessage" ng-model="textMessage" placeholder="Enter your text here..."></textarea>
     <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
 </div>

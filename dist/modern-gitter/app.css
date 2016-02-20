@@ -371,17 +371,19 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 .messages-list-view {
-    height: calc(100vh - 100px - 60px);
-}
-
-#textMessage {
-	height: 100%;
-	width: calc(100vw - 58px - 42px - 42px);
-	border: none;
+    height: calc(100vh - 100px - 50px);
 }
 
 #actions {
     height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+#textMessage {
+    height: 50px;
+	width: calc(100vw - 58px - 42px - 42px);
+	border: none;
 }
 
 .win-progress-bar {
