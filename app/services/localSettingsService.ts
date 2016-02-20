@@ -3,19 +3,39 @@
 module Application.Services {
     export class LocalSettingsService {
         // properties
-        private localSettings = Windows.Storage.ApplicationData.current.localSettings;
+        private localSettings;
+
+        constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
+            if (FeatureToggleService.isWindowsApp()) {
+                this.localSettings = Windows.Storage.ApplicationData.current.localSettings
+            } else {
+                // TODO : use HTML5 local storage
+            }
+        }
         
         // methods
         public getValue = (key: string) => {
-            return this.localSettings.values[key];
+            if (FeatureToggleService.isWindowsApp()) {
+                return this.localSettings.values[key];
+            } else {
+                // TODO
+            }
         };
 
         public setValue = (key: string, value: any) => {
-            this.localSettings.values[key] = value;
+            if (FeatureToggleService.isWindowsApp()) {
+                this.localSettings.values[key] = value;
+            } else {
+                // TODO
+            }
         };
 
         public deleteValue = (key: string) => {
-            this.localSettings.values.remove(key);
+            if (FeatureToggleService.isWindowsApp()) {
+                this.localSettings.values.remove(key);
+            } else {
+                // TODO
+            }
         };
     }
 }

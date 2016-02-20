@@ -17,7 +17,9 @@ var Application;
     (function (Configs) {
         var NavigationConfig = (function () {
             function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
-                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                if (FeatureToggleService.isWindowsApp()) {
+                    var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                }
                 $rootScope.states = [];
                 $rootScope.previousState;
                 $rootScope.currentState;
@@ -38,31 +40,35 @@ var Application;
                     }
                     else {
                         $rootScope.previousState = from.name;
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                        if (FeatureToggleService.isWindowsApp()) {
+                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                        }
                         $rootScope.states.push({
                             state: $rootScope.previousState,
                             params: fromParams
                         });
                     }
                 });
-                systemNavigationManager.onbackrequested = function (args) {
-                    if ($rootScope.states.length > 0) {
-                        $rootScope.isBack = true;
-                        var previous = $rootScope.states.pop();
-                        while (previous.state === 'error' && RoomsService.currentRoom) {
-                            previous = $rootScope.states.pop();
+                if (FeatureToggleService.isWindowsApp()) {
+                    systemNavigationManager.onbackrequested = function (args) {
+                        if ($rootScope.states.length > 0) {
+                            $rootScope.isBack = true;
+                            var previous = $rootScope.states.pop();
+                            while (previous.state === 'error' && RoomsService.currentRoom) {
+                                previous = $rootScope.states.pop();
+                            }
+                            $rootScope.previousState = previous.state;
+                            $state.go(previous.state, previous.params);
+                            if ($rootScope.states.length === 0) {
+                                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                            }
+                            args.handled = true;
                         }
-                        $rootScope.previousState = previous.state;
-                        $state.go(previous.state, previous.params);
-                        if ($rootScope.states.length === 0) {
+                        else {
                             systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
                         }
-                        args.handled = true;
-                    }
-                    else {
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                    }
-                };
+                    };
+                }
             }
             return NavigationConfig;
         })();
@@ -389,26 +395,28 @@ var Application;
         var BackgroundTaskService = (function () {
             function BackgroundTaskService(FeatureToggleService) {
                 this.tasks = [];
-                this.tasks = [
-                    {
-                        entryPoint: 'background\\unreadItemsNotifications.js',
-                        name: 'unreadItemsNotifications',
-                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
-                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                    },
-                    {
-                        entryPoint: 'background\\unreadMentionsNotifications.js',
-                        name: 'unreadMentionsNotifications',
-                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
-                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                    },
-                    {
-                        entryPoint: 'background\\notificationAction.js',
-                        name: 'notificationAction',
-                        trigger: new Windows.ApplicationModel.Background.ToastNotificationActionTrigger(),
-                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                    }
-                ];
+                if (FeatureToggleService.isWindowsApp()) {
+                    this.tasks = [
+                        {
+                            entryPoint: 'background\\unreadItemsNotifications.js',
+                            name: 'unreadItemsNotifications',
+                            trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                            condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                        },
+                        {
+                            entryPoint: 'background\\unreadMentionsNotifications.js',
+                            name: 'unreadMentionsNotifications',
+                            trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                            condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                        },
+                        {
+                            entryPoint: 'background\\notificationAction.js',
+                            name: 'notificationAction',
+                            trigger: new Windows.ApplicationModel.Background.ToastNotificationActionTrigger(),
+                            condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                        }
+                    ];
+                }
                 this.currentVersion = 'v0.6';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
@@ -525,7 +533,10 @@ var Application;
     var Services;
     (function (Services) {
         var LifecycleService = (function () {
-            function LifecycleService() {
+            function LifecycleService(FeatureToggleService) {
+                if (!FeatureToggleService.isWindowsApp()) {
+                    return;
+                }
                 this.app = WinJS.Application;
                 this.activation = Windows.ApplicationModel.Activation;
                 this.app.onactivated = function (args) {
@@ -570,18 +581,34 @@ var Application;
     var Services;
     (function (Services) {
         var LocalSettingsService = (function () {
-            function LocalSettingsService() {
+            function LocalSettingsService(FeatureToggleService) {
                 var _this = this;
-                this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
                 this.getValue = function (key) {
-                    return _this.localSettings.values[key];
+                    if (FeatureToggleService.isWindowsApp()) {
+                        return _this.localSettings.values[key];
+                    }
+                    else {
+                    }
                 };
                 this.setValue = function (key, value) {
-                    _this.localSettings.values[key] = value;
+                    if (FeatureToggleService.isWindowsApp()) {
+                        _this.localSettings.values[key] = value;
+                    }
+                    else {
+                    }
                 };
                 this.deleteValue = function (key) {
-                    _this.localSettings.values.remove(key);
+                    if (FeatureToggleService.isWindowsApp()) {
+                        _this.localSettings.values.remove(key);
+                    }
+                    else {
+                    }
                 };
+                if (FeatureToggleService.isWindowsApp()) {
+                    this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
+                }
+                else {
+                }
             }
             return LocalSettingsService;
         })();
@@ -1541,8 +1568,8 @@ appModule.service('ApiService', function (ConfigService, OAuthService) { return 
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
-appModule.service('LifecycleService', function () { return new Application.Services.LifecycleService(); });
-appModule.service('LocalSettingsService', function () { return new Application.Services.LocalSettingsService(); });
+appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
+appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });

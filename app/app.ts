@@ -43,8 +43,8 @@ appModule.service('ApiService', (ConfigService: Application.Services.ConfigServi
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
 appModule.service('FeatureToggleService', () => new Application.Services.FeatureToggleService());
-appModule.service('LifecycleService', () => new Application.Services.LifecycleService());
-appModule.service('LocalSettingsService', () => new Application.Services.LocalSettingsService());
+appModule.service('LifecycleService', (FeatureToggleService) => new Application.Services.LifecycleService(FeatureToggleService));
+appModule.service('LocalSettingsService', (FeatureToggleService) => new Application.Services.LocalSettingsService(FeatureToggleService));
 appModule.service('NetworkService', (FeatureToggleService) => new Application.Services.NetworkService(FeatureToggleService));
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));
 appModule.service('RealtimeApiService', (OAuthService: Application.Services.OAuthService) => new Application.Services.RealtimeApiService(OAuthService));

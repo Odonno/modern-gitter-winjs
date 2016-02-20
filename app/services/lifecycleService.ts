@@ -3,11 +3,18 @@
 module Application.Services {
     export class LifecycleService {
         // properties
-        private app = WinJS.Application;
-        private activation = Windows.ApplicationModel.Activation;
+        private app;
+        private activation;
         public ontoast: { (action: string, data?: any): void; };
 
-        constructor() {
+        constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
+            if (!FeatureToggleService.isWindowsApp()) {
+                return;
+            }
+            
+            this.app = WinJS.Application;
+            this.activation = Windows.ApplicationModel.Activation;
+            
             this.app.onactivated = function(args) {
                 if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch) {
                     if (args.detail.previousExecutionState !== Windows.ApplicationModel.Activation.ApplicationExecutionState.terminated) {

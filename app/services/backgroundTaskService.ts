@@ -8,26 +8,28 @@ module Application.Services {
         
         // constructor
         constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.tasks = [
-                {
-                    entryPoint: 'background\\unreadItemsNotifications.js',
-                    name: 'unreadItemsNotifications',
-                    trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
-                    condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                },
-                {
-                    entryPoint: 'background\\unreadMentionsNotifications.js',
-                    name: 'unreadMentionsNotifications',
-                    trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
-                    condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                },
-                {
-                    entryPoint: 'background\\notificationAction.js',
-                    name: 'notificationAction',
-                    trigger: new Windows.ApplicationModel.Background.ToastNotificationActionTrigger(),
-                    condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
-                }
-            ];
+            if (FeatureToggleService.isWindowsApp()) {
+                this.tasks = [
+                    {
+                        entryPoint: 'background\\unreadItemsNotifications.js',
+                        name: 'unreadItemsNotifications',
+                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                    },
+                    {
+                        entryPoint: 'background\\unreadMentionsNotifications.js',
+                        name: 'unreadMentionsNotifications',
+                        trigger: new Windows.ApplicationModel.Background.TimeTrigger(15, false),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                    },
+                    {
+                        entryPoint: 'background\\notificationAction.js',
+                        name: 'notificationAction',
+                        trigger: new Windows.ApplicationModel.Background.ToastNotificationActionTrigger(),
+                        condition: new Windows.ApplicationModel.Background.SystemCondition(Windows.ApplicationModel.Background.SystemConditionType.internetAvailable)
+                    }
+                ];
+            }
             this.currentVersion = 'v0.6';
         }
         

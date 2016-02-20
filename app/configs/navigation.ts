@@ -3,7 +3,10 @@
 module Application.Configs {
     export class NavigationConfig {
         constructor($rootScope, $state, RoomsService: Application.Services.RoomsService, FeatureToggleService: Application.Services.FeatureToggleService) {
-            var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+            if (FeatureToggleService.isWindowsApp()) {
+                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+            }
+
             $rootScope.states = [];
             $rootScope.previousState;
             $rootScope.currentState;
@@ -29,7 +32,9 @@ module Application.Configs {
                     $rootScope.isBack = false;
                 } else {
                     $rootScope.previousState = from.name;
-                    systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                    if (FeatureToggleService.isWindowsApp()) {
+                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                    }
             
                     // add current state to history
                     $rootScope.states.push({
@@ -39,33 +44,35 @@ module Application.Configs {
                 }
             });
 
-            systemNavigationManager.onbackrequested = (args) => {
-                if ($rootScope.states.length > 0) {
-                    // is back active
-                    $rootScope.isBack = true;
+            if (FeatureToggleService.isWindowsApp()) {
+                systemNavigationManager.onbackrequested = (args) => {
+                    if ($rootScope.states.length > 0) {
+                        // is back active
+                        $rootScope.isBack = true;
                     
-                    // retrieve and remove last state from history
-                    var previous = $rootScope.states.pop();
+                        // retrieve and remove last state from history
+                        var previous = $rootScope.states.pop();
             
-                    // remove error page from navigation stack if there is a current room now
-                    while (previous.state === 'error' && RoomsService.currentRoom) {
-                        previous = $rootScope.states.pop();
-                    }
+                        // remove error page from navigation stack if there is a current room now
+                        while (previous.state === 'error' && RoomsService.currentRoom) {
+                            previous = $rootScope.states.pop();
+                        }
 
-                    $rootScope.previousState = previous.state;
+                        $rootScope.previousState = previous.state;
             
-                    // go back to previous page
-                    $state.go(previous.state, previous.params);
+                        // go back to previous page
+                        $state.go(previous.state, previous.params);
 
-                    if ($rootScope.states.length === 0) {
+                        if ($rootScope.states.length === 0) {
+                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                        }
+
+                        args.handled = true;
+                    } else {
                         systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
                     }
-
-                    args.handled = true;
-                } else {
-                    systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                }
-            };
+                };
+            }
         }
     }
 }

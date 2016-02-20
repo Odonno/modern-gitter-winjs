@@ -4,7 +4,7 @@ var gulp = require('gulp'),
 
 // paths
 var src = './app/**/*.ts';
-var dest = './js';
+var dest = './dist/modern-gitter';
 
 // default task
 gulp.task('default', ['watch']);
