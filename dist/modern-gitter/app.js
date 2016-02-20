@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -583,28 +583,29 @@ var Application;
         var LocalSettingsService = (function () {
             function LocalSettingsService(FeatureToggleService) {
                 var _this = this;
+                this.FeatureToggleService = FeatureToggleService;
                 this.getValue = function (key) {
-                    if (FeatureToggleService.isWindowsApp()) {
+                    if (_this.FeatureToggleService.isWindowsApp()) {
                         return _this.localSettings.values[key];
                     }
                     else {
                     }
                 };
                 this.setValue = function (key, value) {
-                    if (FeatureToggleService.isWindowsApp()) {
+                    if (_this.FeatureToggleService.isWindowsApp()) {
                         _this.localSettings.values[key] = value;
                     }
                     else {
                     }
                 };
                 this.deleteValue = function (key) {
-                    if (FeatureToggleService.isWindowsApp()) {
+                    if (_this.FeatureToggleService.isWindowsApp()) {
                         _this.localSettings.values.remove(key);
                     }
                     else {
                     }
                 };
-                if (FeatureToggleService.isWindowsApp()) {
+                if (this.FeatureToggleService.isWindowsApp()) {
                     this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
                 }
                 else {
