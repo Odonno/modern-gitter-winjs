@@ -4,16 +4,16 @@
     <!-- four ways to create/join a room -->
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" ng-class="{active: currentView === 'existing'}">
-            <a ui-sref="addRoom.existing" aria-controls="existing" role="tab">Existing</a>
+            <a class="addRoomTab" ui-sref="addRoom.existing" aria-controls="existing" role="tab">Existing</a>
         </li>
         <li role="presentation" ng-class="{active: currentView === 'repository'}">
-            <a ui-sref="addRoom.repository" aria-controls="repository" role="tab">Repository</a>
+            <a class="addRoomTab" ui-sref="addRoom.repository" aria-controls="repository" role="tab">Repository</a>
         </li>
         <li role="presentation" ng-class="{active: currentView === 'channel'}">
-            <a ui-sref="addRoom.channel" aria-controls="channel" role="tab">Channel</a>
+            <a class="addRoomTab" ui-sref="addRoom.channel" aria-controls="channel" role="tab">Channel</a>
         </li>
         <li role="presentation" ng-class="{active: currentView === 'oneToOne'}">
-            <a ui-sref="addRoom.oneToOne" aria-controls="oneToOne" role="tab">One to one</a>
+            <a class="addRoomTab" ui-sref="addRoom.oneToOne" aria-controls="oneToOne" role="tab">One to one</a>
         </li>
     </ul>
 

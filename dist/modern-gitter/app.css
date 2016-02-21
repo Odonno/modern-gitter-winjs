@@ -177,21 +177,6 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     color: white;
 }
 
-#me-circle {
-	width: 200px;
-	height: 200px;
-	margin-top: 30px;
-	margin-bottom: 20px;
-}
-
-#me-img {
-    background-repeat: no-repeat;
-	max-width: 200px;
-	max-height: 200px;
-    background-position: 50%;
-    border-radius: 100%;
-}
-
 /* add a room view style */
 #addRoomHeader {
 	height: 60px;
@@ -259,6 +244,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 /* add a room - channel view style */
+#channelView {
+    overflow-y: auto;
+}
+
 .channel-form-title {
 	padding-top: 6px;
 }
@@ -411,7 +400,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     padding-left: 12px;
     display: inline-block;
     vertical-align: top;
-    width: calc(100vw - 120px);
+    width: calc(100vw - 90px);
 }
 
 .message-username {
@@ -439,29 +428,57 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 /* adaptative design style */
 @media screen and (max-width: 400px) {
-	/* home view style */ 
-	.win-h1 {
-		font-size: 18px;
-	}
-
-	.win-h2 {
-		font-size: 14px;
-	}
-
-	#me-circle {
-		width: 100px;
-		height: 100px;
-		margin-top: 20px;
-		margin-bottom: 10px;
-	}
-
-	#me-img {
-		max-width: 100px;
-		max-height: 100px;
-	}
+    /* global style */
+    body {
+        font-size: 14px !important;
+    }
+    
+    .win-h1 {
+        font-size: 24px;
+    }
+    
+    .win-h2 {
+        font-size: 20px;
+    }
+    
+    .content {
+        margin: 0 10px;
+    }
+    
+    /* addRoom view style */
+    .addRoomTab {
+        font-size: 18px !important;
+    }
+    
+    /* room view style */
+    #roomDescription {
+        height: 70px;
+    }
+    
+    .messages-list-view {
+        height: calc(100vh - 100px - 20px);
+    }
+    
+    #roomImage {
+        max-height: 30px;
+        margin-top: 10px;
+        margin-right: 10px;
+    }
+    
+    .message-timestamp {
+        padding-top: 10px;
+        font-size: 8px;
+    }
 }
 
-@media screen and (max-width: 1020px) {
+@media screen and (min-width: 400px) and (max-width: 700px) {
+	/* addRoom view style */
+    .addRoomTab {
+        font-size: 18px !important;
+    }
+}
+
+@media screen and (min-width: 700px) and (max-width: 1020px) {
 	
 }
 
