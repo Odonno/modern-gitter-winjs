@@ -13,10 +13,12 @@
             <div class="room-tile-text">{{ room.name }}</div>
             <div class="room-tile-badge text-center">
                 <span class="label label-danger" style="background-color: #D02E00; margin-left: 6px;" ng-if="room.mentions > 0">
-                    {{ room.mentions >= 100 ? '99+' : room.mentions }} mention<span ng-if="room.mentions > 1">s</span>
+                    <span>{{ room.mentions >= 100 ? '99+' : room.mentions }}</span>
+                    <span class="hidden-xs">mention<span ng-if="room.mentions > 1">s</span></span>
                 </span>
                 <span class="label label-info" style="background-color: #0078D7; margin-left: 6px;" ng-if="room.unreadItems > 0">
-                    {{ room.unreadItems >= 100 ? '99+' : room.unreadItems }} new
+                    <span>{{ room.unreadItems >= 100 ? '99+' : room.unreadItems }}<span>
+                    <span class="hidden-xs">new</span>
                 </span>
             </div>
         </div>
