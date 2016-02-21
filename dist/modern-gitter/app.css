@@ -44,6 +44,10 @@ hr {
     margin-top: 20px;
 }
 
+.win-navbarcommand-button {
+    background-color: transparent;
+}
+
 .win-splitview-pane-hidden .win-navbarcommand-button {
     width: 46px;
 }
@@ -310,6 +314,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 #roomsContent {
 	height: calc(100vh - 100px);
+    overflow-y: auto;
 }
 
 .room-tile {
@@ -319,7 +324,6 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 .room-tile-icon {
     max-height: 24px;
     max-width: 24px;
-    margin-left: 12px;
     margin-top: 6px;
 	display: inline-block; 
 	vertical-align: middle;
@@ -337,7 +341,6 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	color: white;
 	font-size: 12px;
 	font-weight: bold;
-    margin-right: 12px;
 	margin-top: 8px !important;
 	padding-top: 2px;
 	float: right;

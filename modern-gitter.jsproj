@@ -75,7 +75,6 @@
     <Content Include="dist\angular-sanitize\angular-sanitize.js" />
     <Content Include="dist\angular-timeago\angular-timeago.js" />
     <Content Include="dist\angular-ui-router\angular-ui-router.js" />
-    <Content Include="dist\angular-winjs\angular-winjs.js" />
     <Content Include="dist\angular\angular.js" />
     <Content Include="dist\faye\faye-browser.js" />
     <Content Include="dist\modern-gitter\app.js" />

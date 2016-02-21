@@ -5,23 +5,20 @@
     <input type="text" placeholder="Search a room..." class="form-control form-control-full" ng-model="search" />
 </div>
 
-<!-- list view of rooms -->
-<win-list-view id="roomsContent" item-data-source="filteredRooms">
-    <!-- room template -->
-    <win-item-template>
-        <div ng-click="selectRoom(item.data)" class="clickable" style="padding-bottom: 6px;">
-            <img class="room-tile-icon" ng-src="{{ item.data.image }}" />
-            <div class="room-tile-text">{{ item.data.name }}</div>
+<!-- list of rooms -->
+<div id="roomsContent" class="win-scrollview">
+    <div class="content" ng-repeat="room in filteredRooms">
+        <div ng-click="selectRoom(room)" class="clickable" style="padding-bottom: 6px;">
+            <img class="room-tile-icon" ng-src="{{ room.image }}" />
+            <div class="room-tile-text">{{ room.name }}</div>
             <div class="room-tile-badge text-center">
-                <span class="label label-danger" style="background-color: #D02E00; margin-left: 6px;" ng-if="item.data.mentions > 0">
-                    {{ item.data.mentions >= 100 ? '99+' : item.data.mentions }} mention<span ng-if="item.data.mentions > 1">s</span>
+                <span class="label label-danger" style="background-color: #D02E00; margin-left: 6px;" ng-if="room.mentions > 0">
+                    {{ room.mentions >= 100 ? '99+' : room.mentions }} mention<span ng-if="room.mentions > 1">s</span>
                 </span>
-                <span class="label label-info" style="background-color: #0078D7; margin-left: 6px;" ng-if="item.data.unreadItems > 0">
-                    {{ item.data.unreadItems >= 100 ? '99+' : item.data.unreadItems }} new
+                <span class="label label-info" style="background-color: #0078D7; margin-left: 6px;" ng-if="room.unreadItems > 0">
+                    {{ room.unreadItems >= 100 ? '99+' : room.unreadItems }} new
                 </span>
             </div>
         </div>
-    </win-item-template>
-
-    <win-list-layout></win-list-layout>
-</win-list-view>
+    </div>
+</div>

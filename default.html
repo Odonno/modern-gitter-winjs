@@ -13,7 +13,6 @@
     <script src="dist/angular/angular.js"></script>
     <script src="dist/angular-sanitize/angular-sanitize.js"></script>
     <script src="dist/angular-ui-router/angular-ui-router.js"></script>
-    <script src="dist/angular-winjs/angular-winjs.js"></script>
     <link href="dist/ui-listview/ui-listview.css" rel="stylesheet" />
     <script src="dist/ui-listview/ui-listview.js"></script>
     <script src="dist/angular-timeago/angular-timeago.js"></script>
@@ -34,9 +33,9 @@
     <script src="dist/modern-gitter/app.js"></script>
 </head>
 <body ng-controller="AppCtrl" class="win-type-body">
-    <win-split-view win-control="splitViewWinControl" class="splitView">
+    <div data-win-control="WinJS.UI.SplitView" class="splitView">
         <!-- pane area -->
-        <win-split-view-pane>
+        <div>
             <div class="split-view-header">
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
@@ -46,17 +45,17 @@
             </div>
 
             <div class="split-view-commands">
-                <win-split-view-command class="unselectable" label="'Home'" icon="'home'" ui-sref="home" ng-click="closeSplitViewToggle()"></win-split-view-command>
-                <win-split-view-command class="unselectable" label="'Join a room'" icon="'add'" ui-sref="addRoom" ng-click="closeSplitViewToggle()"></win-split-view-command>
-                <win-split-view-command class="unselectable" label="'Rooms'" icon="'find'" ui-sref="rooms" ng-click="closeSplitViewToggle()"></win-split-view-command>
-                <win-split-view-command class="unselectable" label="'Messages'" icon="'message'" ui-sref="room" ng-click="closeSplitViewToggle()"></win-split-view-command>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}" ui-sref="home" ng-click="closeSplitViewToggle()"></div>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Join a room', icon: 'add'}" ui-sref="addRoom" ng-click="closeSplitViewToggle()"></div>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Rooms', icon: 'find'}" ui-sref="rooms" ng-click="closeSplitViewToggle()"></div>
+                <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Messages', icon: 'message'}" ui-sref="room" ng-click="closeSplitViewToggle()"></div>
             </div>
-        </win-split-view-pane>
+        </div>
 
         <!-- content area -->
-        <win-split-view-content class="content-area">
+        <div class="content-area">
             <div ui-view></div>
-        </win-split-view-content>
-    </win-split-view>
+        </div>
+    </div>
 </body>
 </html>
