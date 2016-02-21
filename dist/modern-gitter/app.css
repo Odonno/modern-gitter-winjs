@@ -379,6 +379,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     height: 50px;
 	width: calc(100vw - 58px - 42px - 42px);
 	border: none;
+    padding: 5px 0;
 }
 
 .win-progress-bar {
