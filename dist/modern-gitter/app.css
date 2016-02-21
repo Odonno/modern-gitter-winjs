@@ -209,6 +209,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 #existingRoomsListView {
 	height: calc(100vh - 220px);
+    overflow-y: auto;
 }
 
 .existing-room {
@@ -234,6 +235,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 /* add a room - repository view style */
 #repositoriesListView {
 	height: calc(100vh - 180px);
+    overflow-y: auto;
 }
 
 .repository {
@@ -285,6 +287,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 #usersListView {
 	height: calc(100vh - 220px);
+    overflow-y: auto;
 }
 
 .onetoone {

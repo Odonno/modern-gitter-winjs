@@ -2,8 +2,8 @@
 <input id="oneToOneHeader" type="text" placeholder="Search a user..." class="form-control" ng-model="username" />
 
 <!-- list of users searched -->
-<div id="usersListView">
-    <div ng-repeat="user in users" class="onetoone clickable">
+<div id="usersListView" class="row win-scrollview">
+    <div ng-repeat="user in users" class="col-md-6 onetoone clickable">
         <img class="onetoone-image" ng-src="{{ user.avatarUrlSmall }}" />
         <h5 class="win-h5 onetoone-name">{{ user.username }}</h5>
         <em class="onetoone-description" ng-show="user.username !== user.displayName">

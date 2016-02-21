@@ -1,6 +1,6 @@
 ﻿<!-- list of repositories without room -->
-<div id="repositoriesListView">
-    <div ng-repeat="room in repositoriesWithoutRoom" class="repository clickable">
+<div id="repositoriesListView" class="row win-scrollview">
+    <div ng-repeat="room in repositoriesWithoutRoom" class="col-md-6 repository clickable">
         <img class="repository-image" ng-src="{{ room.avatar_url }}" />
         <h5 class="win-h5 repository-name">{{ room.name }}</h5>
         <em class="repository-description">{{ room.description }}</em>

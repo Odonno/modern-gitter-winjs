@@ -2,8 +2,8 @@
 <input id="existingRoomsHeader" type="text" placeholder="Search a room..." class="form-control" ng-model="roomname" />
 
 <!-- list of existing rooms -->
-<div id="existingRoomsListView">
-    <div ng-repeat="room in existingRooms" class="existing-room clickable">
+<div id="existingRoomsListView" class="row win-scrollview">
+    <div ng-repeat="room in existingRooms" class="col-md-6 existing-room clickable">
         <img class="existing-room-image" ng-src="{{ room.image }}" />
         <h5 class="win-h5 existing-room-name">{{ room.name }}</h5>
         <em class="existing-room-description">{{ room.topic }}</em>
