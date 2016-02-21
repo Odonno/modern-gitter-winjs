@@ -24,16 +24,13 @@ module Application.Controllers {
             ApiService.getCurrentUser().then((user) => {
                 ApiService.getRepositories(user.id).then((repositories) => {
                     this.scope.repositories = repositories;
+                    this.scope.$digest();
                 });
             });
         
             // watch events
             this.scope.$watch('repositories', () => {
                 this.scope.repositoriesWithoutRoom = $filter('filter')(this.scope.repositories, { exists: false });
-
-                setTimeout(() => {
-                    this.scope.repositoriesWinControl.forceLayout();
-                }, 500);
             }, true);
         }
     }

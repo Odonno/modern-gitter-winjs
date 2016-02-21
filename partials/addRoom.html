@@ -1,24 +1,22 @@
-﻿<h2 id="addRoomHeader" class="win-h2 content">Join a room</h2>
+﻿<div class="content">
+    <h2 id="addRoomHeader" class="win-h2">Join a room</h2>
 
-<!-- four ways to create/join a room -->
-<win-pivot id="addRoomContent">
-    <!-- join existing room -->
-    <win-pivot-item header="'Existing'">
-        <div ui-view="existing"></div>
-    </win-pivot-item>
-    
-    <!-- create from GitHub repository -->
-    <win-pivot-item header="'Repository'">
-        <div ui-view="repository"></div>
-    </win-pivot-item>
+    <!-- four ways to create/join a room -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" ng-class="{active: currentView === 'existing'}">
+            <a ui-sref="addRoom.existing" aria-controls="existing" role="tab">Existing</a>
+        </li>
+        <li role="presentation" ng-class="{active: currentView === 'repository'}">
+            <a ui-sref="addRoom.repository" aria-controls="repository" role="tab">Repository</a>
+        </li>
+        <li role="presentation" ng-class="{active: currentView === 'channel'}">
+            <a ui-sref="addRoom.channel" aria-controls="channel" role="tab">Channel</a>
+        </li>
+        <li role="presentation" ng-class="{active: currentView === 'oneToOne'}">
+            <a ui-sref="addRoom.oneToOne" aria-controls="oneToOne" role="tab">One to one</a>
+        </li>
+    </ul>
 
-    <!-- create a custom channel -->
-    <win-pivot-item header="'Channel'">
-        <div ui-view="channel"></div>
-    </win-pivot-item>
-
-    <!-- create a one to one room based on username -->
-    <win-pivot-item header="'One to one'">
-        <div ui-view="oneToOne"></div>
-    </win-pivot-item>
-</win-pivot>
+    <!-- show subcontent to join a room -->
+    <div ui-view></div>
+</div>

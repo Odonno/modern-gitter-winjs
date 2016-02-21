@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -99,29 +99,30 @@ var Application;
                     controller: 'HomeCtrl'
                 })
                     .state('addRoom', {
+                    abstract: true,
                     url: '/addRoom',
-                    views: {
-                        '': {
-                            templateUrl: 'partials/addRoom.html',
-                            controller: 'AddRoomCtrl'
-                        },
-                        'existing@addRoom': {
-                            templateUrl: 'partials/existing.html',
-                            controller: 'AddExistingRoomCtrl'
-                        },
-                        'repository@addRoom': {
-                            templateUrl: 'partials/repository.html',
-                            controller: 'AddRepositoryRoomCtrl'
-                        },
-                        'channel@addRoom': {
-                            templateUrl: 'partials/channel.html',
-                            controller: 'AddChannelRoomCtrl'
-                        },
-                        'oneToOne@addRoom': {
-                            templateUrl: 'partials/oneToOne.html',
-                            controller: 'AddOneToOneRoomCtrl'
-                        }
-                    }
+                    templateUrl: 'partials/addRoom.html',
+                    controller: 'AddRoomCtrl'
+                })
+                    .state('addRoom.existing', {
+                    url: '/existing',
+                    templateUrl: 'partials/existing.html',
+                    controller: 'AddExistingRoomCtrl'
+                })
+                    .state('addRoom.repository', {
+                    url: '/repository',
+                    templateUrl: 'partials/repository.html',
+                    controller: 'AddRepositoryRoomCtrl'
+                })
+                    .state('addRoom.channel', {
+                    url: '/channel',
+                    templateUrl: 'partials/channel.html',
+                    controller: 'AddChannelRoomCtrl'
+                })
+                    .state('addRoom.oneToOne', {
+                    url: '/oneToOne',
+                    templateUrl: 'partials/oneToOne.html',
+                    controller: 'AddOneToOneRoomCtrl'
                 })
                     .state('rooms', {
                     url: '/rooms',
@@ -1175,6 +1176,7 @@ var Application;
                                 org: true
                             });
                         }
+                        _this.scope.$digest();
                     });
                 });
             }
@@ -1214,9 +1216,7 @@ var Application;
                                     _this.scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + _this.scope.existingRooms[i].name.split('/')[0];
                                 }
                             }
-                            setTimeout(function () {
-                                _this.scope.existingRoomsWinControl.forceLayout();
-                            }, 500);
+                            _this.scope.$digest();
                         });
                     }
                 });
@@ -1249,9 +1249,7 @@ var Application;
                     if (_this.scope.username && _this.scope.username.length > 0) {
                         ApiService.searchUsers(_this.scope.username, 50).then(function (users) {
                             _this.scope.users = users;
-                            setTimeout(function () {
-                                _this.scope.usersWinControl.forceLayout();
-                            }, 500);
+                            _this.scope.$digest();
                         });
                     }
                 });
@@ -1281,13 +1279,11 @@ var Application;
                 ApiService.getCurrentUser().then(function (user) {
                     ApiService.getRepositories(user.id).then(function (repositories) {
                         _this.scope.repositories = repositories;
+                        _this.scope.$digest();
                     });
                 });
                 this.scope.$watch('repositories', function () {
                     _this.scope.repositoriesWithoutRoom = $filter('filter')(_this.scope.repositories, { exists: false });
-                    setTimeout(function () {
-                        _this.scope.repositoriesWinControl.forceLayout();
-                    }, 500);
                 }, true);
             }
             return AddRepositoryRoomCtrl;
@@ -1300,8 +1296,16 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var AddRoomCtrl = (function () {
-            function AddRoomCtrl($scope) {
+            function AddRoomCtrl($scope, $state) {
+                var _this = this;
                 this.scope = $scope;
+                this.scope.currentView = 'existing';
+                this.scope.$watch(function () {
+                    return $state.current.name;
+                }, function () {
+                    var stateName = $state.current.name;
+                    _this.scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
+                });
             }
             return AddRoomCtrl;
         })();
@@ -1444,7 +1448,6 @@ var Application;
                         for (var i = 0; i < messages.length; i++) {
                             _this.scope.messages.unshift(messages[i]);
                         }
-                        _this.scope.fixWinControl.forceLayout();
                         var listview = document.getElementById('customMessagesListView');
                         listview.onscroll = function () {
                             _this.detectUnreadMessages();
@@ -1581,7 +1584,7 @@ appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService,
 appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
-appModule.controller('AddRoomCtrl', function ($scope) { return new Application.Controllers.AddRoomCtrl($scope); });
+appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });

@@ -59,7 +59,7 @@ appModule.controller('AddChannelRoomCtrl', ($scope, $state, ApiService, RoomsSer
 appModule.controller('AddExistingRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
-appModule.controller('AddRoomCtrl', ($scope) => new Application.Controllers.AddRoomCtrl($scope));
+appModule.controller('AddRoomCtrl', ($scope, $state) => new Application.Controllers.AddRoomCtrl($scope, $state));
 appModule.controller('AppCtrl', ($scope, $rootScope, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService));
 appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService));

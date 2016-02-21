@@ -56,14 +56,10 @@ module Application.Controllers {
                 this.currentUser = user;
 
                 this.ApiService.getMessages(this.scope.room.id).then(messages => {
-                    //this.scope.messages = messages;
                     this.scope.messages = [];
                     for (var i = 0; i < messages.length; i++) {
                         this.scope.messages.unshift(messages[i]);
                     }
-
-                    // refresh fix layout to display custom listview
-                    this.scope.fixWinControl.forceLayout();
 
                     var listview = document.getElementById('customMessagesListView');
 

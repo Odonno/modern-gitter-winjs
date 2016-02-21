@@ -36,10 +36,8 @@ module Application.Controllers {
                                 this.scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + this.scope.existingRooms[i].name.split('/')[0];
                             }
                         }
-
-                        setTimeout(() => {
-                            this.scope.existingRoomsWinControl.forceLayout();
-                        }, 500);
+                        
+                        this.scope.$digest();
                     });
                 }
             });

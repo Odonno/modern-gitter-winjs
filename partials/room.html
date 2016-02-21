@@ -11,10 +11,7 @@
     </div>
 </div>
 
-<!-- fix to make ui-listview working -->
-<win-list-view id="fixListView" win-control="fixWinControl" style="height: 0;"></win-list-view>
-
-<!-- list view of messages (ui-listview implementation) -->
+<!-- list view of messages -->
 <div id="customMessagesListView" class="messages-list-view" ui-list-view="message in messages" options="listOptions" style="transform: rotateX(180deg);">
     <div class="message-container clickable" ng-class="message.unread ? 'unread' : 'read'" style="transform: rotateX(180deg);">
         <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />

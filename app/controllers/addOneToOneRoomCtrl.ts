@@ -27,10 +27,7 @@ module Application.Controllers {
                 if (this.scope.username && this.scope.username.length > 0) {
                     ApiService.searchUsers(this.scope.username, 50).then((users) => {
                         this.scope.users = users;
-
-                        setTimeout(() => {
-                            this.scope.usersWinControl.forceLayout();
-                        }, 500);
+                        this.scope.$digest();
                     });
                 }
             });

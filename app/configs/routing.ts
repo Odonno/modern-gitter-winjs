@@ -22,29 +22,30 @@ module Application.Configs {
                     controller: 'HomeCtrl'
                 })
                 .state('addRoom', {
+                    abstract: true,
                     url: '/addRoom',
-                    views: {
-                        '': {
-                            templateUrl: 'partials/addRoom.html',
-                            controller: 'AddRoomCtrl'
-                        },
-                        'existing@addRoom': {
-                            templateUrl: 'partials/existing.html',
-                            controller: 'AddExistingRoomCtrl'
-                        },
-                        'repository@addRoom': {
-                            templateUrl: 'partials/repository.html',
-                            controller: 'AddRepositoryRoomCtrl'
-                        },
-                        'channel@addRoom': {
-                            templateUrl: 'partials/channel.html',
-                            controller: 'AddChannelRoomCtrl'
-                        },
-                        'oneToOne@addRoom': {
-                            templateUrl: 'partials/oneToOne.html',
-                            controller: 'AddOneToOneRoomCtrl'
-                        }
-                    }
+                    templateUrl: 'partials/addRoom.html',
+                    controller: 'AddRoomCtrl'
+                })
+                .state('addRoom.existing', {
+                    url: '/existing',
+                    templateUrl: 'partials/existing.html',
+                    controller: 'AddExistingRoomCtrl'
+                })
+                .state('addRoom.repository', {
+                    url: '/repository',
+                    templateUrl: 'partials/repository.html',
+                    controller: 'AddRepositoryRoomCtrl'
+                })
+                .state('addRoom.channel', {
+                    url: '/channel',
+                    templateUrl: 'partials/channel.html',
+                    controller: 'AddChannelRoomCtrl'
+                })
+                .state('addRoom.oneToOne', {
+                    url: '/oneToOne',
+                    templateUrl: 'partials/oneToOne.html',
+                    controller: 'AddOneToOneRoomCtrl'
                 })
                 .state('rooms', {
                     url: '/rooms',

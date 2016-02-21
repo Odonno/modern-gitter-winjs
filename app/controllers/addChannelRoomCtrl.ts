@@ -52,6 +52,8 @@ module Application.Controllers {
                             org: true
                         });
                     }
+                    
+                    this.scope.$digest();
                 });
             });
         }
