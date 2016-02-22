@@ -1,4 +1,4 @@
-var Application;
+﻿var Application;
 (function (Application) {
     var Models;
     (function (Models) {
