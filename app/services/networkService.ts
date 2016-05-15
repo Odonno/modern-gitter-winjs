@@ -4,7 +4,7 @@ module Application.Services {
     export class NetworkService {
         public internetAvailable: boolean;
 
-        constructor(private FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor(private FeatureToggleService: FeatureToggleService) {
             this.currentStatus();
         }
 

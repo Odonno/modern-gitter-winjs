@@ -4,7 +4,7 @@ module Application.Services {
     export class ToastNotificationService {
         private toastNotifier: any;
 
-        constructor(private FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor(private FeatureToggleService: FeatureToggleService) {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
             }

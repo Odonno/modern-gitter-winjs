@@ -1,28 +1,32 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
-    export class RoomsCtrl {
-        private scope: any;
+    export interface IRoomsScope extends ng.IScope {
+        rooms: Models.Room[];
+        filteredRooms: Models.Room[];
+        search: string;
 
-        constructor($scope, $filter, $state, RoomsService: Application.Services.RoomsService, LocalSettingsService: Application.Services.LocalSettingsService, FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.scope = $scope;
-            
+        selectRoom(room: Models.Room): void;
+    }
+
+    export class RoomsCtrl {
+        constructor($scope: IRoomsScope, $filter: ng.IFilterService, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
             // update local storage
             LocalSettingsService.setValue('lastPage', 'rooms');
-            
+
             // properties
-            this.scope.rooms = RoomsService.rooms;
+            $scope.rooms = RoomsService.rooms;
 
             // methods
-            this.scope.selectRoom = (room) => {
+            $scope.selectRoom = (room: Models.Room) => {
                 RoomsService.selectRoom(room);
                 $state.go('room');
             };
 
             // watch events
-            this.scope.$watchGroup(['rooms', 'search'], () => {
-                this.scope.filteredRooms = $filter('filter')(this.scope.rooms, { name: this.scope.search });
-                this.scope.filteredRooms = $filter('orderBy')(this.scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+            $scope.$watchGroup(['rooms', 'search'], () => {
+                $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
+                $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
             });
         }
     }

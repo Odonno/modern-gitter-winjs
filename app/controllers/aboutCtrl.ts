@@ -1,20 +1,20 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IAboutScope extends ng.IScope {
+        appVersion: string;
+    }
+    
     export class AboutCtrl {
-        private scope: any;
-
-        constructor($scope, FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.scope = $scope;
-            
+        constructor($scope: IAboutScope, FeatureToggleService: Services.FeatureToggleService) {
             // properties
             if (FeatureToggleService.isWindowsApp()) {
                 var currentPackage = Windows.ApplicationModel.Package.current;
                 var packageVersion = currentPackage.id.version;
 
-                this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
+                $scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
             } else {
-                this.scope.appVersion = 'web';
+                $scope.appVersion = 'web';
             }
         }
     }

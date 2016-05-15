@@ -1,15 +1,20 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
-    export class AddChannelRoomCtrl {
-        private scope: any;
+    export interface IAddChannelRoomScope extends ng.IScope {
+        owners: Models.Owner[];
+        permissions: Models.PermissionChannel[];
+        channel: Models.NewChannel;
+        
+        selectOwner(owner: Models.Owner): void;
+        createRoom(): void;
+    }
 
-        constructor($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-            this.scope = $scope;
-            
+    export class AddChannelRoomCtrl {
+        constructor($scope: IAddChannelRoomScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, ToastNotificationService: Services.ToastNotificationService) {
             // properties
-            this.scope.owners = [];
-            this.scope.permissions = [
+            $scope.owners = [];
+            $scope.permissions = [
                 {
                     name: "Public",
                     description: "Anyone in the world can join."
@@ -19,24 +24,24 @@ module Application.Controllers {
                     description: "Only people added to the room can join."
                 }
             ];
-            this.scope.channel = {};
-            
+            $scope.channel = new Models.NewChannel();
+
             // methods
-            this.scope.selectOwner = (owner) => {
-                this.scope.channel.owner = owner;
+            $scope.selectOwner = (owner) => {
+                $scope.channel.owner = owner;
             };
 
-            this.scope.createRoom = () => {
-                RoomsService.createChannel(this.scope.channel, (room) => {
+            $scope.createRoom = () => {
+                RoomsService.createChannel($scope.channel, (room) => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
                     $state.go('room');
                 });
             };
-            
+
             // initialize controller
             ApiService.getCurrentUser().then((user) => {
-                this.scope.owners.push({
+                $scope.owners.push({
                     id: user.id,
                     name: user.username,
                     image: user.avatarUrlSmall,
@@ -45,15 +50,15 @@ module Application.Controllers {
 
                 ApiService.getOrganizations(user.id).then((orgs) => {
                     for (var i = 0; i < orgs.length; i++) {
-                        this.scope.owners.push({
+                        $scope.owners.push({
                             id: orgs[i].id,
                             name: orgs[i].name,
                             image: orgs[i].avatar_url,
                             org: true
                         });
                     }
-                    
-                    this.scope.$digest();
+
+                    $scope.$digest();
                 });
             });
         }

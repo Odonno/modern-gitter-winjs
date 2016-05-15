@@ -4,13 +4,13 @@ module Application.Services {
     export class RoomsService {
         // properties
         public initialized = false;
-        public currentUser: any;
-        public currentRoom: any;
-        public rooms = [];
+        public currentUser: Models.User;
+        public currentRoom: Models.Room;
+        public rooms: Models.Room[] = [];
         public onroomselected: { (): void; };
         public onmessagereceived: { (roomId: string, message: any): void; };
 
-        constructor(private OAuthService: Application.Services.OAuthService, private NetworkService: Application.Services.NetworkService, private ApiService: Application.Services.ApiService, private RealtimeApiService: Application.Services.RealtimeApiService, private ToastNotificationService: Application.Services.ToastNotificationService, private LifecycleService: Application.Services.LifecycleService) {
+        constructor(private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService) {
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
                 if (!this.initialized && this.NetworkService.internetAvailable) {
@@ -28,7 +28,7 @@ module Application.Services {
         }
 
         // private methods
-        private addRoom(room) {
+        private addRoom(room: Models.Room) {
             // compute room image
             if (room.user) {
                 room.image = room.user.avatarUrlMedium;
@@ -46,7 +46,7 @@ module Application.Services {
             this.rooms.push(room);
         }
 
-        private receiveMessage(room, message) {
+        private receiveMessage(room: Models.Room, message: Models.Message) {
             if (this.onmessagereceived) {
                 this.onmessagereceived(room.id, message);
             }
@@ -85,7 +85,7 @@ module Application.Services {
         }
 
         // public methods
-        public initialize(callback?) {
+        public initialize(callback?: { (): void }) {
             if (this.initialized) {
                 if (callback) {
                     callback();
@@ -124,7 +124,7 @@ module Application.Services {
             });
         }
 
-        public getRoomById(id: string) {
+        public getRoomById(id: string): Models.Room {
             for (var i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].id === id) {
                     return this.rooms[i];
@@ -132,7 +132,7 @@ module Application.Services {
             }
         }
 
-        public getRoom(name: string) {
+        public getRoom(name: string): Models.Room {
             for (var i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].name === name) {
                     return this.rooms[i];
@@ -140,21 +140,21 @@ module Application.Services {
             }
         }
 
-        public selectRoom(room) {
+        public selectRoom(room: Models.Room) {
             this.currentRoom = room;
             if (this.onroomselected) {
                 this.onroomselected();
             }
         }
 
-        public createRoom(name, callback) {
+        public createRoom(name: string, callback: { (room: Models.Room): void }) {
             this.ApiService.joinRoom(name).then(room => {
                 this.addRoom(room);
                 callback(room);
             });
         }
 
-        public createChannel(channel, callback) {
+        public createChannel(channel: Models.NewChannel, callback: { (room: Models.Room): void }) {
             this.ApiService.createChannel(channel).then(room => {
                 this.addRoom(room);
                 callback(room);

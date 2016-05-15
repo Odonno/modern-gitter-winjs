@@ -4,7 +4,7 @@ module Application.Services {
     export class RealtimeApiService {
         private client: any;
 
-        constructor(private OAuthService: Application.Services.OAuthService) {
+        constructor(private OAuthService: OAuthService) {
         }
 
         public initialize() {

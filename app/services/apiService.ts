@@ -2,11 +2,11 @@
 
 module Application.Services {
     export class ApiService {
-        constructor(private ConfigService: Application.Services.ConfigService, private OAuthService: Application.Services.OAuthService) {
+        constructor(private ConfigService: ConfigService, private OAuthService: OAuthService) {
         }
 
         public getRooms() {
-            return new Promise<[{}]>((done, error) => {
+            return new Promise<Models.Room[]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "rooms",
@@ -21,8 +21,8 @@ module Application.Services {
             });
         };
 
-        public joinRoom(name) {
-            return new Promise<{}>((done, error) => {
+        public joinRoom(name: string) {
+            return new Promise<Models.Room>((done, error) => {
                 WinJS.xhr({
                     type: 'POST',
                     url: this.ConfigService.baseUrl + "rooms",
@@ -38,8 +38,8 @@ module Application.Services {
             });
         };
 
-        public createChannel(channel) {
-            return new Promise<{}>((done, error) => {
+        public createChannel(channel: Models.NewChannel) {
+            return new Promise<Models.Room>((done, error) => {
                 if (channel.owner.org) {
                     WinJS.xhr({
                         type: 'POST',
@@ -77,7 +77,7 @@ module Application.Services {
             });
         };
 
-        public deleteRoom(roomId) {
+        public deleteRoom(roomId: string) {
             return new Promise<{}>((done, error) => {
                 WinJS.xhr({
                     type: 'DELETE',
@@ -94,7 +94,7 @@ module Application.Services {
         };
 
         public getMessages(roomId: string, beforeId?: string) {
-            return new Promise<[{}]>((done, error) => {
+            return new Promise<Models.Message[]>((done, error) => {
                 var query = '?limit=' + this.ConfigService.messagesLimit;
 
                 if (beforeId) {
@@ -115,8 +115,8 @@ module Application.Services {
             });
         };
 
-        public sendMessage(roomId, text) {
-            return new Promise<{}>((done, error) => {
+        public sendMessage(roomId: string, text: string) {
+            return new Promise<Models.Message>((done, error) => {
                 WinJS.xhr({
                     type: 'POST',
                     url: this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages",
@@ -150,7 +150,7 @@ module Application.Services {
         };
 
         public getCurrentUser() {
-            return new Promise<{}>((done, error) => {
+            return new Promise<Models.User>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "user/",
@@ -165,8 +165,8 @@ module Application.Services {
             });
         };
 
-        public getOrganizations(userId) {
-            return new Promise<[{}]>((done, error) => {
+        public getOrganizations(userId: string) {
+            return new Promise<Models.Org[]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "user/" + userId + "/orgs",
@@ -181,8 +181,8 @@ module Application.Services {
             });
         };
 
-        public getRepositories(userId) {
-            return new Promise<[{}]>((done, error) => {
+        public getRepositories(userId: string) {
+            return new Promise<Models.Repository[]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "user/" + userId + "/repos",
@@ -197,8 +197,8 @@ module Application.Services {
             });
         };
 
-        public searchRooms(query, limit) {
-            return new Promise<[{}]>((done, error) => {
+        public searchRooms(query: string, limit: number) {
+            return new Promise<Models.Room[]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "rooms?q=" + query + "&limit=" + limit,
@@ -213,8 +213,8 @@ module Application.Services {
             });
         };
 
-        public searchUsers(query, limit) {
-            return new Promise<[{}]>((done, error) => {
+        public searchUsers(query: string, limit: number) {
+            return new Promise<Models.User[]>((done, error) => {
                 WinJS.xhr({
                     type: 'GET',
                     url: this.ConfigService.baseUrl + "user?q=" + query + "&limit=" + limit + "&type=gitter",

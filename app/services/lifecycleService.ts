@@ -7,7 +7,7 @@ module Application.Services {
         private activation;
         public ontoast: { (action: string, data?: any): void; };
 
-        constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor(FeatureToggleService: FeatureToggleService) {
             if (!FeatureToggleService.isWindowsApp()) {
                 return;
             }

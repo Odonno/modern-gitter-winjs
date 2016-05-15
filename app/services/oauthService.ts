@@ -2,11 +2,13 @@
 
 module Application.Services {
     export class OAuthService {
+        // properties
         public refreshToken = '';
 
-        constructor(private ConfigService: Application.Services.ConfigService) {
+        constructor(private ConfigService: ConfigService) {
         }
 
+        // public methods
         public initialize() {
             this.refreshToken = this.retrieveTokenFromVault();
         };
@@ -30,6 +32,7 @@ module Application.Services {
             });
         };
 
+        // private methods
         private retrieveTokenFromVault() {
             let passwordVault = new Windows.Security.Credentials.PasswordVault();
             let storedToken;

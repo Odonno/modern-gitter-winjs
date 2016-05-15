@@ -1,6 +1,11 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-/// <reference path="./models/messageOperation.ts"/>
+/// <reference path="./models/channel.ts"/>
+/// <reference path="./models/message.ts"/>
+/// <reference path="./models/org.ts"/>
+/// <reference path="./models/repository.ts"/>
+/// <reference path="./models/room.ts"/>
+/// <reference path="./models/user.ts"/>
 
 /// <reference path="./configs/navigation.ts"/>
 /// <reference path="./configs/routing.ts"/>

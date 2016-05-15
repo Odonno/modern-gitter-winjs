@@ -1,64 +1,126 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IRoomScope extends ng.IScope {
+        listOptions: any;
+        hideProgress: boolean;
+        refreshed: boolean;
+        room: Models.Room;
+        messages: Models.Message[];
+        textMessage: string;
+        sendingMessage: boolean;
+
+        sendMessage(): void;
+        detectUnreadMessages(): void;
+        loadMoreItems(): void;
+    }
+
     export class RoomCtrl {
-        private scope: any;
-        private currentUser: any;
-
-        constructor($scope, private ApiService: Application.Services.ApiService, private RoomsService: Application.Services.RoomsService, private LocalSettingsService: Application.Services.LocalSettingsService, private FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.scope = $scope;
-
+        constructor($scope: IRoomScope, private ApiService: Services.ApiService, private RoomsService: Services.RoomsService, private LocalSettingsService: Services.LocalSettingsService, private FeatureToggleService: Services.FeatureToggleService) {
             // properties
-            this.scope.listOptions = {};
-            this.scope.hideProgress = false;
-            this.scope.refreshed = false;
-            this.scope.room = this.RoomsService.currentRoom;
-            this.scope.messages = [];
-            this.scope.textMessage = '';
-            this.scope.sendingMessage = false;
+            $scope.listOptions = {};
+            $scope.hideProgress = false;
+            $scope.refreshed = false;
+            $scope.room = this.RoomsService.currentRoom;
+            $scope.messages = [];
+            $scope.textMessage = '';
+            $scope.sendingMessage = false;
 
             // methods
-            this.scope.sendMessage = () => {
+            $scope.sendMessage = () => {
                 // do not send the same message multiple times
-                if (this.scope.sendingMessage) {
+                if ($scope.sendingMessage) {
                     return false;
                 }
 
-                if (this.scope.textMessage) {
-                    this.scope.sendingMessage = true;
-                    this.ApiService.sendMessage(this.scope.room.id, this.scope.textMessage).then(message => {
-                        this.scope.textMessage = '';
-                        this.scope.$apply();
-                        this.scope.sendingMessage = false;
+                if ($scope.textMessage) {
+                    $scope.sendingMessage = true;
+                    this.ApiService.sendMessage($scope.room.id, $scope.textMessage).then(message => {
+                        $scope.textMessage = '';
+                        $scope.$apply();
+                        $scope.sendingMessage = false;
                     });
                 } else {
                     console.error('textMessage is empty');
                 }
             };
 
+            $scope.detectUnreadMessages = () => {
+                var firstIndex: number, lastIndex: number;
+
+                var range = $scope.listOptions.range;
+                firstIndex = range.index;
+                lastIndex = range.index + range.length;
+
+                // retrieve id of unread messages that user watch
+                var messageIds = [];
+                for (var i = 0; i < $scope.messages.length; i++) {
+                    if (i >= firstIndex && i <= lastIndex && $scope.messages[i].unread) {
+                        messageIds.push($scope.messages[i].id);
+                        $scope.messages[i].unread = false;
+                    }
+                }
+
+                // if there is at least 1 unread message, mark them as read
+                if (messageIds.length > 0) {
+                    this.RoomsService.markUnreadMessages(messageIds);
+                }
+            }
+
+            $scope.loadMoreItems = () => {
+                var listview = document.getElementById('customMessagesListView');
+                var lastScrollHeight = $scope.listOptions.listView.getScrollHeight();
+
+                if ($scope.hideProgress) {
+                    return;
+                }
+
+                $scope.hideProgress = true;
+
+                // load more messages
+                var olderMessage = $scope.messages[$scope.messages.length - 1];
+                this.ApiService.getMessages($scope.room.id, olderMessage.id).then(beforeMessages => {
+                    if (!beforeMessages || beforeMessages.length <= 0) {
+                        // no more message to load
+                        return;
+                    }
+
+                    // push old messages to the top
+                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                        $scope.messages.push(beforeMessages[i]);
+                    }
+
+                    setTimeout(() => {
+                        var newScrollHeight = $scope.listOptions.listView.getScrollHeight();
+                        listview.scrollTop += newScrollHeight - lastScrollHeight;
+                        $scope.hideProgress = false;
+                    }, 250);
+                });
+            }
+
             // initialize controller
-            if (!this.scope.room) {
+            if (!$scope.room) {
                 console.error('no room selected...');
                 return;
             }
 
             // update local storage
             this.LocalSettingsService.setValue('lastPage', 'room');
-            this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
+            this.LocalSettingsService.setValue('lastRoom', $scope.room.name);
 
+            // check if a new message is sent
             this.RoomsService.onmessagereceived = (roomId, message) => {
-                if (this.scope.room && this.scope.room.id === roomId) {
-                    this.scope.messages.unshift(message);
+                if ($scope.room && $scope.room.id === roomId) {
+                    $scope.messages.unshift(message);
                 }
             };
 
+            // load messages list
             this.ApiService.getCurrentUser().then(user => {
-                this.currentUser = user;
-
-                this.ApiService.getMessages(this.scope.room.id).then(messages => {
-                    this.scope.messages = [];
+                this.ApiService.getMessages($scope.room.id).then(messages => {
+                    $scope.messages = [];
                     for (var i = 0; i < messages.length; i++) {
-                        this.scope.messages.unshift(messages[i]);
+                        $scope.messages.unshift(messages[i]);
                     }
 
                     var listview = document.getElementById('customMessagesListView');
@@ -66,69 +128,15 @@ module Application.Controllers {
                     // each time user scroll
                     listview.onscroll = () => {
                         // detect scroll to detect unread message on view
-                        this.detectUnreadMessages();
-                                
+                        $scope.detectUnreadMessages();
+
                         // detect if we are at the top of the list (load more messages)
-                        var range = this.scope.listOptions.range;
+                        var range = $scope.listOptions.range;
                         if (range && range.index + range.length === range.total) {
-                            this.loadMoreItems();
+                            $scope.loadMoreItems();
                         }
                     };
                 });
-            });
-        }
-        
-        // private methods
-        private detectUnreadMessages() {
-            var firstIndex: number, lastIndex: number;
-
-            var range = this.scope.listOptions.range;
-            firstIndex = range.index;
-            lastIndex = range.index + range.length;
-
-            // retrieve id of unread messages that user watch
-            var messageIds = [];
-            for (var i = 0; i < this.scope.messages.length; i++) {
-                if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
-                    messageIds.push(this.scope.messages[i].id);
-                    this.scope.messages[i].unread = false;
-                }
-            }
-
-            // if there is at least 1 unread message, mark them as read
-            if (messageIds.length > 0) {
-                this.RoomsService.markUnreadMessages(messageIds);
-            }
-        }
-
-        private loadMoreItems() {
-            var listview = document.getElementById('customMessagesListView');
-            var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
-
-            if (this.scope.hideProgress) {
-                return;
-            }
-
-            this.scope.hideProgress = true;
-                
-            // load more messages
-            var olderMessage = this.scope.messages[this.scope.messages.length - 1];
-            this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(beforeMessages => {
-                if (!beforeMessages || beforeMessages.length <= 0) {
-                    // no more message to load
-                    return;
-                }
-
-                // push old messages to the top
-                for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                    this.scope.messages.push(beforeMessages[i]);
-                }
-
-                setTimeout(() => {
-                    var newScrollHeight = this.scope.listOptions.listView.getScrollHeight();
-                    listview.scrollTop += newScrollHeight - lastScrollHeight;
-                    this.scope.hideProgress = false;
-                }, 250);
             });
         }
     }

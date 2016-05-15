@@ -7,7 +7,7 @@ module Application.Services {
         public currentVersion: string;
         
         // constructor
-        constructor(FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor(FeatureToggleService: FeatureToggleService) {
             if (FeatureToggleService.isWindowsApp()) {
                 this.tasks = [
                     {

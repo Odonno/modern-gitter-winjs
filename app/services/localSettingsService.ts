@@ -5,7 +5,7 @@ module Application.Services {
         // properties
         private localSettings;
 
-        constructor(private FeatureToggleService: Application.Services.FeatureToggleService) {
+        constructor(private FeatureToggleService: FeatureToggleService) {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.localSettings = Windows.Storage.ApplicationData.current.localSettings
             } else {

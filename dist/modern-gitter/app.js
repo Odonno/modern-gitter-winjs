@@ -2,6 +2,66 @@ var Application;
 (function (Application) {
     var Models;
     (function (Models) {
+        var User = (function () {
+            function User() {
+            }
+            return User;
+        }());
+        Models.User = User;
+        var Owner = (function () {
+            function Owner() {
+            }
+            return Owner;
+        }());
+        Models.Owner = Owner;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        var PermissionChannel = (function () {
+            function PermissionChannel() {
+            }
+            return PermissionChannel;
+        }());
+        Models.PermissionChannel = PermissionChannel;
+        var Channel = (function () {
+            function Channel() {
+            }
+            return Channel;
+        }());
+        Models.Channel = Channel;
+        var NewChannel = (function () {
+            function NewChannel() {
+            }
+            return NewChannel;
+        }());
+        Models.NewChannel = NewChannel;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        var Message = (function () {
+            function Message() {
+            }
+            return Message;
+        }());
+        Models.Message = Message;
+        var Mention = (function () {
+            function Mention() {
+            }
+            return Mention;
+        }());
+        Models.Mention = Mention;
+        var Issue = (function () {
+            function Issue() {
+            }
+            return Issue;
+        }());
+        Models.Issue = Issue;
         (function (MessageOperation) {
             MessageOperation[MessageOperation["Created"] = 1] = "Created";
             MessageOperation[MessageOperation["Updated"] = 2] = "Updated";
@@ -9,6 +69,59 @@ var Application;
             MessageOperation[MessageOperation["ReadBy"] = 4] = "ReadBy";
         })(Models.MessageOperation || (Models.MessageOperation = {}));
         var MessageOperation = Models.MessageOperation;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        var Room = (function () {
+            function Room() {
+            }
+            Object.defineProperty(Room.prototype, "isFavourite", {
+                get: function () {
+                    return this.favourite == 1;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Room.prototype, "image", {
+                get: function () {
+                    return this._image;
+                },
+                set: function (value) {
+                    this._image = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Room;
+        }());
+        Models.Room = Room;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        var Org = (function () {
+            function Org() {
+            }
+            return Org;
+        }());
+        Models.Org = Org;
+    })(Models = Application.Models || (Application.Models = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Models;
+    (function (Models) {
+        var Repository = (function () {
+            function Repository() {
+            }
+            return Repository;
+        }());
+        Models.Repository = Repository;
     })(Models = Application.Models || (Application.Models = {}));
 })(Application || (Application = {}));
 var Application;
@@ -1141,14 +1254,13 @@ var Application;
     (function (Controllers) {
         var AboutCtrl = (function () {
             function AboutCtrl($scope, FeatureToggleService) {
-                this.scope = $scope;
                 if (FeatureToggleService.isWindowsApp()) {
                     var currentPackage = Windows.ApplicationModel.Package.current;
                     var packageVersion = currentPackage.id.version;
-                    this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
+                    $scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
                 }
                 else {
-                    this.scope.appVersion = 'web';
+                    $scope.appVersion = 'web';
                 }
             }
             return AboutCtrl;
@@ -1162,10 +1274,8 @@ var Application;
     (function (Controllers) {
         var AddChannelRoomCtrl = (function () {
             function AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-                var _this = this;
-                this.scope = $scope;
-                this.scope.owners = [];
-                this.scope.permissions = [
+                $scope.owners = [];
+                $scope.permissions = [
                     {
                         name: "Public",
                         description: "Anyone in the world can join."
@@ -1175,19 +1285,19 @@ var Application;
                         description: "Only people added to the room can join."
                     }
                 ];
-                this.scope.channel = {};
-                this.scope.selectOwner = function (owner) {
-                    _this.scope.channel.owner = owner;
+                $scope.channel = new Application.Models.NewChannel();
+                $scope.selectOwner = function (owner) {
+                    $scope.channel.owner = owner;
                 };
-                this.scope.createRoom = function () {
-                    RoomsService.createChannel(_this.scope.channel, function (room) {
+                $scope.createRoom = function () {
+                    RoomsService.createChannel($scope.channel, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
                 };
                 ApiService.getCurrentUser().then(function (user) {
-                    _this.scope.owners.push({
+                    $scope.owners.push({
                         id: user.id,
                         name: user.username,
                         image: user.avatarUrlSmall,
@@ -1195,14 +1305,14 @@ var Application;
                     });
                     ApiService.getOrganizations(user.id).then(function (orgs) {
                         for (var i = 0; i < orgs.length; i++) {
-                            _this.scope.owners.push({
+                            $scope.owners.push({
                                 id: orgs[i].id,
                                 name: orgs[i].name,
                                 image: orgs[i].avatar_url,
                                 org: true
                             });
                         }
-                        _this.scope.$digest();
+                        $scope.$digest();
                     });
                 });
             }
@@ -1217,32 +1327,30 @@ var Application;
     (function (Controllers) {
         var AddExistingRoomCtrl = (function () {
             function AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-                var _this = this;
-                this.scope = $scope;
-                this.scope.roomname = '';
-                this.scope.existingRooms = [];
-                this.scope.selection = [];
-                this.scope.createRoom = function () {
-                    var selectedRoom = _this.scope.existingRooms[_this.scope.selection[0]];
+                $scope.roomname = '';
+                $scope.existingRooms = [];
+                $scope.selection = [];
+                $scope.createRoom = function () {
+                    var selectedRoom = $scope.existingRooms[$scope.selection[0]];
                     RoomsService.createRoom(selectedRoom.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
                 };
-                this.scope.$watch('roomname', function () {
-                    if (_this.scope.roomname && _this.scope.roomname.length > 0) {
-                        ApiService.searchRooms(_this.scope.roomname, 50).then(function (rooms) {
-                            _this.scope.existingRooms = rooms;
-                            for (var i = 0; i < _this.scope.existingRooms.length; i++) {
-                                if (_this.scope.existingRooms[i].user) {
-                                    _this.scope.existingRooms[i].image = _this.scope.existingRooms[i].user.avatarUrlMedium;
+                $scope.$watch('roomname', function () {
+                    if ($scope.roomname && $scope.roomname.length > 0) {
+                        ApiService.searchRooms($scope.roomname, 50).then(function (rooms) {
+                            $scope.existingRooms = rooms;
+                            for (var i = 0; i < $scope.existingRooms.length; i++) {
+                                if ($scope.existingRooms[i].user) {
+                                    $scope.existingRooms[i].image = $scope.existingRooms[i].user.avatarUrlMedium;
                                 }
                                 else {
-                                    _this.scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + _this.scope.existingRooms[i].name.split('/')[0];
+                                    $scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + $scope.existingRooms[i].name.split('/')[0];
                                 }
                             }
-                            _this.scope.$digest();
+                            $scope.$digest();
                         });
                     }
                 });
@@ -1258,24 +1366,22 @@ var Application;
     (function (Controllers) {
         var AddOneToOneRoomCtrl = (function () {
             function AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-                var _this = this;
-                this.scope = $scope;
-                this.scope.username = '';
-                this.scope.users = [];
-                this.scope.selection = [];
-                this.scope.createRoom = function () {
-                    var selectedUser = _this.scope.users[_this.scope.selection[0]];
+                $scope.username = '';
+                $scope.users = [];
+                $scope.selection = [];
+                $scope.createRoom = function () {
+                    var selectedUser = $scope.users[$scope.selection[0]];
                     RoomsService.createRoom(selectedUser.username, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('room');
                     });
                 };
-                this.scope.$watch('username', function () {
-                    if (_this.scope.username && _this.scope.username.length > 0) {
-                        ApiService.searchUsers(_this.scope.username, 50).then(function (users) {
-                            _this.scope.users = users;
-                            _this.scope.$digest();
+                $scope.$watch('username', function () {
+                    if ($scope.username && $scope.username.length > 0) {
+                        ApiService.searchUsers($scope.username, 50).then(function (users) {
+                            $scope.users = users;
+                            $scope.$digest();
                         });
                     }
                 });
@@ -1291,11 +1397,9 @@ var Application;
     (function (Controllers) {
         var AddRepositoryRoomCtrl = (function () {
             function AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
-                var _this = this;
-                this.scope = $scope;
-                this.scope.selection = [];
-                this.scope.createRoom = function () {
-                    var repository = _this.scope.repositoriesWithoutRoom[_this.scope.selection[0]];
+                $scope.selection = [];
+                $scope.createRoom = function () {
+                    var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
                     RoomsService.createRoom(repository.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
@@ -1304,12 +1408,12 @@ var Application;
                 };
                 ApiService.getCurrentUser().then(function (user) {
                     ApiService.getRepositories(user.id).then(function (repositories) {
-                        _this.scope.repositories = repositories;
-                        _this.scope.$digest();
+                        $scope.repositories = repositories;
+                        $scope.$digest();
                     });
                 });
-                this.scope.$watch('repositories', function () {
-                    _this.scope.repositoriesWithoutRoom = $filter('filter')(_this.scope.repositories, { exists: false });
+                $scope.$watch('repositories', function () {
+                    $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
                 }, true);
             }
             return AddRepositoryRoomCtrl;
@@ -1323,14 +1427,12 @@ var Application;
     (function (Controllers) {
         var AddRoomCtrl = (function () {
             function AddRoomCtrl($scope, $state) {
-                var _this = this;
-                this.scope = $scope;
-                this.scope.currentView = 'existing';
-                this.scope.$watch(function () {
+                $scope.currentView = 'existing';
+                $scope.$watch(function () {
                     return $state.current.name;
                 }, function () {
                     var stateName = $state.current.name;
-                    _this.scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
+                    $scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
                 });
             }
             return AddRoomCtrl;
@@ -1353,7 +1455,6 @@ var Application;
                         }
                     }
                 };
-                this.scope = $scope;
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
                     if (!from.name || to.name === 'splashscreen') {
                         _this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
@@ -1374,7 +1475,6 @@ var Application;
     (function (Controllers) {
         var ErrorCtrl = (function () {
             function ErrorCtrl($scope) {
-                this.scope = $scope;
             }
             return ErrorCtrl;
         }());
@@ -1387,8 +1487,7 @@ var Application;
     (function (Controllers) {
         var HomeCtrl = (function () {
             function HomeCtrl($scope, $state, RoomsService, ToastNotificationService) {
-                this.scope = $scope;
-                this.scope.chatWithUs = function () {
+                $scope.chatWithUs = function () {
                     var roomName = 'Odonno/Modern-Gitter';
                     for (var i = 0; i < RoomsService.rooms.length; i++) {
                         if (RoomsService.rooms[i].name === roomName) {
@@ -1420,98 +1519,95 @@ var Application;
                 this.RoomsService = RoomsService;
                 this.LocalSettingsService = LocalSettingsService;
                 this.FeatureToggleService = FeatureToggleService;
-                this.scope = $scope;
-                this.scope.listOptions = {};
-                this.scope.hideProgress = false;
-                this.scope.refreshed = false;
-                this.scope.room = this.RoomsService.currentRoom;
-                this.scope.messages = [];
-                this.scope.textMessage = '';
-                this.scope.sendingMessage = false;
-                this.scope.sendMessage = function () {
-                    if (_this.scope.sendingMessage) {
+                $scope.listOptions = {};
+                $scope.hideProgress = false;
+                $scope.refreshed = false;
+                $scope.room = this.RoomsService.currentRoom;
+                $scope.messages = [];
+                $scope.textMessage = '';
+                $scope.sendingMessage = false;
+                $scope.sendMessage = function () {
+                    if ($scope.sendingMessage) {
                         return false;
                     }
-                    if (_this.scope.textMessage) {
-                        _this.scope.sendingMessage = true;
-                        _this.ApiService.sendMessage(_this.scope.room.id, _this.scope.textMessage).then(function (message) {
-                            _this.scope.textMessage = '';
-                            _this.scope.$apply();
-                            _this.scope.sendingMessage = false;
+                    if ($scope.textMessage) {
+                        $scope.sendingMessage = true;
+                        _this.ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
+                            $scope.textMessage = '';
+                            $scope.$apply();
+                            $scope.sendingMessage = false;
                         });
                     }
                     else {
                         console.error('textMessage is empty');
                     }
                 };
-                if (!this.scope.room) {
+                $scope.detectUnreadMessages = function () {
+                    var firstIndex, lastIndex;
+                    var range = $scope.listOptions.range;
+                    firstIndex = range.index;
+                    lastIndex = range.index + range.length;
+                    var messageIds = [];
+                    for (var i = 0; i < $scope.messages.length; i++) {
+                        if (i >= firstIndex && i <= lastIndex && $scope.messages[i].unread) {
+                            messageIds.push($scope.messages[i].id);
+                            $scope.messages[i].unread = false;
+                        }
+                    }
+                    if (messageIds.length > 0) {
+                        _this.RoomsService.markUnreadMessages(messageIds);
+                    }
+                };
+                $scope.loadMoreItems = function () {
+                    var listview = document.getElementById('customMessagesListView');
+                    var lastScrollHeight = $scope.listOptions.listView.getScrollHeight();
+                    if ($scope.hideProgress) {
+                        return;
+                    }
+                    $scope.hideProgress = true;
+                    var olderMessage = $scope.messages[$scope.messages.length - 1];
+                    _this.ApiService.getMessages($scope.room.id, olderMessage.id).then(function (beforeMessages) {
+                        if (!beforeMessages || beforeMessages.length <= 0) {
+                            return;
+                        }
+                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                            $scope.messages.push(beforeMessages[i]);
+                        }
+                        setTimeout(function () {
+                            var newScrollHeight = $scope.listOptions.listView.getScrollHeight();
+                            listview.scrollTop += newScrollHeight - lastScrollHeight;
+                            $scope.hideProgress = false;
+                        }, 250);
+                    });
+                };
+                if (!$scope.room) {
                     console.error('no room selected...');
                     return;
                 }
                 this.LocalSettingsService.setValue('lastPage', 'room');
-                this.LocalSettingsService.setValue('lastRoom', this.scope.room.name);
+                this.LocalSettingsService.setValue('lastRoom', $scope.room.name);
                 this.RoomsService.onmessagereceived = function (roomId, message) {
-                    if (_this.scope.room && _this.scope.room.id === roomId) {
-                        _this.scope.messages.unshift(message);
+                    if ($scope.room && $scope.room.id === roomId) {
+                        $scope.messages.unshift(message);
                     }
                 };
                 this.ApiService.getCurrentUser().then(function (user) {
-                    _this.currentUser = user;
-                    _this.ApiService.getMessages(_this.scope.room.id).then(function (messages) {
-                        _this.scope.messages = [];
+                    _this.ApiService.getMessages($scope.room.id).then(function (messages) {
+                        $scope.messages = [];
                         for (var i = 0; i < messages.length; i++) {
-                            _this.scope.messages.unshift(messages[i]);
+                            $scope.messages.unshift(messages[i]);
                         }
                         var listview = document.getElementById('customMessagesListView');
                         listview.onscroll = function () {
-                            _this.detectUnreadMessages();
-                            var range = _this.scope.listOptions.range;
+                            $scope.detectUnreadMessages();
+                            var range = $scope.listOptions.range;
                             if (range && range.index + range.length === range.total) {
-                                _this.loadMoreItems();
+                                $scope.loadMoreItems();
                             }
                         };
                     });
                 });
             }
-            RoomCtrl.prototype.detectUnreadMessages = function () {
-                var firstIndex, lastIndex;
-                var range = this.scope.listOptions.range;
-                firstIndex = range.index;
-                lastIndex = range.index + range.length;
-                var messageIds = [];
-                for (var i = 0; i < this.scope.messages.length; i++) {
-                    if (i >= firstIndex && i <= lastIndex && this.scope.messages[i].unread) {
-                        messageIds.push(this.scope.messages[i].id);
-                        this.scope.messages[i].unread = false;
-                    }
-                }
-                if (messageIds.length > 0) {
-                    this.RoomsService.markUnreadMessages(messageIds);
-                }
-            };
-            RoomCtrl.prototype.loadMoreItems = function () {
-                var _this = this;
-                var listview = document.getElementById('customMessagesListView');
-                var lastScrollHeight = this.scope.listOptions.listView.getScrollHeight();
-                if (this.scope.hideProgress) {
-                    return;
-                }
-                this.scope.hideProgress = true;
-                var olderMessage = this.scope.messages[this.scope.messages.length - 1];
-                this.ApiService.getMessages(this.scope.room.id, olderMessage.id).then(function (beforeMessages) {
-                    if (!beforeMessages || beforeMessages.length <= 0) {
-                        return;
-                    }
-                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                        _this.scope.messages.push(beforeMessages[i]);
-                    }
-                    setTimeout(function () {
-                        var newScrollHeight = _this.scope.listOptions.listView.getScrollHeight();
-                        listview.scrollTop += newScrollHeight - lastScrollHeight;
-                        _this.scope.hideProgress = false;
-                    }, 250);
-                });
-            };
             return RoomCtrl;
         }());
         Controllers.RoomCtrl = RoomCtrl;
@@ -1523,17 +1619,15 @@ var Application;
     (function (Controllers) {
         var RoomsCtrl = (function () {
             function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
-                var _this = this;
-                this.scope = $scope;
                 LocalSettingsService.setValue('lastPage', 'rooms');
-                this.scope.rooms = RoomsService.rooms;
-                this.scope.selectRoom = function (room) {
+                $scope.rooms = RoomsService.rooms;
+                $scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
                     $state.go('room');
                 };
-                this.scope.$watchGroup(['rooms', 'search'], function () {
-                    _this.scope.filteredRooms = $filter('filter')(_this.scope.rooms, { name: _this.scope.search });
-                    _this.scope.filteredRooms = $filter('orderBy')(_this.scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+                $scope.$watchGroup(['rooms', 'search'], function () {
+                    $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
+                    $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
                 });
             }
             return RoomsCtrl;
@@ -1547,7 +1641,6 @@ var Application;
     (function (Controllers) {
         var SplashscreenCtrl = (function () {
             function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
-                this.scope = $scope;
                 RoomsService.initialize(function () {
                     var lastPage = LocalSettingsService.getValue('lastPage');
                     var lastRoom = LocalSettingsService.getValue('lastRoom');

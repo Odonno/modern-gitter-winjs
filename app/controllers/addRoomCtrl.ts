@@ -1,21 +1,21 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IAddRoomScope extends ng.IScope {
+        currentView: string;
+    }
+    
     export class AddRoomCtrl {
-        private scope: any;
-
-        constructor($scope, $state) {
-            this.scope = $scope;
-            
+        constructor($scope: IAddRoomScope, $state: ng.ui.IStateService) {
             // properties
-            this.scope.currentView = 'existing';
+            $scope.currentView = 'existing';
             
             // watch event
-            this.scope.$watch(() => {
+            $scope.$watch(() => {
                 return $state.current.name;
             }, () => {
                 var stateName = $state.current.name;
-                this.scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
+                $scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
             });
         }
     }

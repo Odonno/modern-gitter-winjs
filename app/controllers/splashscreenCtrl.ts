@@ -1,14 +1,13 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface ISplashscreenScope extends ng.IScope {        
+    }
+    
     export class SplashscreenCtrl {
-        private scope: any;
-
-        constructor($scope, $state, RoomsService: Application.Services.RoomsService, LocalSettingsService: Application.Services.LocalSettingsService, BackgroundTaskService: Application.Services.BackgroundTaskService, FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.scope = $scope;
-            
+        constructor($scope: ISplashscreenScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, LocalSettingsService: Services.LocalSettingsService, BackgroundTaskService: Services.BackgroundTaskService, FeatureToggleService: Services.FeatureToggleService) {
             // initialize controller
-            RoomsService.initialize(function() {
+            RoomsService.initialize(() => {
                 // retrieve local storage data
                 var lastPage = LocalSettingsService.getValue('lastPage');
                 var lastRoom = LocalSettingsService.getValue('lastRoom');

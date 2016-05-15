@@ -1,14 +1,14 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IHomeScope extends ng.IScope {
+        chatWithUs(): void
+    }
+    
     export class HomeCtrl {
-        private scope: any;
-
-        constructor($scope, $state: ng.ui.IStateService, RoomsService: Application.Services.RoomsService, ToastNotificationService: Application.Services.ToastNotificationService) {
-            this.scope = $scope;
-            
+        constructor($scope: IHomeScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, ToastNotificationService: Services.ToastNotificationService) {
             // methods
-            this.scope.chatWithUs = () => {
+            $scope.chatWithUs = () => {
                 var roomName = 'Odonno/Modern-Gitter';
 
                 // go to existing room if we already joined it

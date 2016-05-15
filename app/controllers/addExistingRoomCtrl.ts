@@ -1,20 +1,24 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IAddExistingRoomScope extends ng.IScope {
+        roomname: string;
+        existingRooms: Models.Room[];
+        selection: number[];
+        
+        createRoom(): void;
+    }
+    
     export class AddExistingRoomCtrl {
-        private scope: any;
-
-        constructor($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-            this.scope = $scope;
-            
+        constructor($scope: IAddExistingRoomScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, ToastNotificationService: Services.ToastNotificationService) {
             // properties
-            this.scope.roomname = '';
-            this.scope.existingRooms = [];
-            this.scope.selection = [];
+            $scope.roomname = '';
+            $scope.existingRooms = [];
+            $scope.selection = [];
             
             // methods
-            this.scope.createRoom = () => {
-                var selectedRoom = this.scope.existingRooms[this.scope.selection[0]];
+            $scope.createRoom = () => {
+                var selectedRoom = $scope.existingRooms[$scope.selection[0]];
                 RoomsService.createRoom(selectedRoom.uri, (room) => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
@@ -23,21 +27,21 @@ module Application.Controllers {
             };
             
             // watch events
-            this.scope.$watch('roomname', () => {
-                if (this.scope.roomname && this.scope.roomname.length > 0) {
-                    ApiService.searchRooms(this.scope.roomname, 50).then((rooms) => {
-                        this.scope.existingRooms = rooms;
+            $scope.$watch('roomname', () => {
+                if ($scope.roomname && $scope.roomname.length > 0) {
+                    ApiService.searchRooms($scope.roomname, 50).then((rooms) => {
+                        $scope.existingRooms = rooms;
 
-                        for (var i = 0; i < this.scope.existingRooms.length; i++) {
+                        for (var i = 0; i < $scope.existingRooms.length; i++) {
                             // compute room image
-                            if (this.scope.existingRooms[i].user) {
-                                this.scope.existingRooms[i].image = this.scope.existingRooms[i].user.avatarUrlMedium;
+                            if ($scope.existingRooms[i].user) {
+                                $scope.existingRooms[i].image = $scope.existingRooms[i].user.avatarUrlMedium;
                             } else {
-                                this.scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + this.scope.existingRooms[i].name.split('/')[0];
+                                $scope.existingRooms[i].image = "https://avatars.githubusercontent.com/" + $scope.existingRooms[i].name.split('/')[0];
                             }
                         }
                         
-                        this.scope.$digest();
+                        $scope.$digest();
                     });
                 }
             });

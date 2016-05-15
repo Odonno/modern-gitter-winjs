@@ -1,14 +1,14 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Controllers {
+    export interface IAppScope extends ng.IScope {
+        
+    }
+
     export class AppCtrl {
-        private scope: any;
-
-        constructor($scope, $rootScope, FeatureToggleService: Application.Services.FeatureToggleService) {
-            this.scope = $scope;
-
+        constructor($scope: IAppScope, $rootScope: ng.IRootScopeService, FeatureToggleService: Services.FeatureToggleService) {
             // detect navigation
-            $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
+            $rootScope.$on('$stateChangeSuccess', (event, to: ng.ui.IState, toParams, from: ng.ui.IState, fromParams) => {
                 if (!from.name || to.name === 'splashscreen') {
                     // hide pane splitview
                     this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
