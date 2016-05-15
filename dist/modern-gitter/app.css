@@ -165,16 +165,17 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 #home-scroll {
 	height: 100vh;
 	overflow-y: auto;
-    background-image: url(/assets/background.jpg);
+}
+
+/* about view style */
+#about-scroll {
+	height: 100vh;
+	overflow-y: auto;
 }
 
 #app-version {
     margin-top: 12px;
 	margin-bottom: 12px;
-}
-
-#issues-link a {
-    color: white;
 }
 
 /* add a room view style */

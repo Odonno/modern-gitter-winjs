@@ -21,6 +21,11 @@ module Application.Configs {
                     templateUrl: 'partials/home.html',
                     controller: 'HomeCtrl'
                 })
+                .state('about', {
+                    url: '/about',
+                    templateUrl: 'partials/about.html',
+                    controller: 'AboutCtrl'
+                })
                 .state('addRoom', {
                     abstract: true,
                     url: '/addRoom',

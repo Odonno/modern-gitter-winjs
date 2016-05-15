@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -71,7 +71,7 @@ var Application;
                 }
             }
             return NavigationConfig;
-        })();
+        }());
         Configs.NavigationConfig = NavigationConfig;
     })(Configs = Application.Configs || (Application.Configs = {}));
 })(Application || (Application = {}));
@@ -97,6 +97,11 @@ var Application;
                     url: '/home',
                     templateUrl: 'partials/home.html',
                     controller: 'HomeCtrl'
+                })
+                    .state('about', {
+                    url: '/about',
+                    templateUrl: 'partials/about.html',
+                    controller: 'AboutCtrl'
                 })
                     .state('addRoom', {
                     abstract: true,
@@ -136,7 +141,7 @@ var Application;
                 });
             }
             return RoutingConfig;
-        })();
+        }());
         Configs.RoutingConfig = RoutingConfig;
     })(Configs = Application.Configs || (Application.Configs = {}));
 })(Application || (Application = {}));
@@ -385,7 +390,7 @@ var Application;
             };
             ;
             return ApiService;
-        })();
+        }());
         Services.ApiService = ApiService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -478,7 +483,7 @@ var Application;
                 }
             };
             return BackgroundTaskService;
-        })();
+        }());
         Services.BackgroundTaskService = BackgroundTaskService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -497,7 +502,7 @@ var Application;
                 this.messagesLimit = 50;
             }
             return ConfigService;
-        })();
+        }());
         Services.ConfigService = ConfigService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -525,7 +530,7 @@ var Application;
                 };
             }
             return FeatureToggleService;
-        })();
+        }());
         Services.FeatureToggleService = FeatureToggleService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -573,7 +578,7 @@ var Application;
                 }
             };
             return LifecycleService;
-        })();
+        }());
         Services.LifecycleService = LifecycleService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -613,7 +618,7 @@ var Application;
                 }
             }
             return LocalSettingsService;
-        })();
+        }());
         Services.LocalSettingsService = LocalSettingsService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -647,7 +652,7 @@ var Application;
             };
             ;
             return NetworkService;
-        })();
+        }());
         Services.NetworkService = NetworkService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -757,7 +762,7 @@ var Application;
                 return buffer.join("&").replace(/%20/g, "+");
             };
             return OAuthService;
-        })();
+        }());
         Services.OAuthService = OAuthService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -823,7 +828,7 @@ var Application;
             };
             ;
             return RealtimeApiService;
-        })();
+        }());
         Services.RealtimeApiService = RealtimeApiService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -967,7 +972,7 @@ var Application;
                 });
             };
             return RoomsService;
-        })();
+        }());
         Services.RoomsService = RoomsService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -1104,7 +1109,7 @@ var Application;
                 }
             };
             return ToastNotificationService;
-        })();
+        }());
         Services.ToastNotificationService = ToastNotificationService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
@@ -1126,9 +1131,30 @@ var Application;
                 };
             }
             return NgEnter;
-        })();
+        }());
         Directives.NgEnter = NgEnter;
     })(Directives = Application.Directives || (Application.Directives = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AboutCtrl = (function () {
+            function AboutCtrl($scope, FeatureToggleService) {
+                this.scope = $scope;
+                if (FeatureToggleService.isWindowsApp()) {
+                    var currentPackage = Windows.ApplicationModel.Package.current;
+                    var packageVersion = currentPackage.id.version;
+                    this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
+                }
+                else {
+                    this.scope.appVersion = 'web';
+                }
+            }
+            return AboutCtrl;
+        }());
+        Controllers.AboutCtrl = AboutCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
 var Application;
 (function (Application) {
@@ -1181,7 +1207,7 @@ var Application;
                 });
             }
             return AddChannelRoomCtrl;
-        })();
+        }());
         Controllers.AddChannelRoomCtrl = AddChannelRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1222,7 +1248,7 @@ var Application;
                 });
             }
             return AddExistingRoomCtrl;
-        })();
+        }());
         Controllers.AddExistingRoomCtrl = AddExistingRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1255,7 +1281,7 @@ var Application;
                 });
             }
             return AddOneToOneRoomCtrl;
-        })();
+        }());
         Controllers.AddOneToOneRoomCtrl = AddOneToOneRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1287,7 +1313,7 @@ var Application;
                 }, true);
             }
             return AddRepositoryRoomCtrl;
-        })();
+        }());
         Controllers.AddRepositoryRoomCtrl = AddRepositoryRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1308,7 +1334,7 @@ var Application;
                 });
             }
             return AddRoomCtrl;
-        })();
+        }());
         Controllers.AddRoomCtrl = AddRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1328,10 +1354,6 @@ var Application;
                     }
                 };
                 this.scope = $scope;
-                this.scope.showAppNameInSplitView = FeatureToggleService.isSplitviewAppNameShowed();
-                $scope.closeSplitViewToggle = function () {
-                    _this.scope.splitViewWinControl.closePane();
-                };
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
                     if (!from.name || to.name === 'splashscreen') {
                         _this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
@@ -1342,7 +1364,7 @@ var Application;
                 });
             }
             return AppCtrl;
-        })();
+        }());
         Controllers.AppCtrl = AppCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1355,7 +1377,7 @@ var Application;
                 this.scope = $scope;
             }
             return ErrorCtrl;
-        })();
+        }());
         Controllers.ErrorCtrl = ErrorCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1364,16 +1386,8 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var HomeCtrl = (function () {
-            function HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) {
+            function HomeCtrl($scope, $state, RoomsService, ToastNotificationService) {
                 this.scope = $scope;
-                if (FeatureToggleService.isWindowsApp()) {
-                    var currentPackage = Windows.ApplicationModel.Package.current;
-                    var packageVersion = currentPackage.id.version;
-                    this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
-                }
-                else {
-                    this.scope.appVersion = 'web';
-                }
                 this.scope.chatWithUs = function () {
                     var roomName = 'Odonno/Modern-Gitter';
                     for (var i = 0; i < RoomsService.rooms.length; i++) {
@@ -1391,7 +1405,7 @@ var Application;
                 };
             }
             return HomeCtrl;
-        })();
+        }());
         Controllers.HomeCtrl = HomeCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1499,7 +1513,7 @@ var Application;
                 });
             };
             return RoomCtrl;
-        })();
+        }());
         Controllers.RoomCtrl = RoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1523,7 +1537,7 @@ var Application;
                 });
             }
             return RoomsCtrl;
-        })();
+        }());
         Controllers.RoomsCtrl = RoomsCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1561,7 +1575,7 @@ var Application;
                 });
             }
             return SplashscreenCtrl;
-        })();
+        }());
         Controllers.SplashscreenCtrl = SplashscreenCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
@@ -1580,6 +1594,7 @@ appModule.service('RealtimeApiService', function (OAuthService) { return new App
 appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
+appModule.controller('AboutCtrl', function ($scope, FeatureToggleService) { return new Application.Controllers.AboutCtrl($scope, FeatureToggleService); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
@@ -1587,7 +1602,7 @@ appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state,
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
-appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, FeatureToggleService, ToastNotificationService); });
+appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });

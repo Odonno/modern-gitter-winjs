@@ -6,15 +6,7 @@ module Application.Controllers {
 
         constructor($scope, $rootScope, FeatureToggleService: Application.Services.FeatureToggleService) {
             this.scope = $scope;
-            
-            // properties
-            this.scope.showAppNameInSplitView = FeatureToggleService.isSplitviewAppNameShowed();
-            
-            // methods
-            $scope.closeSplitViewToggle = () => {
-                this.scope.splitViewWinControl.closePane();
-            };
-            
+
             // detect navigation
             $rootScope.$on('$stateChangeSuccess', (event, to, toParams, from, fromParams) => {
                 if (!from.name || to.name === 'splashscreen') {

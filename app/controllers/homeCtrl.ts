@@ -4,19 +4,9 @@ module Application.Controllers {
     export class HomeCtrl {
         private scope: any;
 
-        constructor($scope, $state, RoomsService, FeatureToggleService: Application.Services.FeatureToggleService, ToastNotificationService: Application.Services.ToastNotificationService) {
+        constructor($scope, $state: ng.ui.IStateService, RoomsService: Application.Services.RoomsService, ToastNotificationService: Application.Services.ToastNotificationService) {
             this.scope = $scope;
             
-            // properties
-            if (FeatureToggleService.isWindowsApp()) {
-                var currentPackage = Windows.ApplicationModel.Package.current;
-                var packageVersion = currentPackage.id.version;
-
-                this.scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
-            } else {
-                this.scope.appVersion = 'web';
-            }
-
             // methods
             this.scope.chatWithUs = () => {
                 var roomName = 'Odonno/Modern-Gitter';

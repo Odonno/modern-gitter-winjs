@@ -9,7 +9,7 @@
     <script src="dist/winjs/js/base.js"></script>
     <script src="dist/winjs/js/ui.js"></script>
 
-    <!-- Angular WinJS references -->
+    <!-- Angular references -->
     <script src="dist/angular/angular.js"></script>
     <script src="dist/angular-sanitize/angular-sanitize.js"></script>
     <script src="dist/angular-ui-router/angular-ui-router.js"></script>
@@ -40,15 +40,15 @@
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
                         data-win-options="{ splitView: select('.splitView') }"></button>
-                <span class="split-view-title" ng-show="showAppNameInSplitView">Modern Gitter</span>
-                <span style="left: 50px; vertical-align: middle; display: inline-block; margin-bottom: 32px;" ng-hide="showAppNameInSplitView"></span>
+                <span style="left: 50px; vertical-align: middle; display: inline-block; margin-bottom: 32px;"></span>
             </div>
 
             <div class="split-view-commands">
-                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}" ui-sref="home" ng-click="closeSplitViewToggle()"></div>
-                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Join a room', icon: 'add'}" ui-sref="addRoom.existing" ng-click="closeSplitViewToggle()"></div>
-                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Rooms', icon: 'find'}" ui-sref="rooms" ng-click="closeSplitViewToggle()"></div>
-                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Messages', icon: 'message'}" ui-sref="room" ng-click="closeSplitViewToggle()"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}" ui-sref="home"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Join a room', icon: 'add'}" ui-sref="addRoom.existing"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Rooms', icon: 'find'}" ui-sref="rooms"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Messages', icon: 'message'}" ui-sref="room"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'About', icon: 'help'}" ui-sref="about"></div>
             </div>
         </div>
 

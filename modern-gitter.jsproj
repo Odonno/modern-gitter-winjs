@@ -129,6 +129,7 @@
     <Content Include="images\scale-400\Wide310x150Logo.png" />
     <Content Include="images\Square44x44Logo.targetsize-256.png" />
     <Content Include="images\Square44x44Logo.targetsize-48.png" />
+    <Content Include="partials\about.html" />
     <Content Include="partials\addRoom.html" />
     <Content Include="partials\channel.html" />
     <Content Include="partials\error.html" />
