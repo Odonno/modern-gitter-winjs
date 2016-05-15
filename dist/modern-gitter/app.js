@@ -1514,15 +1514,10 @@ var Application;
     (function (Controllers) {
         var RoomCtrl = (function () {
             function RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) {
-                var _this = this;
-                this.ApiService = ApiService;
-                this.RoomsService = RoomsService;
-                this.LocalSettingsService = LocalSettingsService;
-                this.FeatureToggleService = FeatureToggleService;
                 $scope.listOptions = {};
                 $scope.hideProgress = false;
                 $scope.refreshed = false;
-                $scope.room = this.RoomsService.currentRoom;
+                $scope.room = RoomsService.currentRoom;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
@@ -1532,7 +1527,7 @@ var Application;
                     }
                     if ($scope.textMessage) {
                         $scope.sendingMessage = true;
-                        _this.ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
+                        ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
                             $scope.textMessage = '';
                             $scope.$apply();
                             $scope.sendingMessage = false;
@@ -1555,7 +1550,7 @@ var Application;
                         }
                     }
                     if (messageIds.length > 0) {
-                        _this.RoomsService.markUnreadMessages(messageIds);
+                        RoomsService.markUnreadMessages(messageIds);
                     }
                 };
                 $scope.loadMoreItems = function () {
@@ -1566,7 +1561,7 @@ var Application;
                     }
                     $scope.hideProgress = true;
                     var olderMessage = $scope.messages[$scope.messages.length - 1];
-                    _this.ApiService.getMessages($scope.room.id, olderMessage.id).then(function (beforeMessages) {
+                    ApiService.getMessages($scope.room.id, olderMessage.id).then(function (beforeMessages) {
                         if (!beforeMessages || beforeMessages.length <= 0) {
                             return;
                         }
@@ -1584,28 +1579,26 @@ var Application;
                     console.error('no room selected...');
                     return;
                 }
-                this.LocalSettingsService.setValue('lastPage', 'room');
-                this.LocalSettingsService.setValue('lastRoom', $scope.room.name);
-                this.RoomsService.onmessagereceived = function (roomId, message) {
+                LocalSettingsService.setValue('lastPage', 'room');
+                LocalSettingsService.setValue('lastRoom', $scope.room.name);
+                RoomsService.onmessagereceived = function (roomId, message) {
                     if ($scope.room && $scope.room.id === roomId) {
                         $scope.messages.unshift(message);
                     }
                 };
-                this.ApiService.getCurrentUser().then(function (user) {
-                    _this.ApiService.getMessages($scope.room.id).then(function (messages) {
-                        $scope.messages = [];
-                        for (var i = 0; i < messages.length; i++) {
-                            $scope.messages.unshift(messages[i]);
+                ApiService.getMessages($scope.room.id).then(function (messages) {
+                    $scope.messages = [];
+                    for (var i = 0; i < messages.length; i++) {
+                        $scope.messages.unshift(messages[i]);
+                    }
+                    var listview = document.getElementById('customMessagesListView');
+                    listview.onscroll = function () {
+                        $scope.detectUnreadMessages();
+                        var range = $scope.listOptions.range;
+                        if (range && range.index + range.length === range.total) {
+                            $scope.loadMoreItems();
                         }
-                        var listview = document.getElementById('customMessagesListView');
-                        listview.onscroll = function () {
-                            $scope.detectUnreadMessages();
-                            var range = $scope.listOptions.range;
-                            if (range && range.index + range.length === range.total) {
-                                $scope.loadMoreItems();
-                            }
-                        };
-                    });
+                    };
                 });
             }
             return RoomCtrl;

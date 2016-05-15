@@ -16,12 +16,12 @@ module Application.Controllers {
     }
 
     export class RoomCtrl {
-        constructor($scope: IRoomScope, private ApiService: Services.ApiService, private RoomsService: Services.RoomsService, private LocalSettingsService: Services.LocalSettingsService, private FeatureToggleService: Services.FeatureToggleService) {
+        constructor($scope: IRoomScope, ApiService: Services.ApiService, RoomsService: Services.RoomsService, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
             // properties
             $scope.listOptions = {};
             $scope.hideProgress = false;
             $scope.refreshed = false;
-            $scope.room = this.RoomsService.currentRoom;
+            $scope.room = RoomsService.currentRoom;
             $scope.messages = [];
             $scope.textMessage = '';
             $scope.sendingMessage = false;
@@ -35,7 +35,7 @@ module Application.Controllers {
 
                 if ($scope.textMessage) {
                     $scope.sendingMessage = true;
-                    this.ApiService.sendMessage($scope.room.id, $scope.textMessage).then(message => {
+                    ApiService.sendMessage($scope.room.id, $scope.textMessage).then(message => {
                         $scope.textMessage = '';
                         $scope.$apply();
                         $scope.sendingMessage = false;
@@ -63,7 +63,7 @@ module Application.Controllers {
 
                 // if there is at least 1 unread message, mark them as read
                 if (messageIds.length > 0) {
-                    this.RoomsService.markUnreadMessages(messageIds);
+                    RoomsService.markUnreadMessages(messageIds);
                 }
             }
 
@@ -79,7 +79,7 @@ module Application.Controllers {
 
                 // load more messages
                 var olderMessage = $scope.messages[$scope.messages.length - 1];
-                this.ApiService.getMessages($scope.room.id, olderMessage.id).then(beforeMessages => {
+                ApiService.getMessages($scope.room.id, olderMessage.id).then(beforeMessages => {
                     if (!beforeMessages || beforeMessages.length <= 0) {
                         // no more message to load
                         return;
@@ -105,38 +105,36 @@ module Application.Controllers {
             }
 
             // update local storage
-            this.LocalSettingsService.setValue('lastPage', 'room');
-            this.LocalSettingsService.setValue('lastRoom', $scope.room.name);
+            LocalSettingsService.setValue('lastPage', 'room');
+            LocalSettingsService.setValue('lastRoom', $scope.room.name);
 
             // check if a new message is sent
-            this.RoomsService.onmessagereceived = (roomId, message) => {
+            RoomsService.onmessagereceived = (roomId, message) => {
                 if ($scope.room && $scope.room.id === roomId) {
                     $scope.messages.unshift(message);
                 }
             };
 
             // load messages list
-            this.ApiService.getCurrentUser().then(user => {
-                this.ApiService.getMessages($scope.room.id).then(messages => {
-                    $scope.messages = [];
-                    for (var i = 0; i < messages.length; i++) {
-                        $scope.messages.unshift(messages[i]);
+            ApiService.getMessages($scope.room.id).then(messages => {
+                $scope.messages = [];
+                for (var i = 0; i < messages.length; i++) {
+                    $scope.messages.unshift(messages[i]);
+                }
+
+                var listview = document.getElementById('customMessagesListView');
+
+                // each time user scroll
+                listview.onscroll = () => {
+                    // detect scroll to detect unread message on view
+                    $scope.detectUnreadMessages();
+
+                    // detect if we are at the top of the list (load more messages)
+                    var range = $scope.listOptions.range;
+                    if (range && range.index + range.length === range.total) {
+                        $scope.loadMoreItems();
                     }
-
-                    var listview = document.getElementById('customMessagesListView');
-
-                    // each time user scroll
-                    listview.onscroll = () => {
-                        // detect scroll to detect unread message on view
-                        $scope.detectUnreadMessages();
-
-                        // detect if we are at the top of the list (load more messages)
-                        var range = $scope.listOptions.range;
-                        if (range && range.index + range.length === range.total) {
-                            $scope.loadMoreItems();
-                        }
-                    };
-                });
+                };
             });
         }
     }
