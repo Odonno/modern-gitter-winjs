@@ -251,6 +251,11 @@ var Application;
                     url: '/room',
                     templateUrl: 'partials/room.html',
                     controller: 'RoomCtrl'
+                })
+                    .state('chat', {
+                    url: '/chat',
+                    templateUrl: 'partials/chat.html',
+                    controller: 'ChatCtrl'
                 });
             }
             return RoutingConfig;
@@ -1250,6 +1255,86 @@ var Application;
 })(Application || (Application = {}));
 var Application;
 (function (Application) {
+    var Directives;
+    (function (Directives) {
+        var MessageList = (function () {
+            function MessageList(_, $timeout, $location, ApiService, RoomsService) {
+                var _this = this;
+                this._ = _;
+                this.$timeout = $timeout;
+                this.$location = $location;
+                this.ApiService = ApiService;
+                this.RoomsService = RoomsService;
+                this.restrict = 'E';
+                this.replace = true;
+                this.templateUrl = 'partials/message-list.html';
+                this.link = function (scope, element, attrs) {
+                    var angularElement = angular.element(element);
+                    scope.autoScrollDown = true;
+                    var initialize = function () {
+                        _this.RoomsService.onmessagereceived = function (roomId, message) {
+                            if (scope.room && scope.room.id === roomId) {
+                                scope.messages.push(message);
+                            }
+                        };
+                        _this.ApiService.getMessages(scope.room.id).then(function (messages) {
+                            scope.messages = [];
+                            for (var i = 0; i < messages.length; i++) {
+                                scope.messages.push(messages[i]);
+                            }
+                        });
+                        _this.$timeout(function () {
+                            scrollToBottom();
+                            scope.canLoadMoreMessages = true;
+                        }, 1000);
+                        angularElement.bind("scroll", _this._.debounce(watchScroll, 100));
+                    };
+                    var fetchPreviousMessages = function () {
+                        if (!scope.canLoadMoreMessages)
+                            return;
+                        var olderMessage = scope.messages[0];
+                        _this.ApiService.getMessages(scope.room.id, olderMessage.id).then(function (beforeMessages) {
+                            if (!beforeMessages || beforeMessages.length <= 0) {
+                                scope.canLoadMoreMessages = false;
+                                return;
+                            }
+                            for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                                scope.messages.unshift(beforeMessages[i]);
+                            }
+                            _this.$location.hash('message-' + olderMessage.id);
+                        });
+                    };
+                    var scrollToBottom = function () {
+                        angularElement[0].scrollTop = angularElement[0].scrollHeight;
+                    };
+                    var hasScrollReachedBottom = function () {
+                        return (angularElement[0].scrollTop + angularElement[0].clientHeight) >= angularElement[0].scrollHeight;
+                    };
+                    var hasScrollReachedNearBottom = function () {
+                        return (angularElement[0].scrollTop + angularElement[0].clientHeight) >= (angularElement[0].scrollHeight - 50);
+                    };
+                    var hasScrollReachedTop = function () {
+                        return angularElement[0].scrollTop === 0;
+                    };
+                    var hasScrollReachedNearTop = function () {
+                        return angularElement[0].scrollTop <= 150;
+                    };
+                    var watchScroll = function () {
+                        scope.autoScrollDown = hasScrollReachedNearBottom();
+                        if (hasScrollReachedNearTop()) {
+                            fetchPreviousMessages();
+                        }
+                    };
+                    initialize();
+                };
+            }
+            return MessageList;
+        }());
+        Directives.MessageList = MessageList;
+    })(Directives = Application.Directives || (Application.Directives = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
     var Controllers;
     (function (Controllers) {
         var AboutCtrl = (function () {
@@ -1293,7 +1378,7 @@ var Application;
                     RoomsService.createChannel($scope.channel, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
-                        $state.go('room');
+                        $state.go('chat');
                     });
                 };
                 ApiService.getCurrentUser().then(function (user) {
@@ -1335,7 +1420,7 @@ var Application;
                     RoomsService.createRoom(selectedRoom.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
-                        $state.go('room');
+                        $state.go('chat');
                     });
                 };
                 $scope.$watch('roomname', function () {
@@ -1374,7 +1459,7 @@ var Application;
                     RoomsService.createRoom(selectedUser.username, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
-                        $state.go('room');
+                        $state.go('chat');
                     });
                 };
                 $scope.$watch('username', function () {
@@ -1403,7 +1488,7 @@ var Application;
                     RoomsService.createRoom(repository.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
-                        $state.go('room');
+                        $state.go('chat');
                     });
                 };
                 ApiService.getCurrentUser().then(function (user) {
@@ -1473,6 +1558,45 @@ var Application;
 (function (Application) {
     var Controllers;
     (function (Controllers) {
+        var ChatCtrl = (function () {
+            function ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService) {
+                $scope.room = RoomsService.currentRoom;
+                $scope.messages = [];
+                $scope.textMessage = '';
+                $scope.sendingMessage = false;
+                $scope.canLoadMoreMessages = false;
+                $scope.sendMessage = function () {
+                    if ($scope.sendingMessage) {
+                        return;
+                    }
+                    if ($scope.textMessage) {
+                        $scope.sendingMessage = true;
+                        ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
+                            $scope.textMessage = '';
+                            $scope.$apply();
+                            $scope.sendingMessage = false;
+                        });
+                    }
+                    else {
+                        console.error('textMessage is empty');
+                    }
+                };
+                if (!$scope.room) {
+                    console.error('no room selected...');
+                    return;
+                }
+                LocalSettingsService.setValue('lastPage', 'chat');
+                LocalSettingsService.setValue('lastRoom', $scope.room.name);
+            }
+            return ChatCtrl;
+        }());
+        Controllers.ChatCtrl = ChatCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
         var ErrorCtrl = (function () {
             function ErrorCtrl($scope) {
             }
@@ -1492,14 +1616,14 @@ var Application;
                     for (var i = 0; i < RoomsService.rooms.length; i++) {
                         if (RoomsService.rooms[i].name === roomName) {
                             RoomsService.selectRoom(RoomsService.rooms[i]);
-                            $state.go('room');
+                            $state.go('chat');
                             return;
                         }
                     }
                     RoomsService.createRoom(roomName, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
-                        $state.go('room');
+                        $state.go('chat');
                     });
                 };
             }
@@ -1523,7 +1647,7 @@ var Application;
                 $scope.sendingMessage = false;
                 $scope.sendMessage = function () {
                     if ($scope.sendingMessage) {
-                        return false;
+                        return;
                     }
                     if ($scope.textMessage) {
                         $scope.sendingMessage = true;
@@ -1616,7 +1740,7 @@ var Application;
                 $scope.rooms = RoomsService.rooms;
                 $scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
-                    $state.go('room');
+                    $state.go('chat');
                 };
                 $scope.$watchGroup(['rooms', 'search'], function () {
                     $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
@@ -1644,6 +1768,13 @@ var Application;
                         var room = RoomsService.getRoom(lastRoom);
                         RoomsService.selectRoom(room);
                     }
+                    else if (lastPage === 'chat' && lastRoom) {
+                        RoomsService.onroomselected = function () {
+                            $state.go('chat');
+                        };
+                        var room = RoomsService.getRoom(lastRoom);
+                        RoomsService.selectRoom(room);
+                    }
                     else if (lastPage === 'rooms') {
                         $state.go('rooms');
                     }
@@ -1666,6 +1797,7 @@ var Application;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'ui-listView', 'yaru22.angular-timeago', 'emoji']);
+appModule.constant('_', window._);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
@@ -1680,6 +1812,7 @@ appModule.service('RealtimeApiService', function (OAuthService) { return new App
 appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
+appModule.directive('messageList', function (_, $timeout, $location, ApiService, RoomsService) { return new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService); });
 appModule.controller('AboutCtrl', function ($scope, FeatureToggleService) { return new Application.Controllers.AboutCtrl($scope, FeatureToggleService); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
@@ -1687,6 +1820,7 @@ appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService); });
+appModule.controller('ChatCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });

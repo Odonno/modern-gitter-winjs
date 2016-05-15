@@ -21,6 +21,15 @@ module Application.Controllers {
                     // select the room in RoomsService
                     var room = RoomsService.getRoom(lastRoom);
                     RoomsService.selectRoom(room);
+                } else if (lastPage === 'chat' && lastRoom) {
+                    // navigate to previous visited room if there is one
+                    RoomsService.onroomselected = () => {
+                        $state.go('chat');
+                    };
+                        
+                    // select the room in RoomsService
+                    var room = RoomsService.getRoom(lastRoom);
+                    RoomsService.selectRoom(room);
                 } else if (lastPage === 'rooms') {
                     // navigate to rooms list if there is no previous room
                     $state.go('rooms');

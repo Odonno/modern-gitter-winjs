@@ -22,7 +22,7 @@ module Application.Controllers {
                 RoomsService.createRoom(selectedRoom.uri, (room) => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
-                    $state.go('room');
+                    $state.go('chat');
                 });
             };
             

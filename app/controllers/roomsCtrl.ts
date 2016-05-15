@@ -20,7 +20,7 @@ module Application.Controllers {
             // methods
             $scope.selectRoom = (room: Models.Room) => {
                 RoomsService.selectRoom(room);
-                $state.go('room');
+                $state.go('chat');
             };
 
             // watch events

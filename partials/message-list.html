@@ -1,0 +1,23 @@
+<div style="overflow-y: auto;">
+    <div class="progress-bar win-progress-bar" ng-show="canLoadMoreMessages">
+        <div class="progress-circle"></div>
+        <div class="progress-circle"></div>
+        <div class="progress-circle"></div>
+        <div class="progress-circle"></div>
+        <div class="progress-circle"></div>
+    </div>
+
+    <div>
+        <div ng-repeat="message in messages track by message.id" id="message-{{ message.id }}" class="message-container clickable"
+            ng-class="message.unread ? 'unread' : 'read'">
+            <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
+            <div class="message-subcontainer">
+                <div class="message-username">
+                    <span>{{ message.fromUser.username }}</span>
+                    <span class="message-timestamp">{{ message.sent | timeAgo }}</span>
+                </div>
+                <div class="message-content" ng-bind-html="message.html | emoji"></div>
+            </div>
+        </div>
+    </div>
+</div>

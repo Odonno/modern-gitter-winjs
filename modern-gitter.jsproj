@@ -77,6 +77,7 @@
     <Content Include="dist\angular-ui-router\angular-ui-router.js" />
     <Content Include="dist\angular\angular.js" />
     <Content Include="dist\faye\faye-browser.js" />
+    <Content Include="dist\lodash\lodash.js" />
     <Content Include="dist\modern-gitter\app.js" />
     <Content Include="dist\modern-gitter\app.css" />
     <Content Include="dist\ui-listview\ui-listview.css" />
@@ -132,9 +133,11 @@
     <Content Include="partials\about.html" />
     <Content Include="partials\addRoom.html" />
     <Content Include="partials\channel.html" />
+    <Content Include="partials\chat.html" />
     <Content Include="partials\error.html" />
     <Content Include="partials\existing.html" />
     <Content Include="partials\home.html" />
+    <Content Include="partials\message-list.html" />
     <Content Include="partials\oneToOne.html" />
     <Content Include="partials\repository.html" />
     <Content Include="partials\room.html" />

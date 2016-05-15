@@ -23,6 +23,7 @@
 /// <reference path="./services/toastNotificationService.ts"/>
 
 /// <reference path="./directives/ngEnter.ts"/>
+/// <reference path="./directives/messageList.ts"/>
 
 /// <reference path="./controllers/aboutCtrl.ts"/>
 /// <reference path="./controllers/addChannelRoomCtrl.ts"/>
@@ -31,6 +32,7 @@
 /// <reference path="./controllers/addRepositoryRoomCtrl.ts"/>
 /// <reference path="./controllers/addRoomCtrl.ts"/>
 /// <reference path="./controllers/appCtrl.ts"/>
+/// <reference path="./controllers/chatCtrl.ts"/>
 /// <reference path="./controllers/errorCtrl.ts"/>
 /// <reference path="./controllers/homeCtrl.ts"/>
 /// <reference path="./controllers/roomCtrl.ts"/>
@@ -39,6 +41,9 @@
 
 // create module with references
 var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'ui-listView', 'yaru22.angular-timeago', 'emoji']);
+
+// inject constants
+appModule.constant('_', window._);
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
@@ -59,6 +64,7 @@ appModule.service('ToastNotificationService', (FeatureToggleService) => new Appl
 
 // inject directives
 appModule.directive('ngEnter', () => new Application.Directives.NgEnter());
+appModule.directive('messageList', (_, $timeout, $location, ApiService, RoomsService) => new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService));
 
 // inject controllers
 appModule.controller('AboutCtrl', ($scope, FeatureToggleService) => new Application.Controllers.AboutCtrl($scope, FeatureToggleService));
@@ -68,6 +74,7 @@ appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope, $state) => new Application.Controllers.AddRoomCtrl($scope, $state));
 appModule.controller('AppCtrl', ($scope, $rootScope, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService));
+appModule.controller('ChatCtrl', ($scope, ApiService, RoomsService, LocalSettingsService) => new Application.Controllers.ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService));
 appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
 appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService));

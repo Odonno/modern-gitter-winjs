@@ -21,7 +21,6 @@ This project makes use of several frameworks like :
 * [WinJS](https://github.com/winjs/winjs)
 * [winstrap](https://github.com/winjs/winstrap)
 * [angular](https://github.com/angular/angular)
-* [angular-winjs](https://github.com/winjs/angular-winjs)
 * [ui-router](https://github.com/angular-ui/ui-router)
 * [faye](https://github.com/faye/faye)
 * [gulp](https://github.com/gulpjs/gulp)

@@ -30,7 +30,7 @@ module Application.Controllers {
             $scope.sendMessage = () => {
                 // do not send the same message multiple times
                 if ($scope.sendingMessage) {
-                    return false;
+                    return;
                 }
 
                 if ($scope.textMessage) {

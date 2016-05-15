@@ -61,6 +61,11 @@ module Application.Configs {
                     url: '/room',
                     templateUrl: 'partials/room.html',
                     controller: 'RoomCtrl'
+                })
+                .state('chat', {
+                    url: '/chat',
+                    templateUrl: 'partials/chat.html',
+                    controller: 'ChatCtrl'
                 });
         }
     }

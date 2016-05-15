@@ -339,7 +339,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	float: right;
 }
 
-/* room view style */
+/* room/chat view style */
 #roomDescription {
     height: 100px;
     background-color: #f2f2f2;
@@ -385,6 +385,9 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 .win-progress-bar {
     width: 100%;
+    height: 0;
+    margin-top: -6px;
+    margin-left: calc((100vw - 180px) / 2 - 46px);
 }
 
 .message-container {
@@ -424,7 +427,6 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 .unread {
-    border-right: 2px solid #2ECC71;
     background-color: rgba(46, 204, 113, 0.08);
 }
 

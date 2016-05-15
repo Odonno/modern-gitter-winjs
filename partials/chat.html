@@ -1,0 +1,24 @@
+<!-- room description -->
+<div id="roomDescription">
+    <div class="content">
+        <div>
+            <img id="roomImage" ng-src="{{ room.image }}" />
+        </div>
+        <div>
+            <h2 class="win-h2">{{ room.name }}</h2>
+            <h6 id="roomTopic" class="win-h6" ng-show="room.topic">{{ room.topic }}</h6>
+        </div>
+    </div>
+</div>
+
+<!-- list view of messages -->
+<message-list class="messages-list-view"></message-list>
+
+<hr />
+
+<!-- actions (send message) -->
+<div id="actions">
+    <button id="sendFiles" class="btn btn-link btn-icon no-outline" disabled>&#xE16C;</button>
+    <textarea id="textMessage" ng-model="textMessage" placeholder="Enter your text here..."></textarea>
+    <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
+</div>
