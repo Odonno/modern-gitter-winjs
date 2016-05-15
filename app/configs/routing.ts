@@ -57,11 +57,6 @@ module Application.Configs {
                     templateUrl: 'partials/rooms.html',
                     controller: 'RoomsCtrl'
                 })
-                .state('room', {
-                    url: '/room',
-                    templateUrl: 'partials/room.html',
-                    controller: 'RoomCtrl'
-                })
                 .state('chat', {
                     url: '/chat',
                     templateUrl: 'partials/chat.html',

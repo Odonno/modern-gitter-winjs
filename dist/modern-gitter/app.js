@@ -247,11 +247,6 @@ var Application;
                     templateUrl: 'partials/rooms.html',
                     controller: 'RoomsCtrl'
                 })
-                    .state('room', {
-                    url: '/room',
-                    templateUrl: 'partials/room.html',
-                    controller: 'RoomCtrl'
-                })
                     .state('chat', {
                     url: '/chat',
                     templateUrl: 'partials/chat.html',
@@ -1660,104 +1655,6 @@ var Application;
 (function (Application) {
     var Controllers;
     (function (Controllers) {
-        var RoomCtrl = (function () {
-            function RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) {
-                $scope.listOptions = {};
-                $scope.hideProgress = false;
-                $scope.refreshed = false;
-                $scope.room = RoomsService.currentRoom;
-                $scope.messages = [];
-                $scope.textMessage = '';
-                $scope.sendingMessage = false;
-                $scope.sendMessage = function () {
-                    if ($scope.sendingMessage) {
-                        return;
-                    }
-                    if ($scope.textMessage) {
-                        $scope.sendingMessage = true;
-                        ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
-                            $scope.textMessage = '';
-                            $scope.$apply();
-                            $scope.sendingMessage = false;
-                        });
-                    }
-                    else {
-                        console.error('textMessage is empty');
-                    }
-                };
-                $scope.detectUnreadMessages = function () {
-                    var firstIndex, lastIndex;
-                    var range = $scope.listOptions.range;
-                    firstIndex = range.index;
-                    lastIndex = range.index + range.length;
-                    var messageIds = [];
-                    for (var i = 0; i < $scope.messages.length; i++) {
-                        if (i >= firstIndex && i <= lastIndex && $scope.messages[i].unread) {
-                            messageIds.push($scope.messages[i].id);
-                            $scope.messages[i].unread = false;
-                        }
-                    }
-                    if (messageIds.length > 0) {
-                        RoomsService.markUnreadMessages(messageIds);
-                    }
-                };
-                $scope.loadMoreItems = function () {
-                    var listview = document.getElementById('customMessagesListView');
-                    var lastScrollHeight = $scope.listOptions.listView.getScrollHeight();
-                    if ($scope.hideProgress) {
-                        return;
-                    }
-                    $scope.hideProgress = true;
-                    var olderMessage = $scope.messages[$scope.messages.length - 1];
-                    ApiService.getMessages($scope.room.id, olderMessage.id).then(function (beforeMessages) {
-                        if (!beforeMessages || beforeMessages.length <= 0) {
-                            return;
-                        }
-                        for (var i = beforeMessages.length - 1; i >= 0; i--) {
-                            $scope.messages.push(beforeMessages[i]);
-                        }
-                        setTimeout(function () {
-                            var newScrollHeight = $scope.listOptions.listView.getScrollHeight();
-                            listview.scrollTop += newScrollHeight - lastScrollHeight;
-                            $scope.hideProgress = false;
-                        }, 250);
-                    });
-                };
-                if (!$scope.room) {
-                    console.error('no room selected...');
-                    return;
-                }
-                LocalSettingsService.setValue('lastPage', 'room');
-                LocalSettingsService.setValue('lastRoom', $scope.room.name);
-                RoomsService.onmessagereceived = function (roomId, message) {
-                    if ($scope.room && $scope.room.id === roomId) {
-                        $scope.messages.unshift(message);
-                    }
-                };
-                ApiService.getMessages($scope.room.id).then(function (messages) {
-                    $scope.messages = [];
-                    for (var i = 0; i < messages.length; i++) {
-                        $scope.messages.unshift(messages[i]);
-                    }
-                    var listview = document.getElementById('customMessagesListView');
-                    listview.onscroll = function () {
-                        $scope.detectUnreadMessages();
-                        var range = $scope.listOptions.range;
-                        if (range && range.index + range.length === range.total) {
-                            $scope.loadMoreItems();
-                        }
-                    };
-                });
-            }
-            return RoomCtrl;
-        }());
-        Controllers.RoomCtrl = RoomCtrl;
-    })(Controllers = Application.Controllers || (Application.Controllers = {}));
-})(Application || (Application = {}));
-var Application;
-(function (Application) {
-    var Controllers;
-    (function (Controllers) {
         var RoomsCtrl = (function () {
             function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
                 LocalSettingsService.setValue('lastPage', 'rooms');
@@ -1785,14 +1682,7 @@ var Application;
                 RoomsService.initialize(function () {
                     var lastPage = LocalSettingsService.getValue('lastPage');
                     var lastRoom = LocalSettingsService.getValue('lastRoom');
-                    if (lastPage === 'room' && lastRoom) {
-                        RoomsService.onroomselected = function () {
-                            $state.go('room');
-                        };
-                        var room = RoomsService.getRoom(lastRoom);
-                        RoomsService.selectRoom(room);
-                    }
-                    else if (lastPage === 'chat' && lastRoom) {
+                    if (lastPage === 'chat' && lastRoom) {
                         RoomsService.onroomselected = function () {
                             $state.go('chat');
                         };
@@ -1820,7 +1710,7 @@ var Application;
         Controllers.SplashscreenCtrl = SplashscreenCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
-var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'ui-listView', 'yaru22.angular-timeago', 'emoji']);
+var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
 appModule.constant('_', window._);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
 appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
@@ -1847,6 +1737,5 @@ appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleServi
 appModule.controller('ChatCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService); });
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
-appModule.controller('RoomCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });

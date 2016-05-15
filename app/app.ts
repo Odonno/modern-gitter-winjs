@@ -40,7 +40,7 @@
 /// <reference path="./controllers/splashscreenCtrl.ts"/>
 
 // create module with references
-var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'ui-listView', 'yaru22.angular-timeago', 'emoji']);
+var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
 
 // inject constants
 appModule.constant('_', window._);
@@ -77,6 +77,5 @@ appModule.controller('AppCtrl', ($scope, $rootScope, FeatureToggleService) => ne
 appModule.controller('ChatCtrl', ($scope, ApiService, RoomsService, LocalSettingsService) => new Application.Controllers.ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService));
 appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
-appModule.controller('RoomCtrl', ($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomCtrl($scope, ApiService, RoomsService, LocalSettingsService, FeatureToggleService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService));
 appModule.controller('SplashscreenCtrl', ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));

@@ -339,7 +339,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	float: right;
 }
 
-/* room/chat view style */
+/* chat view style */
 #roomDescription {
     height: 100px;
     background-color: #f2f2f2;

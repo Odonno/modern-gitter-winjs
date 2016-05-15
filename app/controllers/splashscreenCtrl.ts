@@ -12,16 +12,7 @@ module Application.Controllers {
                 var lastPage = LocalSettingsService.getValue('lastPage');
                 var lastRoom = LocalSettingsService.getValue('lastRoom');
 
-                if (lastPage === 'room' && lastRoom) {
-                    // navigate to previous visited room if there is one
-                    RoomsService.onroomselected = () => {
-                        $state.go('room');
-                    };
-                        
-                    // select the room in RoomsService
-                    var room = RoomsService.getRoom(lastRoom);
-                    RoomsService.selectRoom(room);
-                } else if (lastPage === 'chat' && lastRoom) {
+                if (lastPage === 'chat' && lastRoom) {
                     // navigate to previous visited room if there is one
                     RoomsService.onroomselected = () => {
                         $state.go('chat');

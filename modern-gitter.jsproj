@@ -80,8 +80,6 @@
     <Content Include="dist\lodash\lodash.js" />
     <Content Include="dist\modern-gitter\app.js" />
     <Content Include="dist\modern-gitter\app.css" />
-    <Content Include="dist\ui-listview\ui-listview.css" />
-    <Content Include="dist\ui-listview\ui-listView.js" />
     <Content Include="dist\winjs\css\ui-dark.css" />
     <Content Include="dist\winjs\css\ui-dark.min.css" />
     <Content Include="dist\winjs\css\ui-light.css" />
@@ -140,7 +138,6 @@
     <Content Include="partials\message-list.html" />
     <Content Include="partials\oneToOne.html" />
     <Content Include="partials\repository.html" />
-    <Content Include="partials\room.html" />
     <Content Include="partials\rooms.html" />
     <Content Include="partials\splashscreen.html" />
     <None Include="modern-gitter_StoreKey.pfx" />

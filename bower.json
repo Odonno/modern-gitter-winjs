@@ -6,7 +6,6 @@
   ],
   "homepage": "https://github.com/Odonno/modern-gitter-winjs",
   "dependencies": {
-    "ui-listView": "~0.0.8",
     "angular-timeago": "~0.2.5",
     "lodash": "^4.12.0"
   }
