@@ -1304,6 +1304,29 @@ var Application;
                             _this.$location.hash('message-' + olderMessage.id);
                         });
                     };
+                    var detectUnreadMessages = function () {
+                        var topOfScrollview = angularElement[0].scrollTop;
+                        var bottomOfScrollview = angularElement[0].scrollTop + angularElement[0].offsetHeight;
+                        var topOfMessageElement = 0;
+                        var messageIds = [];
+                        for (var i = 0; i < scope.messages.length; i++) {
+                            var message = scope.messages[i];
+                            var messageElement = document.getElementById('message-' + message.id);
+                            if (!messageElement)
+                                continue;
+                            if (message.unread) {
+                                var bottomOfMessageElement = topOfMessageElement + messageElement.offsetHeight;
+                                if (bottomOfMessageElement >= topOfScrollview && topOfMessageElement <= bottomOfScrollview) {
+                                    messageIds.push(message.id);
+                                    message.unread = false;
+                                }
+                            }
+                            topOfMessageElement += messageElement.offsetHeight;
+                        }
+                        if (messageIds.length > 0) {
+                            _this.RoomsService.markUnreadMessages(messageIds);
+                        }
+                    };
                     var scrollToBottom = function () {
                         angularElement[0].scrollTop = angularElement[0].scrollHeight;
                     };
@@ -1324,6 +1347,7 @@ var Application;
                         if (hasScrollReachedNearTop()) {
                             fetchPreviousMessages();
                         }
+                        detectUnreadMessages();
                     };
                     initialize();
                 };

@@ -6,11 +6,11 @@ module Application.Directives {
         replace = true;
         templateUrl = 'partials/message-list.html';
         link = (scope: Controllers.IChatScope, element: JQuery, attrs: ng.IAttributes) => {
-            var angularElement = angular.element(element);
+            let angularElement = angular.element(element);
             scope.autoScrollDown = true;
 
             // initialize directive element
-            var initialize = () => {
+            let initialize = () => {
                 // check if a new message is sent
                 this.RoomsService.onmessagereceived = (roomId, message) => {
                     if (scope.room && scope.room.id === roomId) {
@@ -21,7 +21,7 @@ module Application.Directives {
                 // load messages list
                 this.ApiService.getMessages(scope.room.id).then(messages => {
                     scope.messages = [];
-                    for (var i = 0; i < messages.length; i++) {
+                    for (let i = 0; i < messages.length; i++) {
                         scope.messages.push(messages[i]);
                     }
                 });
@@ -37,12 +37,12 @@ module Application.Directives {
             };
 
             // fetch previous messages
-            var fetchPreviousMessages = () => {
+            let fetchPreviousMessages = () => {
                 if (!scope.canLoadMoreMessages)
                     return;
 
                 // load more messages
-                var olderMessage = scope.messages[0];
+                let olderMessage = scope.messages[0];
                 this.ApiService.getMessages(scope.room.id, olderMessage.id).then(beforeMessages => {
                     // no more message to load
                     if (!beforeMessages || beforeMessages.length <= 0) {
@@ -51,7 +51,7 @@ module Application.Directives {
                     }
 
                     // push old messages to the top
-                    for (var i = beforeMessages.length - 1; i >= 0; i--) {
+                    for (let i = beforeMessages.length - 1; i >= 0; i--) {
                         scope.messages.unshift(beforeMessages[i]);
                     }
 
@@ -60,30 +60,63 @@ module Application.Directives {
                 });
             };
 
+            let detectUnreadMessages = () => {
+                let topOfScrollview = angularElement[0].scrollTop;
+                let bottomOfScrollview = angularElement[0].scrollTop + angularElement[0].offsetHeight;
+                let topOfMessageElement = 0;
+
+                // retrieve id of unread messages that user watch
+                let messageIds = [];
+
+                for (let i = 0; i < scope.messages.length; i++) {
+                    let message = scope.messages[i];
+                    let messageElement = document.getElementById('message-' + message.id);
+
+                    if (!messageElement)
+                        continue;
+
+                    if (message.unread) {
+                        let bottomOfMessageElement = topOfMessageElement + messageElement.offsetHeight;
+
+                        if (bottomOfMessageElement >= topOfScrollview && topOfMessageElement <= bottomOfScrollview) {
+                            messageIds.push(message.id);
+                            message.unread = false;
+                        }
+                    }
+
+                    topOfMessageElement += messageElement.offsetHeight;
+                }
+
+                // if there is at least 1 unread message, mark them as read
+                if (messageIds.length > 0) {
+                    this.RoomsService.markUnreadMessages(messageIds);
+                }
+            };
+
             // scroll to bottom of the list
-            var scrollToBottom = () => {
+            let scrollToBottom = () => {
                 angularElement[0].scrollTop = angularElement[0].scrollHeight;
             };
 
             // detect if we are at the bottom of the chat list
-            var hasScrollReachedBottom = (): boolean => {
+            let hasScrollReachedBottom = (): boolean => {
                 return (angularElement[0].scrollTop + angularElement[0].clientHeight) >= angularElement[0].scrollHeight;
             };
             // detect if we are near bottom of the chat list
-            var hasScrollReachedNearBottom = (): boolean => {
+            let hasScrollReachedNearBottom = (): boolean => {
                 return (angularElement[0].scrollTop + angularElement[0].clientHeight) >= (angularElement[0].scrollHeight - 50);
             };
             // detect if we are at the top of the chat list
-            var hasScrollReachedTop = (): boolean => {
+            let hasScrollReachedTop = (): boolean => {
                 return angularElement[0].scrollTop === 0;
             };
             // detect if we are near top of the chat list
-            var hasScrollReachedNearTop = (): boolean => {
+            let hasScrollReachedNearTop = (): boolean => {
                 return angularElement[0].scrollTop <= 150;
             };
 
             // listen to each scroll
-            var watchScroll = () => {
+            let watchScroll = () => {
                 // set auto scroll down enable if we reached near bottom
                 scope.autoScrollDown = hasScrollReachedNearBottom();
 
@@ -91,6 +124,9 @@ module Application.Directives {
                 if (hasScrollReachedNearTop()) {
                     fetchPreviousMessages();
                 }
+
+                // detect unread messages
+                detectUnreadMessages();
             };
 
             initialize();
