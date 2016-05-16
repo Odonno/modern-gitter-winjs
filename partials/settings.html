@@ -1,0 +1,47 @@
+<div id="settings-scroll" class="win-scrollview">
+    <div class="content">
+        <h2 class="win-h2">Settings</h2>
+
+        <!-- notifications options -->
+        <h3 class="win-h3">Notifications</h3>
+
+        <div class="toggle-switch-group">
+            <div>
+                Enable background notifications of unread items <em>(ex : 50 messages unread)</em>
+            </div>
+            <div class="btn-group toggle-switch-settings">
+                <button ng-class="{ active: isUnreadItemsNotificationsEnabled }" ng-click="saveSetting('isUnreadItemsNotificationsEnabled')"
+                    type="button" data-toggle="button" class="btn btn-toggle-switch" autocomplete="off" aria-pressed="false">
+                    <span class="stateLabel stateLabel-on">On</span>
+                    <span class="stateLabel stateLabel-off">Off</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="toggle-switch-group">
+            <div>
+                Enable background notifications on mentions <em>(ex : @Odonno mentioned you)</em>
+            </div>
+            <div class="btn-group toggle-switch-settings">
+                <button ng-class="{ active: isUnreadMentionsNotificationsEnabled }" ng-click="saveSetting('isUnreadMentionsNotificationsEnabled')"
+                    type="button" data-toggle="button" class="btn btn-toggle-switch" autocomplete="off" aria-pressed="false">
+                    <span class="stateLabel stateLabel-on">On</span>
+                    <span class="stateLabel stateLabel-off">Off</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="toggle-switch-group">
+            <div>
+                Enable realtime notifications on every message
+            </div>
+            <div class="btn-group toggle-switch-settings">
+                <button ng-class="{ active: isNewMessageNotificationEnabled }" ng-click="saveSetting('isNewMessageNotificationEnabled')"
+                    type="button" data-toggle="button" class="btn btn-toggle-switch" autocomplete="off" aria-pressed="false">
+                    <span class="stateLabel stateLabel-on">On</span>
+                    <span class="stateLabel stateLabel-off">Off</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

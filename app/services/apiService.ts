@@ -95,7 +95,7 @@ module Application.Services {
 
         public getMessages(roomId: string, beforeId?: string) {
             return new Promise<Models.Message[]>((done, error) => {
-                var query = '?limit=' + this.ConfigService.messagesLimit;
+                let query = '?limit=' + this.ConfigService.messagesLimit;
 
                 if (beforeId) {
                     query += '&beforeId=' + beforeId;

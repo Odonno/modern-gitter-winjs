@@ -18,7 +18,7 @@ module Application.Controllers {
 
             // methods
             $scope.createRoom = () => {
-                var selectedUser = $scope.users[$scope.selection[0]];
+                let selectedUser = $scope.users[$scope.selection[0]];
                 RoomsService.createRoom(selectedUser.username, (room) => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);

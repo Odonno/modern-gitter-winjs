@@ -9,8 +9,8 @@ module Application.Controllers {
             // initialize controller
             RoomsService.initialize(() => {
                 // retrieve local storage data
-                var lastPage = LocalSettingsService.getValue('lastPage');
-                var lastRoom = LocalSettingsService.getValue('lastRoom');
+                let lastPage = LocalSettingsService.getValue('lastPage');
+                let lastRoom = LocalSettingsService.getValue('lastRoom');
 
                 if (lastPage === 'chat' && lastRoom) {
                     // navigate to previous visited room if there is one
@@ -19,7 +19,7 @@ module Application.Controllers {
                     };
                         
                     // select the room in RoomsService
-                    var room = RoomsService.getRoom(lastRoom);
+                    let room = RoomsService.getRoom(lastRoom);
                     RoomsService.selectRoom(room);
                 } else if (lastPage === 'rooms') {
                     // navigate to rooms list if there is no previous room
@@ -31,7 +31,7 @@ module Application.Controllers {
 
                 if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
                     // retrieve version saved of background task
-                    var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                    let lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
 
                     if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
                         // unregister existing background tasks

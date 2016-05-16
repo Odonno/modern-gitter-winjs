@@ -28,13 +28,13 @@ module Application.Services {
 
                 if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.toastNotification) {
                     // retrieve saved query inside argument data
-                    var toastQuery = args.detail.argument;
+                    let toastQuery = args.detail.argument;
 
                     // retrieve action and other values in toast query
-                    var action = this.getQueryValue(toastQuery, 'action');
+                    let action = this.getQueryValue(toastQuery, 'action');
 
                     if (action == 'viewRoom') {
-                        var roomId = this.getQueryValue(toastQuery, 'roomId');
+                        let roomId = this.getQueryValue(toastQuery, 'roomId');
                         
                         // TODO : navigate to room
                         if (this.ontoast) {
@@ -53,9 +53,9 @@ module Application.Services {
         
         // private methods
         private getQueryValue(query, key) {
-            var vars: string[] = query.split('&');
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split('=');
+            let vars: string[] = query.split('&');
+            for (let i = 0; i < vars.length; i++) {
+                let pair = vars[i].split('=');
                 if (pair[0] == key) {
                     return pair[1];
                 }

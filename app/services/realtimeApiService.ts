@@ -9,7 +9,7 @@ module Application.Services {
 
         public initialize() {
             return new Promise((done, error) => {
-                var ClientAuthExt = () => { };
+                let ClientAuthExt = () => { };
 
                 ClientAuthExt.prototype.outgoing = (message, callback) => {
                     if (message.channel == '/meta/handshake') {
@@ -48,7 +48,7 @@ module Application.Services {
                     // new message
                     callback(Application.Models.MessageOperation.Created, response.model);
                 } else if (response.operation === 'update') {
-                    var message = response.model;
+                    let message = response.model;
                     if (message.html) {
                         // message updated
                         callback(Application.Models.MessageOperation.Updated, response.model);

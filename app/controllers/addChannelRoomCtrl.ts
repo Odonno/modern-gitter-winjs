@@ -49,7 +49,7 @@ module Application.Controllers {
                 });
 
                 ApiService.getOrganizations(user.id).then((orgs) => {
-                    for (var i = 0; i < orgs.length; i++) {
+                    for (let i = 0; i < orgs.length; i++) {
                         $scope.owners.push({
                             id: orgs[i].id,
                             name: orgs[i].name,

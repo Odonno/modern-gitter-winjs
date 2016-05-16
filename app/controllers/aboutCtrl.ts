@@ -9,8 +9,8 @@ module Application.Controllers {
         constructor($scope: IAboutScope, FeatureToggleService: Services.FeatureToggleService) {
             // properties
             if (FeatureToggleService.isWindowsApp()) {
-                var currentPackage = Windows.ApplicationModel.Package.current;
-                var packageVersion = currentPackage.id.version;
+                let currentPackage = Windows.ApplicationModel.Package.current;
+                let packageVersion = currentPackage.id.version;
 
                 $scope.appVersion = packageVersion.major + '.' + packageVersion.minor + '.' + packageVersion.build;
             } else {

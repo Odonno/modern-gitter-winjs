@@ -9,10 +9,10 @@ module Application.Controllers {
         constructor($scope: IHomeScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, ToastNotificationService: Services.ToastNotificationService) {
             // methods
             $scope.chatWithUs = () => {
-                var roomName = 'Odonno/Modern-Gitter';
+                let roomName = 'Odonno/Modern-Gitter';
 
                 // go to existing room if we already joined it
-                for (var i = 0; i < RoomsService.rooms.length; i++) {
+                for (let i = 0; i < RoomsService.rooms.length; i++) {
                     if (RoomsService.rooms[i].name === roomName) {
                         RoomsService.selectRoom(RoomsService.rooms[i]);
                         $state.go('chat');

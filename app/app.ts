@@ -35,12 +35,12 @@
 /// <reference path="./controllers/chatCtrl.ts"/>
 /// <reference path="./controllers/errorCtrl.ts"/>
 /// <reference path="./controllers/homeCtrl.ts"/>
-/// <reference path="./controllers/roomCtrl.ts"/>
 /// <reference path="./controllers/roomsCtrl.ts"/>
+/// <reference path="./controllers/settingsCtrl.ts"/>
 /// <reference path="./controllers/splashscreenCtrl.ts"/>
 
 // create module with references
-var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
+let appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
 
 // inject constants
 appModule.constant('_', window._);
@@ -53,13 +53,13 @@ appModule.run(($rootScope, $state, RoomsService, FeatureToggleService) => new Ap
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
-appModule.service('FeatureToggleService', () => new Application.Services.FeatureToggleService());
+appModule.service('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
 appModule.service('LifecycleService', (FeatureToggleService) => new Application.Services.LifecycleService(FeatureToggleService));
 appModule.service('LocalSettingsService', (FeatureToggleService) => new Application.Services.LocalSettingsService(FeatureToggleService));
 appModule.service('NetworkService', (FeatureToggleService) => new Application.Services.NetworkService(FeatureToggleService));
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));
 appModule.service('RealtimeApiService', (OAuthService: Application.Services.OAuthService) => new Application.Services.RealtimeApiService(OAuthService));
-appModule.service('RoomsService', (OAuthService: Application.Services.OAuthService, NetworkService: Application.Services.NetworkService, ApiService: Application.Services.ApiService, RealtimeApiService: Application.Services.RealtimeApiService, ToastNotificationService: Application.Services.ToastNotificationService, LifecycleService) => new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService));
+appModule.service('RoomsService', (OAuthService: Application.Services.OAuthService, NetworkService: Application.Services.NetworkService, ApiService: Application.Services.ApiService, RealtimeApiService: Application.Services.RealtimeApiService, ToastNotificationService: Application.Services.ToastNotificationService, LifecycleService, FeatureToggleService) => new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService));
 appModule.service('ToastNotificationService', (FeatureToggleService) => new Application.Services.ToastNotificationService(FeatureToggleService));
 
 // inject directives
@@ -78,4 +78,5 @@ appModule.controller('ChatCtrl', ($scope, ApiService, RoomsService, LocalSetting
 appModule.controller('ErrorCtrl', ($scope) => new Application.Controllers.ErrorCtrl($scope));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService));
+appModule.controller('SettingsCtrl', ($scope, LocalSettingsService, FeatureToggleService) => new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService));
 appModule.controller('SplashscreenCtrl', ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));

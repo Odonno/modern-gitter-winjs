@@ -130,8 +130,9 @@ var Application;
     (function (Configs) {
         var NavigationConfig = (function () {
             function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
+                var systemNavigationManager;
                 if (FeatureToggleService.isWindowsApp()) {
-                    var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                    systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
                 }
                 $rootScope.states = [];
                 $rootScope.previousState;
@@ -142,7 +143,7 @@ var Application;
                     if (!from.name || from.name === 'splashscreen') {
                         return;
                     }
-                    if (to.name === 'room' && !RoomsService.currentRoom) {
+                    if (to.name === 'chat' && !RoomsService.currentRoom) {
                         $state.go('error');
                     }
                     if (to.name === 'error') {
@@ -215,6 +216,11 @@ var Application;
                     url: '/about',
                     templateUrl: 'partials/about.html',
                     controller: 'AboutCtrl'
+                })
+                    .state('settings', {
+                    url: '/settings',
+                    templateUrl: 'partials/settings.html',
+                    controller: 'SettingsCtrl'
                 })
                     .state('addRoom', {
                     abstract: true,
@@ -536,7 +542,7 @@ var Application;
                         }
                     ];
                 }
-                this.currentVersion = 'v0.6';
+                this.currentVersion = 'v0.7';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 if (this.isRegistered(taskName)) {
@@ -624,24 +630,90 @@ var Application;
     var Services;
     (function (Services) {
         var FeatureToggleService = (function () {
-            function FeatureToggleService() {
-                var _this = this;
-                this.isWindowsApp = function () {
-                    return (typeof Windows !== 'undefined');
-                };
-                this.isDebugMode = function () {
-                    return (typeof Debug !== 'undefined');
-                };
-                this.isNotificationBackgroundTasksEnabled = function () {
-                    return _this.isWindowsApp();
-                };
-                this.isSplitviewAppNameShowed = function () {
-                    return false;
-                };
-                this.isLaunchHandled = function () {
-                    return true;
-                };
+            function FeatureToggleService($injector) {
+                this.$injector = $injector;
             }
+            FeatureToggleService.prototype.inject = function () {
+                if (!this._localSettingsService) {
+                    this._localSettingsService = this.$injector.get('LocalSettingsService');
+                }
+            };
+            FeatureToggleService.prototype.isWindowsApp = function () {
+                return (typeof Windows !== 'undefined');
+            };
+            ;
+            FeatureToggleService.prototype.isDebugMode = function () {
+                if (this.isWindowsApp()) {
+                    var thisPackage = Windows.ApplicationModel.Package.current;
+                    var installedPath = thisPackage.installedLocation.path;
+                    if (typeof installedPath === "string") {
+                        if (installedPath.match(/\\debug\\appx$/i)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            };
+            ;
+            FeatureToggleService.prototype.isNotificationBackgroundTasksEnabled = function () {
+                return this.isWindowsApp();
+            };
+            ;
+            FeatureToggleService.prototype.useFeedbackHubApp = function () {
+                if (this.isWindowsApp()) {
+                    return (Microsoft.Services.Store.Engagement.Feedback.IsSupported);
+                }
+                else {
+                    return false;
+                }
+            };
+            ;
+            FeatureToggleService.prototype.isRunningWindowsMobile = function () {
+                if (this.isWindowsApp()) {
+                    return (Windows.System.Profile.AnalyticsInfo.versionInfo.deviceFamily === "Windows.Mobile");
+                }
+                else {
+                    return false;
+                }
+            };
+            ;
+            FeatureToggleService.prototype.isLaunchHandled = function () {
+                return true;
+            };
+            ;
+            FeatureToggleService.prototype.isUnreadItemsNotificationsEnabled = function () {
+                this.inject();
+                if (this._localSettingsService.containsValue('isUnreadItemsNotificationsEnabled')) {
+                    return this._localSettingsService.getValue('isUnreadItemsNotificationsEnabled');
+                }
+                else {
+                    return true;
+                }
+            };
+            ;
+            FeatureToggleService.prototype.isUnreadMentionsNotificationsEnabled = function () {
+                this.inject();
+                if (this._localSettingsService.containsValue('isUnreadMentionsNotificationsEnabled')) {
+                    return this._localSettingsService.getValue('isUnreadMentionsNotificationsEnabled');
+                }
+                else {
+                    return true;
+                }
+            };
+            ;
+            FeatureToggleService.prototype.isNewMessageNotificationEnabled = function () {
+                this.inject();
+                if (this._localSettingsService.containsValue('isNewMessageNotificationEnabled')) {
+                    return this._localSettingsService.getValue('isNewMessageNotificationEnabled');
+                }
+                else {
+                    return true;
+                }
+            };
+            ;
             return FeatureToggleService;
         }());
         Services.FeatureToggleService = FeatureToggleService;
@@ -701,35 +773,44 @@ var Application;
     (function (Services) {
         var LocalSettingsService = (function () {
             function LocalSettingsService(FeatureToggleService) {
-                var _this = this;
                 this.FeatureToggleService = FeatureToggleService;
-                this.getValue = function (key) {
-                    if (_this.FeatureToggleService.isWindowsApp()) {
-                        return _this.localSettings.values[key];
-                    }
-                    else {
-                    }
-                };
-                this.setValue = function (key, value) {
-                    if (_this.FeatureToggleService.isWindowsApp()) {
-                        _this.localSettings.values[key] = value;
-                    }
-                    else {
-                    }
-                };
-                this.deleteValue = function (key) {
-                    if (_this.FeatureToggleService.isWindowsApp()) {
-                        _this.localSettings.values.remove(key);
-                    }
-                    else {
-                    }
-                };
                 if (this.FeatureToggleService.isWindowsApp()) {
                     this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
                 }
                 else {
                 }
             }
+            LocalSettingsService.prototype.containsValue = function (key) {
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    return this.localSettings.values.hasKey(key);
+                }
+                else {
+                }
+            };
+            LocalSettingsService.prototype.getValue = function (key) {
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    return this.localSettings.values[key];
+                }
+                else {
+                }
+            };
+            ;
+            LocalSettingsService.prototype.setValue = function (key, value) {
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    this.localSettings.values[key] = value;
+                }
+                else {
+                }
+            };
+            ;
+            LocalSettingsService.prototype.deleteValue = function (key) {
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    this.localSettings.values.remove(key);
+                }
+                else {
+                }
+            };
+            ;
             return LocalSettingsService;
         }());
         Services.LocalSettingsService = LocalSettingsService;
@@ -950,7 +1031,7 @@ var Application;
     var Services;
     (function (Services) {
         var RoomsService = (function () {
-            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) {
+            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) {
                 var _this = this;
                 this.OAuthService = OAuthService;
                 this.NetworkService = NetworkService;
@@ -958,6 +1039,7 @@ var Application;
                 this.RealtimeApiService = RealtimeApiService;
                 this.ToastNotificationService = ToastNotificationService;
                 this.LifecycleService = LifecycleService;
+                this.FeatureToggleService = FeatureToggleService;
                 this.initialized = false;
                 this.rooms = [];
                 this.NetworkService.statusChanged(function () {
@@ -995,19 +1077,29 @@ var Application;
                     message.unread = false;
                     return;
                 }
+                this.notifyNewUnreadMessage(room, message);
+                this.notifyNewUnreadMentions(room, message);
+            };
+            RoomsService.prototype.notifyNewUnreadMessage = function (room, message) {
                 if (!room.lurk) {
                     room.unreadItems++;
-                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
+                    if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
+                        this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
+                    }
                 }
+            };
+            RoomsService.prototype.notifyNewUnreadMentions = function (room, message) {
                 for (var i = 0; i < message.mentions.length; i++) {
-                    if (message.mentions[i].userId === this.currentUser.id) {
+                    if (message.mentions[i].userId == this.currentUser.id) {
                         room.mentions++;
-                        var replyOptions = {
-                            args: 'action=reply&roomId=' + room.id,
-                            text: '@' + message.fromUser.username + ' ',
-                            image: 'assets/icons/send.png'
-                        };
-                        this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                        if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
+                            var replyOptions = {
+                                args: 'action=reply&roomId=' + room.id,
+                                text: '@' + message.fromUser.username + ' ',
+                                image: 'assets/icons/send.png'
+                            };
+                            this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                        }
                     }
                 }
             };
@@ -1677,6 +1769,30 @@ var Application;
 (function (Application) {
     var Controllers;
     (function (Controllers) {
+        var SettingsCtrl = (function () {
+            function SettingsCtrl($scope, LocalSettingsService, FeatureToggleService) {
+                $scope.isUnreadItemsNotificationsEnabled = FeatureToggleService.isUnreadItemsNotificationsEnabled();
+                $scope.isUnreadMentionsNotificationsEnabled = FeatureToggleService.isUnreadMentionsNotificationsEnabled();
+                $scope.isNewMessageNotificationEnabled = FeatureToggleService.isNewMessageNotificationEnabled();
+                $scope.saveSetting = function (property) {
+                    if (LocalSettingsService.containsValue(property)) {
+                        var lastValue = LocalSettingsService.getValue(property);
+                        LocalSettingsService.setValue(property, !lastValue);
+                    }
+                    else {
+                        LocalSettingsService.setValue(property, !$scope[property]);
+                    }
+                };
+            }
+            return SettingsCtrl;
+        }());
+        Controllers.SettingsCtrl = SettingsCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
         var SplashscreenCtrl = (function () {
             function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
                 RoomsService.initialize(function () {
@@ -1717,13 +1833,13 @@ appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) 
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
-appModule.service('FeatureToggleService', function () { return new Application.Services.FeatureToggleService(); });
+appModule.service('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
 appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
-appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService); });
+appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.directive('messageList', function (_, $timeout, $location, ApiService, RoomsService) { return new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService); });
@@ -1738,4 +1854,5 @@ appModule.controller('ChatCtrl', function ($scope, ApiService, RoomsService, Loc
 appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
+appModule.controller('SettingsCtrl', function ($scope, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });

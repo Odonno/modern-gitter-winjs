@@ -20,8 +20,8 @@ module Application.Controllers {
         }
 
         private invertCssClass = (oldClass: string, newCLass: string) => {
-            var elements = document.getElementsByClassName(oldClass);
-            for (var i in elements) {
+            let elements = document.getElementsByClassName(oldClass);
+            for (let i in elements) {
                 if (elements.hasOwnProperty(i)) {
                     elements[i].className = newCLass;
                 }

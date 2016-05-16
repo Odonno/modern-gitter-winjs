@@ -14,7 +14,7 @@ module Application.Controllers {
             $scope.$watch(() => {
                 return $state.current.name;
             }, () => {
-                var stateName = $state.current.name;
+                let stateName = $state.current.name;
                 $scope.currentView = stateName.substring(stateName.indexOf('.') + 1);
             });
         }

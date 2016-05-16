@@ -10,8 +10,10 @@ module Application.Configs {
 
     export class NavigationConfig {
         constructor($rootScope: IAppRootScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, FeatureToggleService: Services.FeatureToggleService) {
+            let systemNavigationManager;
+            
             if (FeatureToggleService.isWindowsApp()) {
-                var systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
             }
 
             $rootScope.states = [];
@@ -28,7 +30,7 @@ module Application.Configs {
                 }
 
                 // navigate to error page when there is no selected room
-                if (to.name === 'room' && !RoomsService.currentRoom) {
+                if (to.name === 'chat' && !RoomsService.currentRoom) {
                     $state.go('error');
                 }
                 if (to.name === 'error') {
@@ -58,7 +60,7 @@ module Application.Configs {
                         $rootScope.isBack = true;
 
                         // retrieve and remove last state from history
-                        var previous = $rootScope.states.pop();
+                        let previous = $rootScope.states.pop();
 
                         // remove error page from navigation stack if there is a current room now
                         while (previous.state === 'error' && RoomsService.currentRoom) {

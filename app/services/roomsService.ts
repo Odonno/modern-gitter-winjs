@@ -10,7 +10,7 @@ module Application.Services {
         public onroomselected: { (): void; };
         public onmessagereceived: { (roomId: string, message: Models.Message): void; };
 
-        constructor(private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService) {
+        constructor(private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService, private FeatureToggleService: FeatureToggleService) {
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
                 if (!this.initialized && this.NetworkService.internetAvailable) {
@@ -21,7 +21,7 @@ module Application.Services {
             // detect when we received a toast action
             this.LifecycleService.ontoast = (action, data) => {
                 if (action === 'viewRoom') {
-                    var roomToView = this.getRoomById(data.roomId);
+                    let roomToView = this.getRoomById(data.roomId);
                     this.selectRoom(roomToView);
                 }
             };
@@ -35,7 +35,7 @@ module Application.Services {
             } else {
                 room.image = 'https://avatars.githubusercontent.com/' + room.name.split('/')[0];
             }
-                
+
             // subscribe to realtime messages
             this.RealtimeApiService.subscribe(room.id, (operation: Application.Models.MessageOperation, content: any) => {
                 if (operation === Application.Models.MessageOperation.Created) {
@@ -50,36 +50,48 @@ module Application.Services {
             if (this.onmessagereceived) {
                 this.onmessagereceived(room.id, message);
             }
-            
+
             // no notification if it's our own message
             if (message.fromUser.id === this.currentUser.id) {
                 message.unread = false;
                 return;
             }
-            
-            // push unread message
+
+            this.notifyNewUnreadMessage(room, message);
+
+            this.notifyNewUnreadMentions(room, message);
+        }
+
+        private notifyNewUnreadMessage(room: Models.Room, message: Models.Message) {
+            // push unread message if notifications are globally enabled for this room
             if (!room.lurk) {
                 // increment unread count
                 room.unreadItems++;
-                
-                // send notification
-                this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
+
+                // send notification if settings enabled
+                if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
+                }
             }
-            
+        }
+
+        private notifyNewUnreadMentions(room: Models.Room, message: Models.Message) {
             // for each mention contained in the message
-            for (var i = 0; i < message.mentions.length; i++) {
+            for (let i = 0; i < message.mentions.length; i++) {
                 // push mention (count + notification)
-                if (message.mentions[i].userId === this.currentUser.id) {
+                if (message.mentions[i].userId == this.currentUser.id) {
                     // increment mentions count
                     room.mentions++;
-                
-                    // send notification
-                    var replyOptions = {
-                        args: 'action=reply&roomId=' + room.id,
-                        text: '@' + message.fromUser.username + ' ',
-                        image: 'assets/icons/send.png'
-                    };
-                    this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+
+                    // send notification if settings enabled
+                    if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
+                        let replyOptions = {
+                            args: 'action=reply&roomId=' + room.id,
+                            text: '@' + message.fromUser.username + ' ',
+                            image: 'assets/icons/send.png'
+                        };
+                        this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                    }
                 }
             }
         }
@@ -109,10 +121,10 @@ module Application.Services {
 
                         this.ApiService.getRooms().then(rooms => {
                             // import all rooms from API
-                            for (var i = 0; i < rooms.length; i++) {
+                            for (let i = 0; i < rooms.length; i++) {
                                 this.addRoom(rooms[i]);
                             }
-                            
+
                             // service is now initialized
                             this.initialized = true;
                             if (callback) {
@@ -125,7 +137,7 @@ module Application.Services {
         }
 
         public getRoomById(id: string): Models.Room {
-            for (var i = 0; i < this.rooms.length; i++) {
+            for (let i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].id === id) {
                     return this.rooms[i];
                 }
@@ -133,7 +145,7 @@ module Application.Services {
         }
 
         public getRoom(name: string): Models.Room {
-            for (var i = 0; i < this.rooms.length; i++) {
+            for (let i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i].name === name) {
                     return this.rooms[i];
                 }

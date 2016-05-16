@@ -16,8 +16,8 @@
     }
     backgroundTaskInstance.addEventListener("canceled", onCanceled);
 
-    // do the work of your background task
-    function doWork() {
+    // execute background task
+    function execute() {
         var key = null;
         var settings = Windows.Storage.ApplicationData.current.localSettings;
 
@@ -65,11 +65,11 @@
 
     // methods
     function retrieveTokenFromVault() {
-        let passwordVault = new Windows.Security.Credentials.PasswordVault();
-        let storedToken;
+        var passwordVault = new Windows.Security.Credentials.PasswordVault();
+        var storedToken;
 
         try {
-            let credential = passwordVault.retrieve("OauthToken", "CurrentUser");
+            var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
             storedToken = credential.password;
         } catch (e) {
             // no stored credentials
@@ -89,14 +89,14 @@
     }
 
     // execute or not the background task
-    if (!cancel) {
-        doWork();
-    } else {
+    if (cancel) {
         // record information in LocalSettings to communicate with the app
         key = backgroundTaskInstance.task.taskId.toString();
         settings.values[key] = "Canceled";
 
         // background task must call close when it is done.
         close();
+    } else {
+        execute();
     }
 })();

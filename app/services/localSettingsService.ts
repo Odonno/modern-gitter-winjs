@@ -3,18 +3,26 @@
 module Application.Services {
     export class LocalSettingsService {
         // properties
-        private localSettings;
+        private localSettings: Windows.Storage.ApplicationDataContainer;
 
         constructor(private FeatureToggleService: FeatureToggleService) {
             if (this.FeatureToggleService.isWindowsApp()) {
-                this.localSettings = Windows.Storage.ApplicationData.current.localSettings
+                this.localSettings = Windows.Storage.ApplicationData.current.localSettings;
             } else {
                 // TODO : use HTML5 local storage
             }
         }
-        
+
         // methods
-        public getValue = (key: string) => {
+        public containsValue(key: string): boolean {
+             if (this.FeatureToggleService.isWindowsApp()) {
+                return this.localSettings.values.hasKey(key);
+            } else {
+                // TODO
+            }
+        }
+        
+        public getValue(key: string): any {
             if (this.FeatureToggleService.isWindowsApp()) {
                 return this.localSettings.values[key];
             } else {
@@ -22,7 +30,7 @@ module Application.Services {
             }
         };
 
-        public setValue = (key: string, value: any) => {
+        public setValue(key: string, value: any): void {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.localSettings.values[key] = value;
             } else {
@@ -30,7 +38,7 @@ module Application.Services {
             }
         };
 
-        public deleteValue = (key: string) => {
+        public deleteValue(key: string): void {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.localSettings.values.remove(key);
             } else {

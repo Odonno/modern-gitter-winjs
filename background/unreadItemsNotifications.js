@@ -16,8 +16,8 @@
     }
     backgroundTaskInstance.addEventListener("canceled", onCanceled);
 
-    // do the work of your background task
-    function doWork() {
+    // execute background task
+    function execute() {
         var key = null;
         var settings = Windows.Storage.ApplicationData.current.localSettings;
 
@@ -69,12 +69,21 @@
     }
 
     // methods
+    function isEnabled() {
+        var localSettings = Windows.Storage.ApplicationData.current.localSettings;
+        if (localSettings.values.hasKey('isUnreadItemsNotificationsEnabled')) {
+            return localSettings.values['isUnreadItemsNotificationsEnabled'];
+        } else {
+            return true;
+        }
+    }
+
     function retrieveTokenFromVault() {
-        let passwordVault = new Windows.Security.Credentials.PasswordVault();
-        let storedToken;
+        var passwordVault = new Windows.Security.Credentials.PasswordVault();
+        var storedToken;
 
         try {
-            let credential = passwordVault.retrieve("OauthToken", "CurrentUser");
+            var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
             storedToken = credential.password;
         } catch (e) {
             // no stored credentials
@@ -113,14 +122,14 @@
     function sendImageTitleAndTextNotification(image, title, text, args) {
         // create toast content
         var toast = '<toast launch="' + args + '">'
-                    + '<visual>'
-                    + '<binding template="ToastGeneric">'
-                    + '<image placement="appLogoOverride" src="' + image + '" />'
-                    + '<text>' + title + '</text>'
-                    + '<text>' + text + '</text>'
-                    + '</binding>'
-                    + '</visual>'
-                    + '</toast>';
+            + '<visual>'
+            + '<binding template="ToastGeneric">'
+            + '<image placement="appLogoOverride" src="' + image + '" />'
+            + '<text>' + title + '</text>'
+            + '<text>' + text + '</text>'
+            + '</binding>'
+            + '</visual>'
+            + '</toast>';
         toast = toast.replace(/&/g, '&amp;');
 
         // generate XML from toast content
@@ -134,14 +143,21 @@
     }
 
     // execute or not the background task
-    if (!cancel) {
-        doWork();
-    } else {
+    if (cancel) {
         // record information in LocalSettings to communicate with the app
         key = backgroundTaskInstance.task.taskId.toString();
         settings.values[key] = "Canceled";
 
         // background task must call close when it is done.
         close();
+    } else if (!isEnabled()) {
+        // record information in LocalSettings to communicate with the app
+        key = backgroundTaskInstance.task.taskId.toString();
+        settings.values[key] = "Disabled";
+
+        // background task must call close when it is done.
+        close();
+    } else {
+        execute();
     }
 })();

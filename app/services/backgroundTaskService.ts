@@ -30,7 +30,7 @@ module Application.Services {
                     }
                 ];
             }
-            this.currentVersion = 'v0.6';
+            this.currentVersion = 'v0.7';
         }
         
         // private methods
@@ -49,7 +49,7 @@ module Application.Services {
                 }
                 
                 // create new background task
-                var builder = new Windows.ApplicationModel.Background.BackgroundTaskBuilder();
+                let builder = new Windows.ApplicationModel.Background.BackgroundTaskBuilder();
 
                 builder.name = taskName;
                 builder.taskEntryPoint = taskEntryPoint;
@@ -65,16 +65,16 @@ module Application.Services {
                 }
 
                 // register the new background task
-                var task = builder.register();
+                let task = builder.register();
             });
         }
 
         private unregister(taskName: string) {
             // loop through all background tasks and search for the one to unregister
-            var iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
-            var hasCurrent = iteration.hasCurrent;
+            let iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
+            let hasCurrent = iteration.hasCurrent;
             while (hasCurrent) {
-                var current = iteration.current.value;
+                let current = iteration.current.value;
                 if (current.name === taskName) {
                     current.unregister(true);
                 }
@@ -84,23 +84,23 @@ module Application.Services {
         
         // public methods
         public registerAll() {
-            for (var i = 0; i < this.tasks.length; i++) {
+            for (let i = 0; i < this.tasks.length; i++) {
                 this.register(this.tasks[i].entryPoint, this.tasks[i].name, this.tasks[i].trigger, this.tasks[i].condition);
             }
         }
 
         public unregisterAll() {
-            for (var i = 0; i < this.tasks.length; i++) {
+            for (let i = 0; i < this.tasks.length; i++) {
                 this.unregister(this.tasks[i].name);
             }
         }
 
         public isRegistered(taskName: string) {
-            var taskRegistered = false;
-            var iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
+            let taskRegistered = false;
+            let iteration = Windows.ApplicationModel.Background.BackgroundTaskRegistration.allTasks.first();
 
             while (iteration.hasCurrent) {
-                var task = iteration.current.value;
+                let task = iteration.current.value;
 
                 if (task.name === taskName) {
                     taskRegistered = true;

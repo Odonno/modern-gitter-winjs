@@ -18,7 +18,7 @@ module Application.Controllers {
             
             // methods
             $scope.createRoom = () => {
-                var selectedRoom = $scope.existingRooms[$scope.selection[0]];
+                let selectedRoom = $scope.existingRooms[$scope.selection[0]];
                 RoomsService.createRoom(selectedRoom.uri, (room) => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
@@ -32,7 +32,7 @@ module Application.Controllers {
                     ApiService.searchRooms($scope.roomname, 50).then((rooms) => {
                         $scope.existingRooms = rooms;
 
-                        for (var i = 0; i < $scope.existingRooms.length; i++) {
+                        for (let i = 0; i < $scope.existingRooms.length; i++) {
                             // compute room image
                             if ($scope.existingRooms[i].user) {
                                 $scope.existingRooms[i].image = $scope.existingRooms[i].user.avatarUrlMedium;

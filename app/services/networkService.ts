@@ -10,8 +10,8 @@ module Application.Services {
 
         private currentStatus() {
             if (this.FeatureToggleService.isWindowsApp()) {
-                var internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
-                var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                let internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
+                let networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
                 this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
                 return this.internetAvailable;
             } else {

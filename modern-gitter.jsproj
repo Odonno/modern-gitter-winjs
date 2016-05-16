@@ -139,6 +139,7 @@
     <Content Include="partials\oneToOne.html" />
     <Content Include="partials\repository.html" />
     <Content Include="partials\rooms.html" />
+    <Content Include="partials\settings.html" />
     <Content Include="partials\splashscreen.html" />
     <None Include="modern-gitter_StoreKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />

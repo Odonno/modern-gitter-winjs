@@ -7,7 +7,7 @@
 
 <!-- list of rooms -->
 <div id="roomsContent" class="win-scrollview">
-    <div class="content" ng-repeat="room in filteredRooms">
+    <div class="content" ng-repeat="room in filteredRooms track by room.id">
         <div ng-click="selectRoom(room)" class="clickable" style="padding-bottom: 6px;">
             <img class="room-tile-icon" ng-src="{{ room.image }}" />
             <div class="room-tile-text">{{ room.name }}</div>

@@ -172,6 +172,20 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	margin-bottom: 12px;
 }
 
+/* settings view style */
+#settings-scroll {
+	height: 100vh;
+	overflow-y: auto;
+}
+
+.toggle-switch-group {
+    margin-top: 24px;
+}
+
+.toggle-switch-settings {
+    margin-top: 0;
+}
+
 /* add a room view style */
 #addRoomHeader {
 	height: 60px;
