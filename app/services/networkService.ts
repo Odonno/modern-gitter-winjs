@@ -11,12 +11,18 @@ module Application.Services {
         private currentStatus() {
             if (this.FeatureToggleService.isWindowsApp()) {
                 let internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
-                let networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-                this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-                return this.internetAvailable;
+
+                if (!internetConnectionProfile) {
+                    this.internetAvailable = false;
+                } else {
+                    let networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                    this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                }
             } else {
-                return true;
+                this.internetAvailable = true;
             }
+
+            return this.internetAvailable;
         }
 
         public statusChanged(callback) {

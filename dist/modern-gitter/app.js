@@ -828,13 +828,18 @@ var Application;
             NetworkService.prototype.currentStatus = function () {
                 if (this.FeatureToggleService.isWindowsApp()) {
                     var internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
-                    var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
-                    this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
-                    return this.internetAvailable;
+                    if (!internetConnectionProfile) {
+                        this.internetAvailable = false;
+                    }
+                    else {
+                        var networkConnectivityLevel = internetConnectionProfile.getNetworkConnectivityLevel();
+                        this.internetAvailable = (networkConnectivityLevel === Windows.Networking.Connectivity.NetworkConnectivityLevel.internetAccess);
+                    }
                 }
                 else {
-                    return true;
+                    this.internetAvailable = true;
                 }
+                return this.internetAvailable;
             };
             NetworkService.prototype.statusChanged = function (callback) {
                 var _this = this;
