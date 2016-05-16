@@ -15,6 +15,16 @@ module Application.Directives {
                 this.RoomsService.onmessagereceived = (roomId, message) => {
                     if (scope.room && scope.room.id === roomId) {
                         scope.messages.push(message);
+                        
+                        if (scope.autoScrollDown) {
+                            let refreshCount = 5;
+                            let timer = setInterval(() => {
+                                scrollToBottom();
+                                if (--refreshCount <= 0) {
+                                    clearInterval(timer);
+                                }
+                            }, 200);
+                        }
                     }
                 };
 

@@ -1367,6 +1367,15 @@ var Application;
                         _this.RoomsService.onmessagereceived = function (roomId, message) {
                             if (scope.room && scope.room.id === roomId) {
                                 scope.messages.push(message);
+                                if (scope.autoScrollDown) {
+                                    var refreshCount_1 = 5;
+                                    var timer_1 = setInterval(function () {
+                                        scrollToBottom();
+                                        if (--refreshCount_1 <= 0) {
+                                            clearInterval(timer_1);
+                                        }
+                                    }, 200);
+                                }
                             }
                         };
                         _this.ApiService.getMessages(scope.room.id).then(function (messages) {
