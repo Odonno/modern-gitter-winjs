@@ -1433,6 +1433,10 @@ var Application;
                         if (!scope.canLoadMoreMessages)
                             return;
                         var olderMessage = scope.messages[0];
+                        if (!olderMessage) {
+                            scope.canLoadMoreMessages = false;
+                            return;
+                        }
                         _this.ApiService.getMessages(scope.room.id, olderMessage.id).then(function (beforeMessages) {
                             if (!beforeMessages || beforeMessages.length <= 0) {
                                 scope.canLoadMoreMessages = false;

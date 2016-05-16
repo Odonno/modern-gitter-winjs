@@ -15,7 +15,7 @@ module Application.Directives {
                 this.RoomsService.onmessagereceived = (roomId, message) => {
                     if (scope.room && scope.room.id === roomId) {
                         scope.messages.push(message);
-                        
+
                         if (scope.autoScrollDown) {
                             let refreshCount = 5;
                             let timer = setInterval(() => {
@@ -53,6 +53,13 @@ module Application.Directives {
 
                 // load more messages
                 let olderMessage = scope.messages[0];
+
+                // room does not contain any message
+                if (!olderMessage) {
+                    scope.canLoadMoreMessages = false;
+                    return;
+                }
+
                 this.ApiService.getMessages(scope.room.id, olderMessage.id).then(beforeMessages => {
                     // no more message to load
                     if (!beforeMessages || beforeMessages.length <= 0) {
