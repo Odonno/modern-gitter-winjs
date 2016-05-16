@@ -10,11 +10,14 @@
     <div class="content" ng-repeat="room in filteredRooms track by room.id">
         <div ng-click="selectRoom(room)" class="clickable" style="padding-bottom: 6px;">
             <img class="room-tile-icon" ng-src="{{ room.image }}" />
-            <div class="room-tile-text">{{ room.name }}</div>
+            <div class="room-tile-text">
+                <span class="glyph glyph-star" aria-hidden="true" ng-show="room.favourite" style="margin-top: -6px;"></span>
+                <span>{{ room.name }}</span>
+            </div>
             <div class="room-tile-badge text-center">
                 <span class="label label-danger" style="background-color: #D02E00; margin-left: 6px;" ng-if="room.mentions > 0">
                     <span>{{ room.mentions >= 100 ? '99+' : room.mentions }}</span>
-                    <span class="hidden-xs">mention<span ng-if="room.mentions > 1">s</span></span>
+                <span class="hidden-xs">mention<span ng-if="room.mentions > 1">s</span></span>
                 </span>
                 <span class="label label-info" style="background-color: #0078D7; margin-left: 6px;" ng-if="room.unreadItems > 0">
                     <span>{{ room.unreadItems >= 100 ? '99+' : room.unreadItems }}<span>

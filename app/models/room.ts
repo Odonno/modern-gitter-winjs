@@ -28,13 +28,6 @@ module Application.Models {
         public githubType: string;
         public tags: string[];
 
-        /**
-         * Check the room is one of favourite of the current user
-         */
-        get isFavourite(): boolean {
-            return this.favourite == 1;
-        }
-
         private _image: string;
         /**
          * Image created based on room/user info

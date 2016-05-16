@@ -78,13 +78,6 @@ var Application;
         var Room = (function () {
             function Room() {
             }
-            Object.defineProperty(Room.prototype, "isFavourite", {
-                get: function () {
-                    return this.favourite == 1;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(Room.prototype, "image", {
                 get: function () {
                     return this._image;
