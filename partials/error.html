@@ -1,6 +1,6 @@
 ﻿<div id="error-container">
-    <div id="error-subcontainer">
-        <!-- error description -->
+    <div class="error-subcontainer" ng-show="errorType === 'noRoomSelected'">
+        <!-- error title -->
         <h2 class="win-h2">You haven't selected a room.</h2>
 
         <!-- potential actions -->
@@ -8,5 +8,13 @@
             <button class="btn btn-primary" ui-sref="addRoom.existing">Join a room</button>
             <button class="btn btn-primary" ui-sref="rooms">Choose a room you're already in</button>
         </div>
+    </div>
+    
+    <div class="error-subcontainer" ng-show="errorType === 'network'">
+        <!-- error title -->
+        <h2 class="win-h2">:(</h2>
+        
+        <!-- error description -->
+        <p>An error occured. Please verify your internet connection.</p>
     </div>
 </div>

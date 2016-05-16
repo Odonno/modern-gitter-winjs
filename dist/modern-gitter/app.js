@@ -129,60 +129,52 @@ var Application;
     var Configs;
     (function (Configs) {
         var NavigationConfig = (function () {
-            function NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService) {
-                var systemNavigationManager;
-                if (FeatureToggleService.isWindowsApp()) {
-                    systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
-                }
+            function NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) {
+                var _this = this;
                 $rootScope.states = [];
-                $rootScope.previousState;
-                $rootScope.currentState;
                 $rootScope.isBack = false;
+                if (FeatureToggleService.isWindowsApp()) {
+                    this._systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                }
+                NetworkService.statusChanged(function (networkStatus) {
+                    $rootScope.onnetworkstatuschanged(networkStatus);
+                });
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
                     $rootScope.currentState = to.name;
+                    $rootScope.currentParams = toParams;
+                    $rootScope.onnetworkstatuschanged(NetworkService.internetAvailable);
                     if (!from.name || from.name === 'splashscreen') {
-                        return;
-                    }
-                    if (to.name === 'chat' && !RoomsService.currentRoom) {
-                        $state.go('error');
-                    }
-                    if (to.name === 'error') {
                         return;
                     }
                     if ($rootScope.isBack) {
                         $rootScope.isBack = false;
+                        return;
                     }
-                    else {
-                        $rootScope.previousState = from.name;
-                        if (FeatureToggleService.isWindowsApp()) {
-                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
-                        }
-                        $rootScope.states.push({
-                            state: $rootScope.previousState,
-                            params: fromParams
-                        });
-                    }
+                    NavigationService.onnavigate(from, fromParams, NetworkService.internetAvailable);
                 });
                 if (FeatureToggleService.isWindowsApp()) {
-                    systemNavigationManager.onbackrequested = function (args) {
+                    this._systemNavigationManager.onbackrequested = function (args) {
                         if ($rootScope.states.length > 0) {
-                            $rootScope.isBack = true;
-                            var previous = $rootScope.states.pop();
-                            while (previous.state === 'error' && RoomsService.currentRoom) {
-                                previous = $rootScope.states.pop();
-                            }
-                            $rootScope.previousState = previous.state;
-                            $state.go(previous.state, previous.params);
-                            if ($rootScope.states.length === 0) {
-                                systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                            }
+                            NavigationService.goBack();
                             args.handled = true;
                         }
                         else {
-                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                            _this._systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
                         }
                     };
                 }
+                $rootScope.onnetworkstatuschanged = function (networkStatus) {
+                    if (networkStatus) {
+                        if ($rootScope.currentState === 'error' && $rootScope.currentParams.errorType === 'network') {
+                            NavigationService.goBack();
+                        }
+                    }
+                    else {
+                        if ($rootScope.currentState !== 'error') {
+                            $state.go('error', { errorType: 'network' });
+                        }
+                    }
+                };
             }
             return NavigationConfig;
         }());
@@ -200,7 +192,10 @@ var Application;
                     .state('error', {
                     url: '/error',
                     templateUrl: 'partials/error.html',
-                    controller: 'ErrorCtrl'
+                    controller: 'ErrorCtrl',
+                    params: {
+                        errorType: null
+                    }
                 })
                     .state('splashscreen', {
                     url: '/splashscreen',
@@ -814,6 +809,57 @@ var Application;
             return LocalSettingsService;
         }());
         Services.LocalSettingsService = LocalSettingsService;
+    })(Services = Application.Services || (Application.Services = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Services;
+    (function (Services) {
+        var NavigationService = (function () {
+            function NavigationService($rootScope, $state, RoomsService, FeatureToggleService) {
+                this.$rootScope = $rootScope;
+                this.$state = $state;
+                this.RoomsService = RoomsService;
+                this.FeatureToggleService = FeatureToggleService;
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    this._systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+                }
+            }
+            NavigationService.prototype.onnavigate = function (fromState, fromParams, canGoBack) {
+                if (canGoBack === void 0) { canGoBack = true; }
+                this.$rootScope.previousState = fromState.name;
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    if (canGoBack) {
+                        this._systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
+                    }
+                    else {
+                        this._systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                    }
+                }
+                this.$rootScope.states.push({
+                    state: this.$rootScope.previousState,
+                    params: fromParams
+                });
+            };
+            NavigationService.prototype.goBack = function () {
+                if (this.$rootScope.states.length === 0) {
+                    return;
+                }
+                this.$rootScope.isBack = true;
+                var previous = this.$rootScope.states.pop();
+                while (previous.state === 'chat' && !this.RoomsService.currentRoom) {
+                    previous = this.$rootScope.states.pop();
+                }
+                this.$state.go(previous.state, previous.params);
+                if (this.FeatureToggleService.isWindowsApp()) {
+                    if (this.$rootScope.states.length === 0) {
+                        this._systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                    }
+                }
+            };
+            return NavigationService;
+        }());
+        Services.NavigationService = NavigationService;
     })(Services = Application.Services || (Application.Services = {}));
 })(Application || (Application = {}));
 var Application;
@@ -1684,7 +1730,12 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var ChatCtrl = (function () {
-            function ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService) {
+            function ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) {
+                if (!RoomsService.currentRoom) {
+                    console.error('no room selected...');
+                    $state.go('error', { errorType: 'noRoomSelected' });
+                    return;
+                }
                 $scope.room = RoomsService.currentRoom;
                 $scope.messages = [];
                 $scope.textMessage = '';
@@ -1706,10 +1757,6 @@ var Application;
                         console.error('textMessage is empty');
                     }
                 };
-                if (!$scope.room) {
-                    console.error('no room selected...');
-                    return;
-                }
                 LocalSettingsService.setValue('lastPage', 'chat');
                 LocalSettingsService.setValue('lastRoom', $scope.room.name);
             }
@@ -1723,7 +1770,8 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var ErrorCtrl = (function () {
-            function ErrorCtrl($scope) {
+            function ErrorCtrl($scope, $state) {
+                $scope.errorType = $state.params['errorType'];
             }
             return ErrorCtrl;
         }());
@@ -1843,13 +1891,14 @@ var Application;
 var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
 appModule.constant('_', window._);
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.run(function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, FeatureToggleService); });
+appModule.run(function ($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
 appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
+appModule.service('NavigationService', function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
@@ -1864,8 +1913,8 @@ appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService); });
-appModule.controller('ChatCtrl', function ($scope, ApiService, RoomsService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, ApiService, RoomsService, LocalSettingsService); });
-appModule.controller('ErrorCtrl', function ($scope) { return new Application.Controllers.ErrorCtrl($scope); });
+appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService); });
+appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SettingsCtrl', function ($scope, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService); });

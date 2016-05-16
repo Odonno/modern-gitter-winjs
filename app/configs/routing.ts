@@ -9,7 +9,10 @@ module Application.Configs {
                 .state('error', {
                     url: '/error',
                     templateUrl: 'partials/error.html',
-                    controller: 'ErrorCtrl'
+                    controller: 'ErrorCtrl',
+                    params: {
+                        errorType: null
+                    }
                 })
                 .state('splashscreen', {
                     url: '/splashscreen',

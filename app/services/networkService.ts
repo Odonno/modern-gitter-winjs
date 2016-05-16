@@ -8,7 +8,7 @@ module Application.Services {
             this.currentStatus();
         }
 
-        private currentStatus() {
+        private currentStatus(): boolean {
             if (this.FeatureToggleService.isWindowsApp()) {
                 let internetConnectionProfile = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile();
 
@@ -25,7 +25,7 @@ module Application.Services {
             return this.internetAvailable;
         }
 
-        public statusChanged(callback) {
+        public statusChanged(callback: { (status: boolean): void }) {
             if (this.FeatureToggleService.isWindowsApp()) {
                 Windows.Networking.Connectivity.NetworkInformation.onnetworkstatuschanged = (ev) => {
                     callback(this.currentStatus());

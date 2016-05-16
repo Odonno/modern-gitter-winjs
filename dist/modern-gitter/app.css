@@ -127,7 +127,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
     height: 100vh;
 }
 
-#error-subcontainer {
+.error-subcontainer {
     position: absolute;
     top: 50%;
     left: 50%;

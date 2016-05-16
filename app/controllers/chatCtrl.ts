@@ -8,19 +8,26 @@ module Application.Controllers {
         sendingMessage: boolean;
         autoScrollDown: boolean;
         canLoadMoreMessages: boolean;
-        
+
         sendMessage(): void;
     }
 
     export class ChatCtrl {
-        constructor($scope: IChatScope, ApiService: Services.ApiService, RoomsService: Services.RoomsService, LocalSettingsService: Services.LocalSettingsService) {
+        constructor($scope: IChatScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, NavigationService: Services.NavigationService, LocalSettingsService: Services.LocalSettingsService) {
+            // navigate to error page when there is no selected room
+            if (!RoomsService.currentRoom) {
+                console.error('no room selected...');
+                $state.go('error', { errorType: 'noRoomSelected' });
+                return;
+            }
+
             // properties
             $scope.room = RoomsService.currentRoom;
             $scope.messages = [];
             $scope.textMessage = '';
             $scope.sendingMessage = false;
             $scope.canLoadMoreMessages = false;
-            
+
             // methods
             $scope.sendMessage = () => {
                 // do not send the same message multiple times
@@ -39,12 +46,6 @@ module Application.Controllers {
                     console.error('textMessage is empty');
                 }
             };
-            
-            // initialize controller
-            if (!$scope.room) {
-                console.error('no room selected...');
-                return;
-            }
 
             // update local storage
             LocalSettingsService.setValue('lastPage', 'chat');

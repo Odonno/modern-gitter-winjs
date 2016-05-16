@@ -5,83 +5,75 @@ module Application.Configs {
         states: { state: ng.ui.IState, params: any }[];
         previousState: ng.ui.IState;
         currentState: ng.ui.IState;
+        currentParams: any;
         isBack: boolean;
+
+        onnetworkstatuschanged(networkStatus: boolean): void;
     }
 
     export class NavigationConfig {
-        constructor($rootScope: IAppRootScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, FeatureToggleService: Services.FeatureToggleService) {
-            let systemNavigationManager;
-            
-            if (FeatureToggleService.isWindowsApp()) {
-                systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
-            }
+        private _systemNavigationManager: any;
 
+        constructor($rootScope: IAppRootScope, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, NetworkService: Services.NetworkService, NavigationService: Services.NavigationService, FeatureToggleService: Services.FeatureToggleService) {
+            // properties
             $rootScope.states = [];
-            $rootScope.previousState;
-            $rootScope.currentState;
             $rootScope.isBack = false;
 
-            $rootScope.$on('$stateChangeSuccess', (event, to: ng.ui.IState, toParams, from: ng.ui.IState, fromParams) => {
+            if (FeatureToggleService.isWindowsApp()) {
+                this._systemNavigationManager = Windows.UI.Core.SystemNavigationManager.getForCurrentView();
+            }
+
+            // handle network change
+            NetworkService.statusChanged(networkStatus => {
+                $rootScope.onnetworkstatuschanged(networkStatus);
+            });
+
+            // add an event when we navigate to another view
+            $rootScope.$on('$stateChangeSuccess', (event: ng.IAngularEvent, to: ng.ui.IState, toParams, from: ng.ui.IState, fromParams) => {
                 $rootScope.currentState = to.name;
+                $rootScope.currentParams = toParams;
+
+                $rootScope.onnetworkstatuschanged(NetworkService.internetAvailable);
 
                 // remove navigation stack if we are before the home page (start app / splashscreen)
                 if (!from.name || from.name === 'splashscreen') {
                     return;
                 }
 
-                // navigate to error page when there is no selected room
-                if (to.name === 'chat' && !RoomsService.currentRoom) {
-                    $state.go('error');
-                }
-                if (to.name === 'error') {
-                    return;
-                }
-
                 if ($rootScope.isBack) {
                     $rootScope.isBack = false;
-                } else {
-                    $rootScope.previousState = from.name;
-                    if (FeatureToggleService.isWindowsApp()) {
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.visible;
-                    }
-
-                    // add current state to history
-                    $rootScope.states.push({
-                        state: $rootScope.previousState,
-                        params: fromParams
-                    });
+                    return;
                 }
+                
+                NavigationService.onnavigate(from, fromParams, NetworkService.internetAvailable);
             });
 
+            // add an event when we go back to a previous view
             if (FeatureToggleService.isWindowsApp()) {
-                systemNavigationManager.onbackrequested = (args) => {
+                this._systemNavigationManager.onbackrequested = (args) => {
                     if ($rootScope.states.length > 0) {
-                        // is back active
-                        $rootScope.isBack = true;
-
-                        // retrieve and remove last state from history
-                        let previous = $rootScope.states.pop();
-
-                        // remove error page from navigation stack if there is a current room now
-                        while (previous.state === 'error' && RoomsService.currentRoom) {
-                            previous = $rootScope.states.pop();
-                        }
-
-                        $rootScope.previousState = previous.state;
-
-                        // go back to previous page
-                        $state.go(previous.state, previous.params);
-
-                        if ($rootScope.states.length === 0) {
-                            systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
-                        }
-
-                        args.handled = true;
+                        NavigationService.goBack();
+                        args.handled = true; // do not exit application
                     } else {
-                        systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
+                        this._systemNavigationManager.appViewBackButtonVisibility = Windows.UI.Core.AppViewBackButtonVisibility.collapsed;
                     }
                 };
             }
+
+            // initialize controller
+            $rootScope.onnetworkstatuschanged = (networkStatus: boolean) => {
+                if (networkStatus) {
+                    // switch back to a previous view if we are seeing an error view
+                    if ($rootScope.currentState === 'error' && $rootScope.currentParams.errorType === 'network') {
+                        NavigationService.goBack();
+                    }
+                } else {
+                    // navigate to an error view if we are seeing a non-error view
+                    if ($rootScope.currentState !== 'error') {
+                        $state.go('error', { errorType: 'network' });
+                    }
+                }
+            };
         }
     }
 }
