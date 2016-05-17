@@ -1402,6 +1402,8 @@ var Application;
                 this.link = function (scope, element, attrs) {
                     var angularElement = angular.element(element);
                     scope.autoScrollDown = true;
+                    scope.canLoadMoreMessages = false;
+                    scope.fetchingPreviousMessages = false;
                     var initialize = function () {
                         _this.RoomsService.onmessagereceived = function (roomId, message) {
                             if (scope.room && scope.room.id === roomId) {
@@ -1427,7 +1429,7 @@ var Application;
                             scrollToBottom();
                             scope.canLoadMoreMessages = true;
                         }, 1000);
-                        angularElement.bind("scroll", _this._.debounce(watchScroll, 100));
+                        angularElement.bind("scroll", _this._.throttle(watchScroll, 200));
                     };
                     var fetchPreviousMessages = function () {
                         if (!scope.canLoadMoreMessages)
@@ -1437,6 +1439,9 @@ var Application;
                             scope.canLoadMoreMessages = false;
                             return;
                         }
+                        if (scope.fetchingPreviousMessages)
+                            return;
+                        scope.fetchingPreviousMessages = true;
                         _this.ApiService.getMessages(scope.room.id, olderMessage.id).then(function (beforeMessages) {
                             if (!beforeMessages || beforeMessages.length <= 0) {
                                 scope.canLoadMoreMessages = false;
@@ -1446,6 +1451,7 @@ var Application;
                                 scope.messages.unshift(beforeMessages[i]);
                             }
                             _this.$location.hash('message-' + olderMessage.id);
+                            scope.fetchingPreviousMessages = false;
                         });
                     };
                     var detectUnreadMessages = function () {
@@ -1737,7 +1743,6 @@ var Application;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
-                $scope.canLoadMoreMessages = false;
                 $scope.sendMessage = function () {
                     if ($scope.sendingMessage) {
                         return;

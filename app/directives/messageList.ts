@@ -6,8 +6,11 @@ module Application.Directives {
         replace = true;
         templateUrl = 'partials/message-list.html';
         link = (scope: Controllers.IChatScope, element: JQuery, attrs: ng.IAttributes) => {
+            // initialize variables
             let angularElement = angular.element(element);
             scope.autoScrollDown = true;
+            scope.canLoadMoreMessages = false;
+            scope.fetchingPreviousMessages = false;
 
             // initialize directive element
             let initialize = () => {
@@ -43,7 +46,7 @@ module Application.Directives {
                 }, 1000);
 
                 // add event when user scroll on the list
-                angularElement.bind("scroll", this._.debounce(watchScroll, 100));
+                angularElement.bind("scroll", this._.throttle(watchScroll, 200));
             };
 
             // fetch previous messages
@@ -60,6 +63,13 @@ module Application.Directives {
                     return;
                 }
 
+                // cannot fetch message if we're already doing it
+                if (scope.fetchingPreviousMessages)
+                    return;
+
+                // start fetching messages
+                scope.fetchingPreviousMessages = true;
+
                 this.ApiService.getMessages(scope.room.id, olderMessage.id).then(beforeMessages => {
                     // no more message to load
                     if (!beforeMessages || beforeMessages.length <= 0) {
@@ -74,6 +84,9 @@ module Application.Directives {
 
                     // scroll to the previous message
                     this.$location.hash('message-' + olderMessage.id);
+
+                    // stop fetching messages
+                    scope.fetchingPreviousMessages = false;
                 });
             };
 
@@ -149,7 +162,7 @@ module Application.Directives {
             initialize();
         };
 
-        constructor(private _, private $timeout: ng.ITimeoutService, private $location: ng.ILocationService, private ApiService: Services.ApiService, private RoomsService: Services.RoomsService) {
+        constructor(private _: _.LoDashStatic, private $timeout: ng.ITimeoutService, private $location: ng.ILocationService, private ApiService: Services.ApiService, private RoomsService: Services.RoomsService) {
         }
     }
 }

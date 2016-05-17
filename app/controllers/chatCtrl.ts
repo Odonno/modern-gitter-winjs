@@ -8,7 +8,8 @@ module Application.Controllers {
         sendingMessage: boolean;
         autoScrollDown: boolean;
         canLoadMoreMessages: boolean;
-
+        fetchingPreviousMessages: boolean;
+        
         sendMessage(): void;
     }
 
@@ -26,7 +27,6 @@ module Application.Controllers {
             $scope.messages = [];
             $scope.textMessage = '';
             $scope.sendingMessage = false;
-            $scope.canLoadMoreMessages = false;
 
             // methods
             $scope.sendMessage = () => {
