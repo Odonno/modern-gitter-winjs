@@ -76,6 +76,7 @@
     <Content Include="dist\angular-timeago\angular-timeago.js" />
     <Content Include="dist\angular-ui-router\angular-ui-router.js" />
     <Content Include="dist\angular\angular.js" />
+    <Content Include="dist\application-insights\angular-applicationinsights.min.js" />
     <Content Include="dist\faye\faye-browser.js" />
     <Content Include="dist\lodash\lodash.js" />
     <Content Include="dist\modern-gitter\app.js" />
