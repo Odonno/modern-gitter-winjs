@@ -4,7 +4,7 @@ module Application.Directives {
     export class MessageList implements ng.IDirective {
         restrict = 'E';
         replace = true;
-        templateUrl = 'partials/message-list.html';
+        templateUrl = 'partials/directives/message-list.html';
         link = (scope: Controllers.IChatScope, element: JQuery, attrs: ng.IAttributes) => {
             // initialize variables
             let angularElement = angular.element(element);

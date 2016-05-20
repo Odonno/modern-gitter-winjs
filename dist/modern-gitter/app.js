@@ -218,22 +218,22 @@ var Application;
                 })
                     .state('addRoom.existing', {
                     url: '/existing',
-                    templateUrl: 'partials/existing.html',
+                    templateUrl: 'partials/addRoom/existing.html',
                     controller: 'AddExistingRoomCtrl'
                 })
                     .state('addRoom.repository', {
                     url: '/repository',
-                    templateUrl: 'partials/repository.html',
+                    templateUrl: 'partials/addRoom/repository.html',
                     controller: 'AddRepositoryRoomCtrl'
                 })
                     .state('addRoom.channel', {
                     url: '/channel',
-                    templateUrl: 'partials/channel.html',
+                    templateUrl: 'partials/addRoom/channel.html',
                     controller: 'AddChannelRoomCtrl'
                 })
                     .state('addRoom.oneToOne', {
                     url: '/oneToOne',
-                    templateUrl: 'partials/oneToOne.html',
+                    templateUrl: 'partials/addRoom/oneToOne.html',
                     controller: 'AddOneToOneRoomCtrl'
                 })
                     .state('rooms', {
@@ -1440,7 +1440,7 @@ var Application;
                 this.RoomsService = RoomsService;
                 this.restrict = 'E';
                 this.replace = true;
-                this.templateUrl = 'partials/message-list.html';
+                this.templateUrl = 'partials/directives/message-list.html';
                 this.link = function (scope, element, attrs) {
                     var angularElement = angular.element(element);
                     scope.autoScrollDown = true;
