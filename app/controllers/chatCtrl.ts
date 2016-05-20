@@ -48,8 +48,8 @@ module Application.Controllers {
             };
 
             // update local storage
-            LocalSettingsService.setValue('lastPage', 'chat');
-            LocalSettingsService.setValue('lastRoom', $scope.room.name);
+            LocalSettingsService.set('lastPage', 'chat');
+            LocalSettingsService.set('lastRoom', $scope.room.name);
         }
     }
 }

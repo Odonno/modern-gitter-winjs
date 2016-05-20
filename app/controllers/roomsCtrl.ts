@@ -12,7 +12,7 @@ module Application.Controllers {
     export class RoomsCtrl {
         constructor($scope: IRoomsScope, $filter: ng.IFilterService, $state: ng.ui.IStateService, RoomsService: Services.RoomsService, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
             // update local storage
-            LocalSettingsService.setValue('lastPage', 'rooms');
+            LocalSettingsService.set('lastPage', 'rooms');
 
             // properties
             $scope.rooms = RoomsService.rooms;

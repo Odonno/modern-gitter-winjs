@@ -22,8 +22,8 @@ module Application.Controllers {
                     $scope.loggedIn = RoomsService.loggedIn;
 
                     // retrieve local storage data
-                    let lastPage = LocalSettingsService.getValue('lastPage');
-                    let lastRoom = LocalSettingsService.getValue('lastRoom');
+                    let lastPage = LocalSettingsService.get('lastPage');
+                    let lastRoom = LocalSettingsService.get('lastRoom');
 
                     if (lastPage === 'chat' && lastRoom) {
                         // navigate to previous visited room if there is one
@@ -47,8 +47,8 @@ module Application.Controllers {
             $scope.logout = () => {
                 if (FeatureToggleService.isSignOutHandled()) {
                     // update local storage
-                    LocalSettingsService.setValue('lastPage', 'rooms');
-                    LocalSettingsService.deleteValue('lastRoom');
+                    LocalSettingsService.remove('lastPage');
+                    LocalSettingsService.remove('lastRoom');
 
                     // TODO : navigate to non-authenticated view
                     $state.go('home');
@@ -70,7 +70,7 @@ module Application.Controllers {
             // upgrade to latest background tasks if there is newer version
             if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
                 // retrieve version saved of background task
-                let lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                let lastVersion = LocalSettingsService.get('backgroundTaskVersion');
 
                 if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
                     // unregister existing background tasks
@@ -80,7 +80,7 @@ module Application.Controllers {
                     BackgroundTaskService.registerAll();
 
                     // save version in local storage
-                    LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
+                    LocalSettingsService.set('backgroundTaskVersion', BackgroundTaskService.currentVersion);
                 }
             }
 

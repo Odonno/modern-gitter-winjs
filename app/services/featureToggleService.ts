@@ -72,8 +72,8 @@ module Application.Services {
         public isUnreadItemsNotificationsEnabled(): boolean {
             this.inject();
 
-            if (this._localSettingsService.containsValue('isUnreadItemsNotificationsEnabled')) {
-                return this._localSettingsService.getValue('isUnreadItemsNotificationsEnabled');
+            if (this._localSettingsService.contains('isUnreadItemsNotificationsEnabled')) {
+                return this._localSettingsService.get('isUnreadItemsNotificationsEnabled');
             } else {
                 return true;
             }
@@ -82,8 +82,8 @@ module Application.Services {
         public isUnreadMentionsNotificationsEnabled(): boolean {
             this.inject();
 
-            if (this._localSettingsService.containsValue('isUnreadMentionsNotificationsEnabled')) {
-                return this._localSettingsService.getValue('isUnreadMentionsNotificationsEnabled');
+            if (this._localSettingsService.contains('isUnreadMentionsNotificationsEnabled')) {
+                return this._localSettingsService.get('isUnreadMentionsNotificationsEnabled');
             } else {
                 return true;
             }
@@ -92,8 +92,8 @@ module Application.Services {
         public isNewMessageNotificationEnabled(): boolean {
             this.inject();
 
-            if (this._localSettingsService.containsValue('isNewMessageNotificationEnabled')) {
-                return this._localSettingsService.getValue('isNewMessageNotificationEnabled');
+            if (this._localSettingsService.contains('isNewMessageNotificationEnabled')) {
+                return this._localSettingsService.get('isNewMessageNotificationEnabled');
             } else {
                 return true;
             }

@@ -678,8 +678,8 @@ var Application;
             ;
             FeatureToggleService.prototype.isUnreadItemsNotificationsEnabled = function () {
                 this.inject();
-                if (this._localSettingsService.containsValue('isUnreadItemsNotificationsEnabled')) {
-                    return this._localSettingsService.getValue('isUnreadItemsNotificationsEnabled');
+                if (this._localSettingsService.contains('isUnreadItemsNotificationsEnabled')) {
+                    return this._localSettingsService.get('isUnreadItemsNotificationsEnabled');
                 }
                 else {
                     return true;
@@ -688,8 +688,8 @@ var Application;
             ;
             FeatureToggleService.prototype.isUnreadMentionsNotificationsEnabled = function () {
                 this.inject();
-                if (this._localSettingsService.containsValue('isUnreadMentionsNotificationsEnabled')) {
-                    return this._localSettingsService.getValue('isUnreadMentionsNotificationsEnabled');
+                if (this._localSettingsService.contains('isUnreadMentionsNotificationsEnabled')) {
+                    return this._localSettingsService.get('isUnreadMentionsNotificationsEnabled');
                 }
                 else {
                     return true;
@@ -698,8 +698,8 @@ var Application;
             ;
             FeatureToggleService.prototype.isNewMessageNotificationEnabled = function () {
                 this.inject();
-                if (this._localSettingsService.containsValue('isNewMessageNotificationEnabled')) {
-                    return this._localSettingsService.getValue('isNewMessageNotificationEnabled');
+                if (this._localSettingsService.contains('isNewMessageNotificationEnabled')) {
+                    return this._localSettingsService.get('isNewMessageNotificationEnabled');
                 }
                 else {
                     return true;
@@ -772,14 +772,14 @@ var Application;
                 else {
                 }
             }
-            LocalSettingsService.prototype.containsValue = function (key) {
+            LocalSettingsService.prototype.contains = function (key) {
                 if (this.FeatureToggleService.isWindowsApp()) {
                     return this.localSettings.values.hasKey(key);
                 }
                 else {
                 }
             };
-            LocalSettingsService.prototype.getValue = function (key) {
+            LocalSettingsService.prototype.get = function (key) {
                 if (this.FeatureToggleService.isWindowsApp()) {
                     return this.localSettings.values[key];
                 }
@@ -787,7 +787,7 @@ var Application;
                 }
             };
             ;
-            LocalSettingsService.prototype.setValue = function (key, value) {
+            LocalSettingsService.prototype.set = function (key, value) {
                 if (this.FeatureToggleService.isWindowsApp()) {
                     this.localSettings.values[key] = value;
                 }
@@ -795,7 +795,7 @@ var Application;
                 }
             };
             ;
-            LocalSettingsService.prototype.deleteValue = function (key) {
+            LocalSettingsService.prototype.remove = function (key) {
                 if (this.FeatureToggleService.isWindowsApp()) {
                     this.localSettings.values.remove(key);
                 }
@@ -1740,8 +1740,8 @@ var Application;
                 $scope.tryLogin = function () {
                     RoomsService.logIn(function () {
                         $scope.loggedIn = RoomsService.loggedIn;
-                        var lastPage = LocalSettingsService.getValue('lastPage');
-                        var lastRoom = LocalSettingsService.getValue('lastRoom');
+                        var lastPage = LocalSettingsService.get('lastPage');
+                        var lastRoom = LocalSettingsService.get('lastRoom');
                         if (lastPage === 'chat' && lastRoom) {
                             RoomsService.onroomselected = function () {
                                 $state.go(lastPage);
@@ -1759,8 +1759,8 @@ var Application;
                 };
                 $scope.logout = function () {
                     if (FeatureToggleService.isSignOutHandled()) {
-                        LocalSettingsService.setValue('lastPage', 'rooms');
-                        LocalSettingsService.deleteValue('lastRoom');
+                        LocalSettingsService.remove('lastPage');
+                        LocalSettingsService.remove('lastRoom');
                         $state.go('home');
                         OAuthService.disconnect();
                         RoomsService.reset();
@@ -1770,11 +1770,11 @@ var Application;
                 };
                 $scope.tryLogin();
                 if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
-                    var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                    var lastVersion = LocalSettingsService.get('backgroundTaskVersion');
                     if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
                         BackgroundTaskService.unregisterAll();
                         BackgroundTaskService.registerAll();
-                        LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
+                        LocalSettingsService.set('backgroundTaskVersion', BackgroundTaskService.currentVersion);
                     }
                 }
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
@@ -1822,8 +1822,8 @@ var Application;
                         console.error('textMessage is empty');
                     }
                 };
-                LocalSettingsService.setValue('lastPage', 'chat');
-                LocalSettingsService.setValue('lastRoom', $scope.room.name);
+                LocalSettingsService.set('lastPage', 'chat');
+                LocalSettingsService.set('lastRoom', $scope.room.name);
             }
             return ChatCtrl;
         }());
@@ -1876,7 +1876,7 @@ var Application;
     (function (Controllers) {
         var RoomsCtrl = (function () {
             function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
-                LocalSettingsService.setValue('lastPage', 'rooms');
+                LocalSettingsService.set('lastPage', 'rooms');
                 $scope.rooms = RoomsService.rooms;
                 $scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
@@ -1902,12 +1902,12 @@ var Application;
                 $scope.isUnreadMentionsNotificationsEnabled = FeatureToggleService.isUnreadMentionsNotificationsEnabled();
                 $scope.isNewMessageNotificationEnabled = FeatureToggleService.isNewMessageNotificationEnabled();
                 $scope.saveSetting = function (property) {
-                    if (LocalSettingsService.containsValue(property)) {
-                        var lastValue = LocalSettingsService.getValue(property);
-                        LocalSettingsService.setValue(property, !lastValue);
+                    if (LocalSettingsService.contains(property)) {
+                        var lastValue = LocalSettingsService.get(property);
+                        LocalSettingsService.set(property, !lastValue);
                     }
                     else {
-                        LocalSettingsService.setValue(property, !$scope[property]);
+                        LocalSettingsService.set(property, !$scope[property]);
                     }
                 };
             }

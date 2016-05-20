@@ -14,7 +14,7 @@ module Application.Services {
         }
 
         // methods
-        public containsValue(key: string): boolean {
+        public contains(key: string): boolean {
              if (this.FeatureToggleService.isWindowsApp()) {
                 return this.localSettings.values.hasKey(key);
             } else {
@@ -22,7 +22,7 @@ module Application.Services {
             }
         }
         
-        public getValue(key: string): any {
+        public get(key: string): any {
             if (this.FeatureToggleService.isWindowsApp()) {
                 return this.localSettings.values[key];
             } else {
@@ -30,7 +30,7 @@ module Application.Services {
             }
         };
 
-        public setValue(key: string, value: any): void {
+        public set<T>(key: string, value: T): void {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.localSettings.values[key] = value;
             } else {
@@ -38,7 +38,7 @@ module Application.Services {
             }
         };
 
-        public deleteValue(key: string): void {
+        public remove(key: string): void {
             if (this.FeatureToggleService.isWindowsApp()) {
                 this.localSettings.values.remove(key);
             } else {

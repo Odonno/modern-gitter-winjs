@@ -19,11 +19,11 @@ module Application.Controllers {
             // method
             $scope.saveSetting = (property: string) => {
                 // save in local storage
-                if (LocalSettingsService.containsValue(property)) {
-                    let lastValue: boolean = LocalSettingsService.getValue(property);
-                    LocalSettingsService.setValue(property, !lastValue);
+                if (LocalSettingsService.contains(property)) {
+                    let lastValue: boolean = LocalSettingsService.get(property);
+                    LocalSettingsService.set(property, !lastValue);
                 } else {
-                    LocalSettingsService.setValue(property, !$scope[property]);
+                    LocalSettingsService.set(property, !$scope[property]);
                 }
             };
         }
