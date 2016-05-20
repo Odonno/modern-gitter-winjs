@@ -69,6 +69,16 @@ module Application.Services {
         };
 
         // Settings Toggles
+        public isLineReturnShouldSendChatMessage(): boolean {
+            this.inject();
+
+            if (this._localSettingsService.contains('isLineReturnShouldSendChatMessage')) {
+                return this._localSettingsService.get('isLineReturnShouldSendChatMessage');
+            } else {
+                return !this.isRunningWindowsMobile();
+            }
+        };
+        
         public isUnreadItemsNotificationsEnabled(): boolean {
             this.inject();
 
@@ -108,10 +118,7 @@ module Application.Services {
                 useFeedbackHubApp: this.useFeedbackHubApp,
                 isRunningWindowsMobile: this.isRunningWindowsMobile,
                 isLaunchHandled: this.isLaunchHandled,
-                isSignOutHandled: this.isSignOutHandled,
-                isUnreadItemsNotificationsEnabled: this.isUnreadItemsNotificationsEnabled,
-                isUnreadMentionsNotificationsEnabled: this.isUnreadMentionsNotificationsEnabled,
-                isNewMessageNotificationEnabled: this.isNewMessageNotificationEnabled
+                isSignOutHandled: this.isSignOutHandled
             };
         } 
     }

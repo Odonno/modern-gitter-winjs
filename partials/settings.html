@@ -1,6 +1,22 @@
 <div id="settings-scroll" class="win-scrollview">
     <div class="content">
         <h2 class="win-h2">Settings</h2>
+        
+        <!-- chat options -->
+        <h3 class="win-h3">Chat</h3>
+
+        <div class="toggle-switch-group">
+            <div>
+                A line return automatically send chat message
+            </div>
+            <div class="btn-group toggle-switch-settings">
+                <button ng-class="{ active: isLineReturnShouldSendChatMessage }" ng-click="saveSetting('isLineReturnShouldSendChatMessage')"
+                    type="button" data-toggle="button" class="btn btn-toggle-switch" autocomplete="off" aria-pressed="false">
+                    <span class="stateLabel stateLabel-on">On</span>
+                    <span class="stateLabel stateLabel-off">Off</span>
+                </button>
+            </div>
+        </div>
 
         <!-- notifications options -->
         <h3 class="win-h3">Notifications</h3>

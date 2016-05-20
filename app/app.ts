@@ -47,13 +47,13 @@ let appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yar
 appModule.constant('_', window._);
 
 // inject providers
-appModule.provider('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
+appModule.provider('FeatureToggle', ($injector) => new Application.Services.FeatureToggleService($injector));
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.config((applicationInsightsServiceProvider, FeatureToggleServiceProvider: Application.Services.FeatureToggleService) => {
+appModule.config((applicationInsightsServiceProvider, FeatureToggleProvider: Application.Services.FeatureToggleService) => {
     var options = { applicationName: 'moderngitter' };
-    if (!FeatureToggleServiceProvider.isDebugMode()) {
+    if (!FeatureToggleProvider.isDebugMode()) {
         applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
     }
 });
@@ -63,6 +63,7 @@ appModule.run(($rootScope, $state, RoomsService, NetworkService, NavigationServi
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
+appModule.service('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
 appModule.service('LifecycleService', (FeatureToggleService) => new Application.Services.LifecycleService(FeatureToggleService));
 appModule.service('LocalSettingsService', (FeatureToggleService) => new Application.Services.LocalSettingsService(FeatureToggleService));
 appModule.service('NavigationService', ($rootScope, $state, RoomsService, FeatureToggleService) => new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService));
@@ -84,7 +85,7 @@ appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope, $state) => new Application.Controllers.AddRoomCtrl($scope, $state));
 appModule.controller('AppCtrl', ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));
-appModule.controller('ChatCtrl', ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) => new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService));
+appModule.controller('ChatCtrl', ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService));
 appModule.controller('ErrorCtrl', ($scope, $state) => new Application.Controllers.ErrorCtrl($scope, $state));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService));

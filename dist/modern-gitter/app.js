@@ -676,6 +676,16 @@ var Application;
                 return true;
             };
             ;
+            FeatureToggleService.prototype.isLineReturnShouldSendChatMessage = function () {
+                this.inject();
+                if (this._localSettingsService.contains('isLineReturnShouldSendChatMessage')) {
+                    return this._localSettingsService.get('isLineReturnShouldSendChatMessage');
+                }
+                else {
+                    return !this.isRunningWindowsMobile();
+                }
+            };
+            ;
             FeatureToggleService.prototype.isUnreadItemsNotificationsEnabled = function () {
                 this.inject();
                 if (this._localSettingsService.contains('isUnreadItemsNotificationsEnabled')) {
@@ -714,10 +724,7 @@ var Application;
                     useFeedbackHubApp: this.useFeedbackHubApp,
                     isRunningWindowsMobile: this.isRunningWindowsMobile,
                     isLaunchHandled: this.isLaunchHandled,
-                    isSignOutHandled: this.isSignOutHandled,
-                    isUnreadItemsNotificationsEnabled: this.isUnreadItemsNotificationsEnabled,
-                    isUnreadMentionsNotificationsEnabled: this.isUnreadMentionsNotificationsEnabled,
-                    isNewMessageNotificationEnabled: this.isNewMessageNotificationEnabled
+                    isSignOutHandled: this.isSignOutHandled
                 };
             };
             return FeatureToggleService;
@@ -1810,7 +1817,7 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var ChatCtrl = (function () {
-            function ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) {
+            function ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService) {
                 if (!RoomsService.currentRoom) {
                     console.error('no room selected...');
                     $state.go('error', { errorType: 'noRoomSelected' });
@@ -1820,6 +1827,11 @@ var Application;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
+                $scope.returnLine = function () {
+                    if (FeatureToggleService.isLineReturnShouldSendChatMessage()) {
+                        $scope.sendMessage();
+                    }
+                };
                 $scope.sendMessage = function () {
                     if ($scope.sendingMessage) {
                         return;
@@ -1828,8 +1840,8 @@ var Application;
                         $scope.sendingMessage = true;
                         ApiService.sendMessage($scope.room.id, $scope.textMessage).then(function (message) {
                             $scope.textMessage = '';
-                            $scope.$apply();
                             $scope.sendingMessage = false;
+                            $scope.$apply();
                         });
                     }
                     else {
@@ -1912,6 +1924,7 @@ var Application;
     (function (Controllers) {
         var SettingsCtrl = (function () {
             function SettingsCtrl($scope, LocalSettingsService, FeatureToggleService) {
+                $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
                 $scope.isUnreadItemsNotificationsEnabled = FeatureToggleService.isUnreadItemsNotificationsEnabled();
                 $scope.isUnreadMentionsNotificationsEnabled = FeatureToggleService.isUnreadMentionsNotificationsEnabled();
                 $scope.isNewMessageNotificationEnabled = FeatureToggleService.isNewMessageNotificationEnabled();
@@ -1944,11 +1957,11 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji', 'ApplicationInsightsModule']);
 appModule.constant('_', window._);
-appModule.provider('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
+appModule.provider('FeatureToggle', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.config(function (applicationInsightsServiceProvider, FeatureToggleServiceProvider) {
+appModule.config(function (applicationInsightsServiceProvider, FeatureToggleProvider) {
     var options = { applicationName: 'moderngitter' };
-    if (!FeatureToggleServiceProvider.isDebugMode()) {
+    if (!FeatureToggleProvider.isDebugMode()) {
         applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
     }
 });
@@ -1956,6 +1969,7 @@ appModule.run(function ($rootScope, $state, RoomsService, NetworkService, Naviga
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
+appModule.service('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
 appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
 appModule.service('NavigationService', function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService); });
@@ -1973,7 +1987,7 @@ appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
-appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService); });
+appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });

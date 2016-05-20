@@ -2,6 +2,10 @@
 
 module Application.Controllers {
     export interface ISettingsScope extends ng.IScope {
+        // chat settings
+        isLineReturnShouldSendChatMessage: boolean;        
+        
+        // notifications settings
         isUnreadItemsNotificationsEnabled: boolean;
         isUnreadMentionsNotificationsEnabled: boolean;
         isNewMessageNotificationEnabled: boolean;
@@ -12,6 +16,8 @@ module Application.Controllers {
     export class SettingsCtrl {
         constructor($scope: ISettingsScope, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
             // properties
+            $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
+            
             $scope.isUnreadItemsNotificationsEnabled = FeatureToggleService.isUnreadItemsNotificationsEnabled();
             $scope.isUnreadMentionsNotificationsEnabled = FeatureToggleService.isUnreadMentionsNotificationsEnabled();
             $scope.isNewMessageNotificationEnabled = FeatureToggleService.isNewMessageNotificationEnabled();
