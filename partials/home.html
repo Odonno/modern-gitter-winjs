@@ -6,16 +6,30 @@
         <div class="text-center">
             <div>
                 <h1 class="win-h1">Hi,</h1>
+                
                 <h2 class="win-h2">
                     I'm David Bottiau, an independant developer.<br />
-                    I think you're here to chat, just select a room.
                 </h2>
+                
+                <h2 class="win-h2">
+                    <span ng-show="!isSignOutHandled || loggedIn">
+                        I think you're here to chat, just select a room.
+                    </span>
+                    <span ng-show="isSignOutHandled && !loggedIn">
+                        Log in to Gitter with your GitHub or Twitter account and enjoy the app !
+                    </span>
+                </h2>
+                
                 <h1 class="win-h1">:)</h1>
             </div>
 
-            <div>
+            <div ng-show="!isSignOutHandled || loggedIn">
                 <button class="btn btn-primary" ui-sref="addRoom.existing">Join a room</button>
                 <button class="btn btn-primary" ng-click="chatWithUs()">Chat with us</button>
+            </div>
+
+            <div ng-show="isSignOutHandled && !loggedIn">
+                <button class="btn btn-primary" ng-click="tryLogin()">Authenticate</button>
             </div>
         </div>
     </div>

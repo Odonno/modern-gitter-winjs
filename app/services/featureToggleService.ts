@@ -61,6 +61,10 @@ module Application.Services {
 
         // Experiment Toggles
         public isLaunchHandled(): boolean {
+            return false;
+        };
+
+        public isSignOutHandled(): boolean {
             return true;
         };
 

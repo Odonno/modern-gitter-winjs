@@ -79,10 +79,10 @@ appModule.controller('AddExistingRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope, $state) => new Application.Controllers.AddRoomCtrl($scope, $state));
-appModule.controller('AppCtrl', ($scope, $rootScope, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService));
+appModule.controller('AppCtrl', ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));
 appModule.controller('ChatCtrl', ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) => new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService));
 appModule.controller('ErrorCtrl', ($scope, $state) => new Application.Controllers.ErrorCtrl($scope, $state));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService));
 appModule.controller('SettingsCtrl', ($scope, LocalSettingsService, FeatureToggleService) => new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService));
-appModule.controller('SplashscreenCtrl', ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));
+appModule.controller('SplashscreenCtrl', ($scope) => new Application.Controllers.SplashscreenCtrl($scope));

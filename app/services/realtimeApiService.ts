@@ -7,7 +7,7 @@ module Application.Services {
         constructor(private OAuthService: OAuthService) {
         }
 
-        public initialize() {
+        public initialize(): Promise<any> {
             return new Promise((done, error) => {
                 let ClientAuthExt = () => { };
 
@@ -41,28 +41,33 @@ module Application.Services {
             });
         };
 
-        public subscribe(roomId, callback) {
+        public subscribe(roomId: string, callback: { (messageOperation: Models.MessageOperation, model: any): void }) {
             // subscribe to realtime messages
             this.client.subscribe('/api/v1/rooms/' + roomId + '/chatMessages', (response) => {
                 if (response.operation === 'create') {
                     // new message
-                    callback(Application.Models.MessageOperation.Created, response.model);
+                    callback(Models.MessageOperation.Created, response.model);
                 } else if (response.operation === 'update') {
                     let message = response.model;
                     if (message.html) {
                         // message updated
-                        callback(Application.Models.MessageOperation.Updated, response.model);
+                        callback(Models.MessageOperation.Updated, response.model);
                     } else {
                         // message deleted
-                        callback(Application.Models.MessageOperation.Deleted, response.model);
+                        callback(Models.MessageOperation.Deleted, response.model);
                     }
                 } else if (response.operation === 'patch') {
                     // readby event
-                    callback(Application.Models.MessageOperation.ReadBy, response.model);
+                    callback(Models.MessageOperation.ReadBy, response.model);
                 } else {
                     console.log(response);
                 }
             });
+        };
+
+        public unsubscribe(roomId: string) {
+            // unsubscribe from realtime messages
+            this.client.unsubscribe('/api/v1/rooms/' + roomId + '/chatMessages');
         };
     }
 }

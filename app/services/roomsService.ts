@@ -3,18 +3,18 @@
 module Application.Services {
     export class RoomsService {
         // properties
-        public initialized = false;
+        public loggedIn = false;
         public currentUser: Models.User;
-        public currentRoom: Models.Room;
         public rooms: Models.Room[] = [];
+        public currentRoom: Models.Room;
         public onroomselected: { (): void; };
         public onmessagereceived: { (roomId: string, message: Models.Message): void; };
 
         constructor(private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService, private FeatureToggleService: FeatureToggleService) {
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
-                if (!this.initialized && this.NetworkService.internetAvailable) {
-                    this.initialize();
+                if (!this.loggedIn && this.NetworkService.internetAvailable) {
+                    this.logIn();
                 }
             });
 
@@ -37,8 +37,8 @@ module Application.Services {
             }
 
             // subscribe to realtime messages
-            this.RealtimeApiService.subscribe(room.id, (operation: Application.Models.MessageOperation, content: any) => {
-                if (operation === Application.Models.MessageOperation.Created) {
+            this.RealtimeApiService.subscribe(room.id, (operation: Models.MessageOperation, content: any) => {
+                if (operation === Models.MessageOperation.Created) {
                     this.receiveMessage(room, content);
                 }
             });
@@ -97,16 +97,18 @@ module Application.Services {
         }
 
         // public methods
-        public initialize(callback?: { (): void }) {
-            if (this.initialized) {
+        public logIn(callback?: { (): void }) {
+            if (this.loggedIn) {
                 if (callback) {
                     callback();
-                    return;
                 }
+                return;
             }
 
             if (!this.NetworkService.internetAvailable) {
-                callback();
+                if (callback) {
+                    callback();
+                }
                 return;
             }
 
@@ -117,6 +119,7 @@ module Application.Services {
                     console.log('Sucessfully subscribed to realtime API');
 
                     this.ApiService.getCurrentUser().then(user => {
+                        console.log('Sucessfully logged in');
                         this.currentUser = user;
 
                         this.ApiService.getRooms().then(rooms => {
@@ -125,8 +128,8 @@ module Application.Services {
                                 this.addRoom(rooms[i]);
                             }
 
-                            // service is now initialized
-                            this.initialized = true;
+                            // app is now initialized and user logged in
+                            this.loggedIn = true;
                             if (callback) {
                                 callback();
                             }
@@ -134,6 +137,19 @@ module Application.Services {
                     });
                 });
             });
+        }
+
+        public reset(): void {
+            // unsubscribe to each room
+            for (var i = 0; i < this.rooms.length; i++) {
+                this.RealtimeApiService.unsubscribe(this.rooms[i].id);
+            }
+
+            // reset properties
+            this.currentUser = undefined;
+            this.rooms = [];
+            this.currentRoom = undefined;
+            this.loggedIn = false;
         }
 
         public getRoomById(id: string): Models.Room {

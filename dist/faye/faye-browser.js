@@ -477,7 +477,8 @@ var _fulfill = function(promise, value) {
   while (fn = onFulfilled.shift()) fn(value);
 };
 
-var reject = Promise.reject = function(promise, reason) {
+var reject = Promise.reject = function (promise, reason) {
+  if (!promise) return;
   if (promise._state !== PENDING) return;
 
   promise._state       = REJECTED;

@@ -3,45 +3,50 @@
 module Application.Services {
     export class OAuthService {
         // properties
-        public refreshToken = '';
+        public refreshToken: string;
 
         constructor(private ConfigService: ConfigService) {
+            this.refreshToken = this.retrieveTokenFromVault();
         }
 
         // public methods
-        public initialize() {
-            this.refreshToken = this.retrieveTokenFromVault();
-        };
-
-        public connect() {
-            this.initialize();
+        public connect(): Promise<string> {
             return new Promise((done, error) => {
                 if (!this.refreshToken) {
-                    this.authenticate().then(
-                        token => this.grant(token).then(accessToken => {
-                            let cred = new Windows.Security.Credentials
-                                .PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
-                            this.refreshToken = accessToken.access_token;
-                            let passwordVault = new Windows.Security.Credentials.PasswordVault();
-                            passwordVault.add(cred);
-                            done(this.refreshToken);
-                        }));
+                    this.authenticate()
+                        .then(token => this.grant(token)
+                            .then(accessToken => {
+                                let credentials = new Windows.Security.Credentials.PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
+                                let passwordVault = new Windows.Security.Credentials.PasswordVault();
+                                passwordVault.add(credentials);
+
+                                this.refreshToken = accessToken.access_token;
+
+                                done(this.refreshToken);
+                            }));
                 } else {
                     done(this.refreshToken);
                 }
             });
         };
 
-        // private methods
-        private retrieveTokenFromVault() {
+        public disconnect() {
             let passwordVault = new Windows.Security.Credentials.PasswordVault();
-            let storedToken;
+            let credential = passwordVault.retrieve("OauthToken", "CurrentUser");
+
+            // remove the token from the password vault so you'll have to log in again
+            passwordVault.remove(credential);
+            this.refreshToken = undefined;
+        }
+
+        // private methods
+        private retrieveTokenFromVault(): string {
+            let passwordVault = new Windows.Security.Credentials.PasswordVault();
+            let storedToken: string;
 
             try {
                 let credential = passwordVault.retrieve("OauthToken", "CurrentUser");
                 storedToken = credential.password;
-                // Uncomment this line to remove the token from the password vault so you'll have to log in again
-                //passwordVault.remove(credential);
             } catch (e) {
                 // no stored credentials
             }
@@ -49,7 +54,7 @@ module Application.Services {
             return storedToken;
         }
 
-        private grant(token) {
+        private grant(token: string) {
             let oauthUrl = this.ConfigService.tokenUri;
             let clientId = this.ConfigService.clientId;
             let clientSecret = this.ConfigService.clientSecret;
@@ -65,14 +70,13 @@ module Application.Services {
                     redirect_uri: redirectUrl,
                     grant_type: 'authorization_code'
                 }),
-                headers:
-                {
+                headers: {
                     "Content-type": "application/x-www-form-urlencoded; charset=utf-8"
                 }
             }).then(x => JSON.parse(x.response));
         };
 
-        private authenticate() {
+        private authenticate(): Promise<string> {
             return new Promise((complete, error) => {
                 let oauthUrl = this.ConfigService.authUri;
                 let clientId = this.ConfigService.clientId;
@@ -81,8 +85,7 @@ module Application.Services {
                 let callbackUri = new Windows.Foundation.Uri(redirectUrl);
 
                 Windows.Security.Authentication.Web.WebAuthenticationBroker.
-                    authenticateAsync(Windows.Security.Authentication.Web.
-                        WebAuthenticationOptions.none, requestUri, callbackUri)
+                    authenticateAsync(Windows.Security.Authentication.Web.WebAuthenticationOptions.none, requestUri, callbackUri)
                     .done(result => {
                         if (result.responseStatus === 0) {
                             complete(result.responseData.replace('http://localhost/?code=', ''));
@@ -93,8 +96,9 @@ module Application.Services {
             });
         }
 
-        // Serialize a piece of data to a querystring
         private serializeData(data, encode?) {
+            // Serialize a piece of data to a querystring
+
             if (typeof data !== 'object') {
                 return ((data == null) ? "" : data.toString());
             }

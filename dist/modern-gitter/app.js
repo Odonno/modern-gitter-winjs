@@ -669,6 +669,10 @@ var Application;
             };
             ;
             FeatureToggleService.prototype.isLaunchHandled = function () {
+                return false;
+            };
+            ;
+            FeatureToggleService.prototype.isSignOutHandled = function () {
                 return true;
             };
             ;
@@ -901,23 +905,19 @@ var Application;
         var OAuthService = (function () {
             function OAuthService(ConfigService) {
                 this.ConfigService = ConfigService;
-                this.refreshToken = '';
-            }
-            OAuthService.prototype.initialize = function () {
                 this.refreshToken = this.retrieveTokenFromVault();
-            };
-            ;
+            }
             OAuthService.prototype.connect = function () {
                 var _this = this;
-                this.initialize();
                 return new Promise(function (done, error) {
                     if (!_this.refreshToken) {
-                        _this.authenticate().then(function (token) { return _this.grant(token).then(function (accessToken) {
-                            var cred = new Windows.Security.Credentials
-                                .PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
-                            _this.refreshToken = accessToken.access_token;
+                        _this.authenticate()
+                            .then(function (token) { return _this.grant(token)
+                            .then(function (accessToken) {
+                            var credentials = new Windows.Security.Credentials.PasswordCredential("OauthToken", "CurrentUser", accessToken.access_token);
                             var passwordVault = new Windows.Security.Credentials.PasswordVault();
-                            passwordVault.add(cred);
+                            passwordVault.add(credentials);
+                            _this.refreshToken = accessToken.access_token;
                             done(_this.refreshToken);
                         }); });
                     }
@@ -927,6 +927,12 @@ var Application;
                 });
             };
             ;
+            OAuthService.prototype.disconnect = function () {
+                var passwordVault = new Windows.Security.Credentials.PasswordVault();
+                var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
+                passwordVault.remove(credential);
+                this.refreshToken = undefined;
+            };
             OAuthService.prototype.retrieveTokenFromVault = function () {
                 var passwordVault = new Windows.Security.Credentials.PasswordVault();
                 var storedToken;
@@ -968,8 +974,7 @@ var Application;
                     var requestUri = new Windows.Foundation.Uri(oauthUrl + "?client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUrl) + "&response_type=code&access_type=offline");
                     var callbackUri = new Windows.Foundation.Uri(redirectUrl);
                     Windows.Security.Authentication.Web.WebAuthenticationBroker.
-                        authenticateAsync(Windows.Security.Authentication.Web.
-                        WebAuthenticationOptions.none, requestUri, callbackUri)
+                        authenticateAsync(Windows.Security.Authentication.Web.WebAuthenticationOptions.none, requestUri, callbackUri)
                         .done(function (result) {
                         if (result.responseStatus === 0) {
                             complete(result.responseData.replace('http://localhost/?code=', ''));
@@ -1065,6 +1070,10 @@ var Application;
                 });
             };
             ;
+            RealtimeApiService.prototype.unsubscribe = function (roomId) {
+                this.client.unsubscribe('/api/v1/rooms/' + roomId + '/chatMessages');
+            };
+            ;
             return RealtimeApiService;
         }());
         Services.RealtimeApiService = RealtimeApiService;
@@ -1084,11 +1093,11 @@ var Application;
                 this.ToastNotificationService = ToastNotificationService;
                 this.LifecycleService = LifecycleService;
                 this.FeatureToggleService = FeatureToggleService;
-                this.initialized = false;
+                this.loggedIn = false;
                 this.rooms = [];
                 this.NetworkService.statusChanged(function () {
-                    if (!_this.initialized && _this.NetworkService.internetAvailable) {
-                        _this.initialize();
+                    if (!_this.loggedIn && _this.NetworkService.internetAvailable) {
+                        _this.logIn();
                     }
                 });
                 this.LifecycleService.ontoast = function (action, data) {
@@ -1147,16 +1156,18 @@ var Application;
                     }
                 }
             };
-            RoomsService.prototype.initialize = function (callback) {
+            RoomsService.prototype.logIn = function (callback) {
                 var _this = this;
-                if (this.initialized) {
+                if (this.loggedIn) {
                     if (callback) {
                         callback();
-                        return;
                     }
+                    return;
                 }
                 if (!this.NetworkService.internetAvailable) {
-                    callback();
+                    if (callback) {
+                        callback();
+                    }
                     return;
                 }
                 this.OAuthService.connect().then(function (t) {
@@ -1164,12 +1175,13 @@ var Application;
                     _this.RealtimeApiService.initialize().then(function (t) {
                         console.log('Sucessfully subscribed to realtime API');
                         _this.ApiService.getCurrentUser().then(function (user) {
+                            console.log('Sucessfully logged in');
                             _this.currentUser = user;
                             _this.ApiService.getRooms().then(function (rooms) {
                                 for (var i = 0; i < rooms.length; i++) {
                                     _this.addRoom(rooms[i]);
                                 }
-                                _this.initialized = true;
+                                _this.loggedIn = true;
                                 if (callback) {
                                     callback();
                                 }
@@ -1177,6 +1189,15 @@ var Application;
                         });
                     });
                 });
+            };
+            RoomsService.prototype.reset = function () {
+                for (var i = 0; i < this.rooms.length; i++) {
+                    this.RealtimeApiService.unsubscribe(this.rooms[i].id);
+                }
+                this.currentUser = undefined;
+                this.rooms = [];
+                this.currentRoom = undefined;
+                this.loggedIn = false;
             };
             RoomsService.prototype.getRoomById = function (id) {
                 for (var i = 0; i < this.rooms.length; i++) {
@@ -1704,7 +1725,7 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var AppCtrl = (function () {
-            function AppCtrl($scope, $rootScope, FeatureToggleService) {
+            function AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
                 var _this = this;
                 this.invertCssClass = function (oldClass, newCLass) {
                     var elements = document.getElementsByClassName(oldClass);
@@ -1714,6 +1735,48 @@ var Application;
                         }
                     }
                 };
+                $scope.loggedIn = RoomsService.loggedIn;
+                $scope.isSignOutHandled = FeatureToggleService.isSignOutHandled();
+                $scope.tryLogin = function () {
+                    RoomsService.logIn(function () {
+                        $scope.loggedIn = RoomsService.loggedIn;
+                        var lastPage = LocalSettingsService.getValue('lastPage');
+                        var lastRoom = LocalSettingsService.getValue('lastRoom');
+                        if (lastPage === 'chat' && lastRoom) {
+                            RoomsService.onroomselected = function () {
+                                $state.go(lastPage);
+                            };
+                            var room = RoomsService.getRoom(lastRoom);
+                            RoomsService.selectRoom(room);
+                        }
+                        else if (lastPage === 'rooms') {
+                            $state.go(lastPage);
+                        }
+                        else {
+                            $state.go('home');
+                        }
+                    });
+                };
+                $scope.logout = function () {
+                    if (FeatureToggleService.isSignOutHandled()) {
+                        LocalSettingsService.setValue('lastPage', 'rooms');
+                        LocalSettingsService.deleteValue('lastRoom');
+                        $state.go('home');
+                        OAuthService.disconnect();
+                        RoomsService.reset();
+                        $scope.loggedIn = RoomsService.loggedIn;
+                        console.log('Succesfully logged out');
+                    }
+                };
+                $scope.tryLogin();
+                if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
+                    var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
+                    if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
+                        BackgroundTaskService.unregisterAll();
+                        BackgroundTaskService.registerAll();
+                        LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
+                    }
+                }
                 $rootScope.$on('$stateChangeSuccess', function (event, to, toParams, from, fromParams) {
                     if (!from.name || to.name === 'splashscreen') {
                         _this.invertCssClass('win-splitview-pane', 'win-splitview-pane-hidden');
@@ -1858,32 +1921,7 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var SplashscreenCtrl = (function () {
-            function SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) {
-                RoomsService.initialize(function () {
-                    var lastPage = LocalSettingsService.getValue('lastPage');
-                    var lastRoom = LocalSettingsService.getValue('lastRoom');
-                    if (lastPage === 'chat' && lastRoom) {
-                        RoomsService.onroomselected = function () {
-                            $state.go('chat');
-                        };
-                        var room = RoomsService.getRoom(lastRoom);
-                        RoomsService.selectRoom(room);
-                    }
-                    else if (lastPage === 'rooms') {
-                        $state.go('rooms');
-                    }
-                    else {
-                        $state.go('home');
-                    }
-                    if (FeatureToggleService.isNotificationBackgroundTasksEnabled()) {
-                        var lastVersion = LocalSettingsService.getValue('backgroundTaskVersion');
-                        if (!lastVersion || lastVersion !== BackgroundTaskService.currentVersion) {
-                            BackgroundTaskService.unregisterAll();
-                            BackgroundTaskService.registerAll();
-                            LocalSettingsService.setValue('backgroundTaskVersion', BackgroundTaskService.currentVersion);
-                        }
-                    }
-                });
+            function SplashscreenCtrl($scope) {
             }
             return SplashscreenCtrl;
         }());
@@ -1918,10 +1956,10 @@ appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
-appModule.controller('AppCtrl', function ($scope, $rootScope, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, FeatureToggleService); });
+appModule.controller('AppCtrl', function ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
 appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService); });
 appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SettingsCtrl', function ($scope, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService); });
-appModule.controller('SplashscreenCtrl', function ($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.SplashscreenCtrl($scope, $state, RoomsService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
+appModule.controller('SplashscreenCtrl', function ($scope) { return new Application.Controllers.SplashscreenCtrl($scope); });
