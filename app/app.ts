@@ -46,11 +46,16 @@ let appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yar
 // inject constants
 appModule.constant('_', window._);
 
+// inject providers
+appModule.provider('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
+
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.config((applicationInsightsServiceProvider) => {
+appModule.config((applicationInsightsServiceProvider, FeatureToggleServiceProvider: Application.Services.FeatureToggleService) => {
     var options = { applicationName: 'moderngitter' };
-    applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
+    if (!FeatureToggleServiceProvider.isDebugMode()) {
+        applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
+    }
 });
 appModule.run(($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService));
 
@@ -58,7 +63,6 @@ appModule.run(($rootScope, $state, RoomsService, NetworkService, NavigationServi
 appModule.service('ApiService', (ConfigService: Application.Services.ConfigService, OAuthService: Application.Services.OAuthService) => new Application.Services.ApiService(ConfigService, OAuthService));
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
-appModule.service('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
 appModule.service('LifecycleService', (FeatureToggleService) => new Application.Services.LifecycleService(FeatureToggleService));
 appModule.service('LocalSettingsService', (FeatureToggleService) => new Application.Services.LocalSettingsService(FeatureToggleService));
 appModule.service('NavigationService', ($rootScope, $state, RoomsService, FeatureToggleService) => new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService));

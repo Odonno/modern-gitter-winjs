@@ -706,6 +706,20 @@ var Application;
                 }
             };
             ;
+            FeatureToggleService.prototype.$get = function () {
+                return {
+                    isWindowsApp: this.isWindowsApp,
+                    isDebugMode: this.isDebugMode,
+                    isNotificationBackgroundTasksEnabled: this.isNotificationBackgroundTasksEnabled,
+                    useFeedbackHubApp: this.useFeedbackHubApp,
+                    isRunningWindowsMobile: this.isRunningWindowsMobile,
+                    isLaunchHandled: this.isLaunchHandled,
+                    isSignOutHandled: this.isSignOutHandled,
+                    isUnreadItemsNotificationsEnabled: this.isUnreadItemsNotificationsEnabled,
+                    isUnreadMentionsNotificationsEnabled: this.isUnreadMentionsNotificationsEnabled,
+                    isNewMessageNotificationEnabled: this.isNewMessageNotificationEnabled
+                };
+            };
             return FeatureToggleService;
         }());
         Services.FeatureToggleService = FeatureToggleService;
@@ -1930,16 +1944,18 @@ var Application;
 })(Application || (Application = {}));
 var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji', 'ApplicationInsightsModule']);
 appModule.constant('_', window._);
+appModule.provider('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.config(function (applicationInsightsServiceProvider) {
+appModule.config(function (applicationInsightsServiceProvider, FeatureToggleServiceProvider) {
     var options = { applicationName: 'moderngitter' };
-    applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
+    if (!FeatureToggleServiceProvider.isDebugMode()) {
+        applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
+    }
 });
 appModule.run(function ($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
-appModule.service('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
 appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
 appModule.service('NavigationService', function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService); });

@@ -1,7 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Services {
-    export class FeatureToggleService {
+    export class FeatureToggleService implements ng.IServiceProvider {
         // properties
         private _localSettingsService: LocalSettingsService;
 
@@ -98,5 +98,21 @@ module Application.Services {
                 return true;
             }
         };
+        
+        // provider implementation
+        public $get() {
+            return {
+                isWindowsApp: this.isWindowsApp,
+                isDebugMode: this.isDebugMode,
+                isNotificationBackgroundTasksEnabled: this.isNotificationBackgroundTasksEnabled,
+                useFeedbackHubApp: this.useFeedbackHubApp,
+                isRunningWindowsMobile: this.isRunningWindowsMobile,
+                isLaunchHandled: this.isLaunchHandled,
+                isSignOutHandled: this.isSignOutHandled,
+                isUnreadItemsNotificationsEnabled: this.isUnreadItemsNotificationsEnabled,
+                isUnreadMentionsNotificationsEnabled: this.isUnreadMentionsNotificationsEnabled,
+                isNewMessageNotificationEnabled: this.isNewMessageNotificationEnabled
+            };
+        } 
     }
 }
