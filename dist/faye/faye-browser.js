@@ -466,7 +466,8 @@ var fulfill = Promise.fulfill = Promise.resolve = function(promise, value) {
   }
 };
 
-var _fulfill = function(promise, value) {
+var _fulfill = function (promise, value) {
+  if (!promise) return;
   if (promise._state !== PENDING) return;
 
   promise._state      = FULFILLED;
