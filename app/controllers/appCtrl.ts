@@ -92,6 +92,12 @@ module Application.Controllers {
                 } else {
                     // make visible pane splitview
                     this.invertCssClass('win-splitview-pane-hidden', 'win-splitview-pane');
+                    
+                    // close pane splitview if we are on mobile
+                    if (FeatureToggleService.isRunningWindowsMobile()) {
+                        var splitView = document.querySelector(".splitView").winControl;
+                        splitView.paneOpened = false;
+                    }
                 }
             });
         }

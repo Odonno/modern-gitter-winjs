@@ -1804,6 +1804,10 @@ var Application;
                     }
                     else {
                         _this.invertCssClass('win-splitview-pane-hidden', 'win-splitview-pane');
+                        if (FeatureToggleService.isRunningWindowsMobile()) {
+                            var splitView = document.querySelector(".splitView").winControl;
+                            splitView.paneOpened = false;
+                        }
                     }
                 });
             }
