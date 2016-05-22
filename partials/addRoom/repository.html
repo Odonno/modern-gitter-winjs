@@ -1,12 +1,13 @@
 ﻿<!-- list of repositories without room -->
-<div id="repositoriesListView" class="row win-scrollview">
-    <div ng-repeat="room in repositoriesWithoutRoom" class="col-md-6 repository clickable">
-        <img class="repository-image" ng-src="{{ room.avatar_url }}" />
-        <h5 class="win-h5 repository-name">{{ room.name }}</h5>
-        <em class="repository-description">{{ room.description }}</em>
+<div id="repositoriesListView" class="win-scrollview">
+    <div ng-repeat="repository in repositoriesWithoutRoom" class="col-xs-6 repository clickable" ng-class="{ 'selected-item': repository.id === selectedRepository.id }"
+        ng-click="selectRepository(repository)">
+        <img class="repository-image" ng-src="{{ repository.avatar_url }}" />
+        <h5 class="win-h5 repository-name">{{ repository.name }}</h5>
+        <em class="repository-description">{{ repository.description }}</em>
     </div>
 </div>
 
-<button class="btn btn-primary" ng-disabled="selection.length !== 1" ng-click="createRoom()">
+<button class="btn btn-primary" ng-disabled="!selectedRepository" ng-click="createRoom()">
     Create project room
 </button>

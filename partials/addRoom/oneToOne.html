@@ -1,9 +1,9 @@
 ﻿<!-- search input -->
-<input id="oneToOneHeader" type="text" placeholder="Search a user..." class="form-control" ng-model="username" />
+<input id="oneToOneHeader" type="text" placeholder="Search a user..." class="form-control" ng-model="search" />
 
 <!-- list of users searched -->
-<div id="usersListView" class="row win-scrollview">
-    <div ng-repeat="user in users" class="col-md-6 onetoone clickable">
+<div id="usersListView" class="win-scrollview">
+    <div ng-repeat="user in users" class="col-xs-3 onetoone clickable" ng-class="{ 'selected-item': user.id === selectedUser.id }" ng-click="selectUser(user)">
         <img class="onetoone-image" ng-src="{{ user.avatarUrlSmall }}" />
         <h5 class="win-h5 onetoone-name">{{ user.username }}</h5>
         <em class="onetoone-description" ng-show="user.username !== user.displayName">
@@ -12,4 +12,6 @@
     </div>
 </div>
 
-<button class="btn btn-primary" ng-disabled="selection.length !== 1" ng-click="createRoom()">Chat with him</button>
+<button class="btn btn-primary" ng-disabled="!selectedUser" ng-click="createRoom()">
+    Chat with him
+</button>

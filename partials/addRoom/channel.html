@@ -2,7 +2,8 @@
     <!-- owner of this new room -->
     <h3 class="win-h3 channel-form-title">Owner</h3>
     <div class="dropdown">
-        <button id="dropdown-owner" class="btn btn-dropdown dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+        <button id="dropdown-owner" class="btn btn-dropdown dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+            role="button" aria-expanded="false">
             <span ng-hide="channel.owner">Select an owner</span>
             <span ng-show="channel.owner">
             <img class="owner-image" ng-src="{{ channel.owner.image }}" />
@@ -48,5 +49,8 @@
         </div>
     </div>
 
-    <button class="btn btn-primary" ng-click="createRoom()">Create channel room</button>
+    <!-- create room (submit) -->
+    <button class="btn btn-primary" ng-click="createRoom()">
+        Create channel room
+    </button>
 </div>

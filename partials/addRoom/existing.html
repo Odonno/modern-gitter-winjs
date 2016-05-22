@@ -1,13 +1,16 @@
 ﻿<!-- search input -->
-<input id="existingRoomsHeader" type="text" placeholder="Search a room..." class="form-control" ng-model="roomname" />
+<input id="existingRoomsHeader" type="text" placeholder="Search a room..." class="form-control" ng-model="search" />
 
 <!-- list of existing rooms -->
-<div id="existingRoomsListView" class="row win-scrollview">
-    <div ng-repeat="room in existingRooms" class="col-md-6 existing-room clickable">
+<div id="existingRoomsListView" class="win-scrollview">
+    <div ng-repeat="room in existingRooms" class="col-xs-6 existing-room clickable" ng-class="{ 'selected-item': room.id === selectedRoom.id }"
+        ng-click="selectRoom(room)">
         <img class="existing-room-image" ng-src="{{ room.image }}" />
         <h5 class="win-h5 existing-room-name">{{ room.name }}</h5>
         <em class="existing-room-description">{{ room.topic }}</em>
     </div>
 </div>
 
-<button class="btn btn-primary" ng-disabled="selection.length !== 1" ng-click="createRoom()">Join room</button>
+<button class="btn btn-primary" ng-disabled="!selectedRoom" ng-click="joinRoom()">
+    Join room
+</button>

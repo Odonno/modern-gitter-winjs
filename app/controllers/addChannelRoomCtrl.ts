@@ -5,7 +5,7 @@ module Application.Controllers {
         owners: Models.Owner[];
         permissions: Models.PermissionChannel[];
         channel: Models.NewChannel;
-        
+
         selectOwner(owner: Models.Owner): void;
         createRoom(): void;
     }
@@ -40,15 +40,15 @@ module Application.Controllers {
             };
 
             // initialize controller
-            ApiService.getCurrentUser().then((user) => {
-                $scope.owners.push({
-                    id: user.id,
-                    name: user.username,
-                    image: user.avatarUrlSmall,
-                    org: false
-                });
+            $scope.owners.push({
+                id: RoomsService.currentUser.id,
+                name: RoomsService.currentUser.username,
+                image: RoomsService.currentUser.avatarUrlSmall,
+                org: false
+            });
 
-                ApiService.getOrganizations(user.id).then((orgs) => {
+            ApiService.getOrganizations(RoomsService.currentUser.id)
+                .then(orgs => {
                     for (let i = 0; i < orgs.length; i++) {
                         $scope.owners.push({
                             id: orgs[i].id,
@@ -60,7 +60,6 @@ module Application.Controllers {
 
                     $scope.$digest();
                 });
-            });
         }
     }
 }

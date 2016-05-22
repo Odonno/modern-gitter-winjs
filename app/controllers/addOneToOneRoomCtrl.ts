@@ -2,24 +2,27 @@
 
 module Application.Controllers {
     export interface IAddOneToOneRoomScope extends ng.IScope {
-        username: string;
+        search: string;
         users: Models.User[];
-        selection: number[];
-        
+        selectedUser: Models.User;
+
+        selectUser(user: Models.User);
         createRoom(): void;
     }
 
     export class AddOneToOneRoomCtrl {
         constructor($scope: IAddOneToOneRoomScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, ToastNotificationService: Services.ToastNotificationService) {
             // properties
-            $scope.username = '';
+            $scope.search = '';
             $scope.users = [];
-            $scope.selection = [];
 
             // methods
+            $scope.selectUser = (user: Models.User) => {
+                $scope.selectedUser = user;
+            };
+
             $scope.createRoom = () => {
-                let selectedUser = $scope.users[$scope.selection[0]];
-                RoomsService.createRoom(selectedUser.username, (room) => {
+                RoomsService.createRoom($scope.selectedUser.username, room => {
                     ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&roomId=' + room.id);
                     RoomsService.selectRoom(room);
                     $state.go('chat');
@@ -27,12 +30,13 @@ module Application.Controllers {
             };
 
             // watch events
-            $scope.$watch('username', () => {
-                if ($scope.username && $scope.username.length > 0) {
-                    ApiService.searchUsers($scope.username, 50).then((users) => {
-                        $scope.users = users;
-                        $scope.$digest();
-                    });
+            $scope.$watch('search', () => {
+                if ($scope.search && $scope.search.length > 0) {
+                    ApiService.searchUsers($scope.search, 50)
+                        .then(users => {
+                            $scope.users = users;
+                            $scope.$digest();
+                        });
                 }
             });
         }

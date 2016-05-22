@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -1597,24 +1597,23 @@ var Application;
                         $state.go('chat');
                     });
                 };
-                ApiService.getCurrentUser().then(function (user) {
-                    $scope.owners.push({
-                        id: user.id,
-                        name: user.username,
-                        image: user.avatarUrlSmall,
-                        org: false
-                    });
-                    ApiService.getOrganizations(user.id).then(function (orgs) {
-                        for (var i = 0; i < orgs.length; i++) {
-                            $scope.owners.push({
-                                id: orgs[i].id,
-                                name: orgs[i].name,
-                                image: orgs[i].avatar_url,
-                                org: true
-                            });
-                        }
-                        $scope.$digest();
-                    });
+                $scope.owners.push({
+                    id: RoomsService.currentUser.id,
+                    name: RoomsService.currentUser.username,
+                    image: RoomsService.currentUser.avatarUrlSmall,
+                    org: false
+                });
+                ApiService.getOrganizations(RoomsService.currentUser.id)
+                    .then(function (orgs) {
+                    for (var i = 0; i < orgs.length; i++) {
+                        $scope.owners.push({
+                            id: orgs[i].id,
+                            name: orgs[i].name,
+                            image: orgs[i].avatar_url,
+                            org: true
+                        });
+                    }
+                    $scope.$digest();
                 });
             }
             return AddChannelRoomCtrl;
@@ -1628,20 +1627,22 @@ var Application;
     (function (Controllers) {
         var AddExistingRoomCtrl = (function () {
             function AddExistingRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-                $scope.roomname = '';
+                $scope.search = '';
                 $scope.existingRooms = [];
-                $scope.selection = [];
-                $scope.createRoom = function () {
-                    var selectedRoom = $scope.existingRooms[$scope.selection[0]];
-                    RoomsService.createRoom(selectedRoom.uri, function (room) {
+                $scope.selectRoom = function (room) {
+                    $scope.selectedRoom = room;
+                };
+                $scope.joinRoom = function () {
+                    RoomsService.createRoom($scope.selectedRoom.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You joined the room ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
                 };
-                $scope.$watch('roomname', function () {
-                    if ($scope.roomname && $scope.roomname.length > 0) {
-                        ApiService.searchRooms($scope.roomname, 50).then(function (rooms) {
+                $scope.$watch('search', function () {
+                    if ($scope.search && $scope.search.length > 0) {
+                        ApiService.searchRooms($scope.search, 50)
+                            .then(function (rooms) {
                             $scope.existingRooms = rooms;
                             for (var i = 0; i < $scope.existingRooms.length; i++) {
                                 if ($scope.existingRooms[i].user) {
@@ -1667,20 +1668,22 @@ var Application;
     (function (Controllers) {
         var AddOneToOneRoomCtrl = (function () {
             function AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService) {
-                $scope.username = '';
+                $scope.search = '';
                 $scope.users = [];
-                $scope.selection = [];
+                $scope.selectUser = function (user) {
+                    $scope.selectedUser = user;
+                };
                 $scope.createRoom = function () {
-                    var selectedUser = $scope.users[$scope.selection[0]];
-                    RoomsService.createRoom(selectedUser.username, function (room) {
+                    RoomsService.createRoom($scope.selectedUser.username, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'You can now chat with ' + room.name, 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
                 };
-                $scope.$watch('username', function () {
-                    if ($scope.username && $scope.username.length > 0) {
-                        ApiService.searchUsers($scope.username, 50).then(function (users) {
+                $scope.$watch('search', function () {
+                    if ($scope.search && $scope.search.length > 0) {
+                        ApiService.searchUsers($scope.search, 50)
+                            .then(function (users) {
                             $scope.users = users;
                             $scope.$digest();
                         });
@@ -1698,20 +1701,20 @@ var Application;
     (function (Controllers) {
         var AddRepositoryRoomCtrl = (function () {
             function AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
-                $scope.selection = [];
+                $scope.selectRepository = function (repository) {
+                    $scope.selectedRepository = repository;
+                };
                 $scope.createRoom = function () {
-                    var repository = $scope.repositoriesWithoutRoom[$scope.selection[0]];
-                    RoomsService.createRoom(repository.uri, function (room) {
+                    RoomsService.createRoom($scope.selectedRepository.uri, function (room) {
                         ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
                 };
-                ApiService.getCurrentUser().then(function (user) {
-                    ApiService.getRepositories(user.id).then(function (repositories) {
-                        $scope.repositories = repositories;
-                        $scope.$digest();
-                    });
+                ApiService.getRepositories(RoomsService.currentUser.id)
+                    .then(function (repositories) {
+                    $scope.repositories = repositories;
+                    $scope.$digest();
                 });
                 $scope.$watch('repositories', function () {
                     $scope.repositoriesWithoutRoom = $filter('filter')($scope.repositories, { exists: false });
