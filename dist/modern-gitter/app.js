@@ -737,34 +737,34 @@ var Application;
     var Services;
     (function (Services) {
         var LifecycleService = (function () {
-            function LifecycleService(FeatureToggleService) {
+            function LifecycleService(FeatureToggleService, LocalSettingsService) {
+                var _this = this;
                 if (!FeatureToggleService.isWindowsApp()) {
                     return;
                 }
-                this.app = WinJS.Application;
-                this.activation = Windows.ApplicationModel.Activation;
-                this.app.onactivated = function (args) {
+                WinJS.Application.onactivated = function (args) {
                     if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch) {
                         if (args.detail.previousExecutionState !== Windows.ApplicationModel.Activation.ApplicationExecutionState.terminated) {
                         }
                         else {
                         }
-                        args.setPromise(WinJS.UI.processAll());
                     }
                     if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.toastNotification) {
                         var toastQuery = args.detail.argument;
-                        var action = this.getQueryValue(toastQuery, 'action');
+                        var action = _this.getQueryValue(toastQuery, 'action');
                         if (action == 'viewRoom') {
-                            var roomId = this.getQueryValue(toastQuery, 'roomId');
-                            if (this.ontoast) {
-                                this.ontoast(action, { room: roomId });
+                            LocalSettingsService.remove('lastPage');
+                            var roomId = _this.getQueryValue(toastQuery, 'roomId');
+                            if (_this.ontoast) {
+                                _this.ontoast(action, { roomId: roomId });
                             }
                         }
                     }
+                    args.setPromise(WinJS.UI.processAll());
                 };
-                this.app.oncheckpoint = function (args) {
+                WinJS.Application.oncheckpoint = function (args) {
                 };
-                this.app.start();
+                WinJS.Application.start();
             }
             LifecycleService.prototype.getQueryValue = function (query, key) {
                 var vars = query.split('&');
@@ -1105,7 +1105,7 @@ var Application;
     var Services;
     (function (Services) {
         var RoomsService = (function () {
-            function RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) {
+            function RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) {
                 var _this = this;
                 this.OAuthService = OAuthService;
                 this.NetworkService = NetworkService;
@@ -1123,8 +1123,9 @@ var Application;
                 });
                 this.LifecycleService.ontoast = function (action, data) {
                     if (action === 'viewRoom') {
-                        var roomToView = _this.getRoomById(data.roomId);
-                        _this.selectRoom(roomToView);
+                        var room = _this.getRoomById(data.roomId);
+                        _this.selectRoom(room);
+                        $state.go('chat');
                     }
                 };
             }
@@ -1974,13 +1975,13 @@ appModule.service('ApiService', function (ConfigService, OAuthService) { return 
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
 appModule.service('ConfigService', function () { return new Application.Services.ConfigService(); });
 appModule.service('FeatureToggleService', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
-appModule.service('LifecycleService', function (FeatureToggleService) { return new Application.Services.LifecycleService(FeatureToggleService); });
+appModule.service('LifecycleService', function (FeatureToggleService, LocalSettingsService) { return new Application.Services.LifecycleService(FeatureToggleService, LocalSettingsService); });
 appModule.service('LocalSettingsService', function (FeatureToggleService) { return new Application.Services.LocalSettingsService(FeatureToggleService); });
 appModule.service('NavigationService', function ($rootScope, $state, RoomsService, FeatureToggleService) { return new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService); });
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
-appModule.service('RoomsService', function (OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
+appModule.service('RoomsService', function ($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.directive('messageList', function (_, $timeout, $location, ApiService, RoomsService) { return new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService); });

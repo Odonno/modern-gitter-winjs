@@ -64,13 +64,13 @@ appModule.service('ApiService', (ConfigService: Application.Services.ConfigServi
 appModule.service('BackgroundTaskService', (FeatureToggleService) => new Application.Services.BackgroundTaskService(FeatureToggleService));
 appModule.service('ConfigService', () => new Application.Services.ConfigService());
 appModule.service('FeatureToggleService', ($injector) => new Application.Services.FeatureToggleService($injector));
-appModule.service('LifecycleService', (FeatureToggleService) => new Application.Services.LifecycleService(FeatureToggleService));
+appModule.service('LifecycleService', (FeatureToggleService, LocalSettingsService) => new Application.Services.LifecycleService(FeatureToggleService, LocalSettingsService));
 appModule.service('LocalSettingsService', (FeatureToggleService) => new Application.Services.LocalSettingsService(FeatureToggleService));
 appModule.service('NavigationService', ($rootScope, $state, RoomsService, FeatureToggleService) => new Application.Services.NavigationService($rootScope, $state, RoomsService, FeatureToggleService));
 appModule.service('NetworkService', (FeatureToggleService) => new Application.Services.NetworkService(FeatureToggleService));
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));
 appModule.service('RealtimeApiService', (OAuthService: Application.Services.OAuthService) => new Application.Services.RealtimeApiService(OAuthService));
-appModule.service('RoomsService', (OAuthService: Application.Services.OAuthService, NetworkService: Application.Services.NetworkService, ApiService: Application.Services.ApiService, RealtimeApiService: Application.Services.RealtimeApiService, ToastNotificationService: Application.Services.ToastNotificationService, LifecycleService, FeatureToggleService) => new Application.Services.RoomsService(OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService));
+appModule.service('RoomsService', ($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) => new Application.Services.RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService));
 appModule.service('ToastNotificationService', (FeatureToggleService) => new Application.Services.ToastNotificationService(FeatureToggleService));
 
 // inject directives
