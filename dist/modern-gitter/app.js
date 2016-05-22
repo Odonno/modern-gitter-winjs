@@ -1859,6 +1859,13 @@ var Application;
                 LocalSettingsService.set('lastRoom', $scope.room.name);
                 if (FeatureToggleService.isDebugMode()) {
                     ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', 'action=viewRoom&roomId=' + $scope.room.id);
+                    var username = 'gitter-bot';
+                    var replyOptions = {
+                        args: 'action=reply&roomId=' + $scope.room.id,
+                        text: '@' + username + ' ',
+                        image: 'assets/icons/send.png'
+                    };
+                    ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, username + ' mentioned you', 'This is a test message, please respond', replyOptions, 'action=viewRoom&roomId=' + $scope.room.id);
                 }
             }
             return ChatCtrl;

@@ -37,7 +37,7 @@
                 // send the message
                 WinJS.xhr({
                     type: 'POST',
-                    url: "https://api.gitter.im/v1/rooms/" + room.id + "/chatMessages",
+                    url: "https://api.gitter.im/v1/rooms/" + roomId + "/chatMessages",
                     data: JSON.stringify({ text: text }),
                     headers: {
                         "Accept": "application/json",
