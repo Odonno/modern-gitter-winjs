@@ -1105,7 +1105,7 @@ var Application;
     var Services;
     (function (Services) {
         var RoomsService = (function () {
-            function RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) {
+            function RoomsService($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) {
                 var _this = this;
                 this.OAuthService = OAuthService;
                 this.NetworkService = NetworkService;
@@ -1122,10 +1122,15 @@ var Application;
                     }
                 });
                 this.LifecycleService.ontoast = function (action, data) {
-                    if (action === 'viewRoom') {
-                        var room = _this.getRoomById(data.roomId);
-                        _this.selectRoom(room);
-                        $state.go('chat');
+                    if (!_this.loggedIn) {
+                        $timeout(function () { return _this.LifecycleService.ontoast(action, data); }, 200);
+                    }
+                    else {
+                        if (action === 'viewRoom') {
+                            var room = _this.getRoomById(data.roomId);
+                            _this.selectRoom(room);
+                            $state.go('chat');
+                        }
                     }
                 };
             }
@@ -1981,7 +1986,7 @@ appModule.service('NavigationService', function ($rootScope, $state, RoomsServic
 appModule.service('NetworkService', function (FeatureToggleService) { return new Application.Services.NetworkService(FeatureToggleService); });
 appModule.service('OAuthService', function (ConfigService) { return new Application.Services.OAuthService(ConfigService); });
 appModule.service('RealtimeApiService', function (OAuthService) { return new Application.Services.RealtimeApiService(OAuthService); });
-appModule.service('RoomsService', function ($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
+appModule.service('RoomsService', function ($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
 appModule.directive('messageList', function (_, $timeout, $location, ApiService, RoomsService) { return new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService); });

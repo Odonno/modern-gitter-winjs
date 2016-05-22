@@ -27,12 +27,11 @@ module Application.Services {
                     let action = this.getQueryValue(toastQuery, 'action');
 
                     if (action == 'viewRoom') {
-                        // TODO : remove navigation history
+                        // remove navigation history
                         LocalSettingsService.remove('lastPage');
-                        
-                        let roomId = this.getQueryValue(toastQuery, 'roomId');
 
-                        // TODO : navigate to room
+                        // navigate to room via 'ontoast' event
+                        let roomId = this.getQueryValue(toastQuery, 'roomId');
                         if (this.ontoast) {
                             this.ontoast(action, { roomId: roomId });
                         }

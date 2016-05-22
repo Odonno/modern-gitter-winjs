@@ -10,7 +10,7 @@ module Application.Services {
         public onroomselected: { (): void; };
         public onmessagereceived: { (roomId: string, message: Models.Message): void; };
 
-        constructor($state: ng.ui.IStateService, private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService, private FeatureToggleService: FeatureToggleService) {
+        constructor($state: ng.ui.IStateService, $timeout: ng.ITimeoutService, private OAuthService: OAuthService, private NetworkService: NetworkService, private ApiService: ApiService, private RealtimeApiService: RealtimeApiService, private ToastNotificationService: ToastNotificationService, private LifecycleService: LifecycleService, private FeatureToggleService: FeatureToggleService) {
             // check when internet status changed
             this.NetworkService.statusChanged(() => {
                 if (!this.loggedIn && this.NetworkService.internetAvailable) {
@@ -20,10 +20,15 @@ module Application.Services {
 
             // detect when we received a toast action
             this.LifecycleService.ontoast = (action, data) => {
-                if (action === 'viewRoom') {
-                    let room = this.getRoomById(data.roomId);
-                    this.selectRoom(room);
-                    $state.go('chat');
+                if (!this.loggedIn) {
+                    $timeout(() => this.LifecycleService.ontoast(action, data), 200);                    
+                } else {
+                    // execute viewRoom action
+                    if (action === 'viewRoom') {
+                        let room = this.getRoomById(data.roomId);
+                        this.selectRoom(room);
+                        $state.go('chat');
+                    }
                 }
             };
         }

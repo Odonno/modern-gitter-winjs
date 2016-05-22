@@ -70,7 +70,7 @@ appModule.service('NavigationService', ($rootScope, $state, RoomsService, Featur
 appModule.service('NetworkService', (FeatureToggleService) => new Application.Services.NetworkService(FeatureToggleService));
 appModule.service('OAuthService', (ConfigService: Application.Services.ConfigService) => new Application.Services.OAuthService(ConfigService));
 appModule.service('RealtimeApiService', (OAuthService: Application.Services.OAuthService) => new Application.Services.RealtimeApiService(OAuthService));
-appModule.service('RoomsService', ($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) => new Application.Services.RoomsService($state, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService));
+appModule.service('RoomsService', ($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) => new Application.Services.RoomsService($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService));
 appModule.service('ToastNotificationService', (FeatureToggleService) => new Application.Services.ToastNotificationService(FeatureToggleService));
 
 // inject directives
