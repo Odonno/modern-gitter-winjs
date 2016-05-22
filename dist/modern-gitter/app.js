@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -669,7 +669,7 @@ var Application;
             };
             ;
             FeatureToggleService.prototype.isLaunchHandled = function () {
-                return false;
+                return true;
             };
             ;
             FeatureToggleService.prototype.isSignOutHandled = function () {
@@ -1278,6 +1278,12 @@ var Application;
                     this.toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
                 }
             }
+            ToastNotificationService.prototype.encodeArgsNotification = function (args) {
+                return args.replace(/&/g, '&amp;');
+            };
+            ToastNotificationService.prototype.encodeTextNotification = function (text) {
+                return text.replace('<', '&lt;').replace('>', '&gt;');
+            };
             ToastNotificationService.prototype.sendGenericToast = function (toast) {
                 var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
                 toastXml.loadXml(toast);
@@ -1286,15 +1292,14 @@ var Application;
             };
             ToastNotificationService.prototype.sendTextNotification = function (text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<text></text>'
-                        + '<text>' + text + '</text>'
+                        + '<text>' + this.encodeTextNotification(text) + '</text>'
                         + '</binding>'
                         + '</visual>'
                         + '</toast>';
-                    toast = toast.replace(/&/g, '&amp;');
                     this.sendGenericToast(toast);
                 }
                 else {
@@ -1308,15 +1313,14 @@ var Application;
             };
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
-                        + '<text>' + title + '</text>'
-                        + '<text>' + text + '</text>'
+                        + '<text>' + this.encodeTextNotification(title) + '</text>'
+                        + '<text>' + this.encodeTextNotification(text) + '</text>'
                         + '</binding>'
                         + '</visual>'
                         + '</toast>';
-                    toast = toast.replace(/&/g, '&amp;');
                     this.sendGenericToast(toast);
                 }
                 else {
@@ -1331,16 +1335,15 @@ var Application;
             };
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<image placement="appLogoOverride" src="' + image + '" />'
                         + '<text></text>'
-                        + '<text>' + text + '</text>'
+                        + '<text>' + this.encodeTextNotification(text) + '</text>'
                         + '</binding>'
                         + '</visual>'
                         + '</toast>';
-                    toast = toast.replace(/&/g, '&amp;');
                     this.sendGenericToast(toast);
                 }
                 else {
@@ -1356,16 +1359,15 @@ var Application;
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<image placement="appLogoOverride" src="' + image + '" />'
-                        + '<text>' + title + '</text>'
-                        + '<text>' + text + '</text>'
+                        + '<text>' + this.encodeTextNotification(title) + '</text>'
+                        + '<text>' + this.encodeTextNotification(text) + '</text>'
                         + '</binding>'
                         + '</visual>'
                         + '</toast>';
-                    toast = toast.replace(/&/g, '&amp;');
                     this.sendGenericToast(toast);
                 }
                 else {
@@ -1382,20 +1384,19 @@ var Application;
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, args) {
                 if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                         + '<visual>'
                         + '<binding template="ToastGeneric">'
                         + '<image placement="appLogoOverride" src="' + image + '" />'
-                        + '<text>' + title + '</text>'
-                        + '<text>' + text + '</text>'
+                        + '<text>' + this.encodeTextNotification(title) + '</text>'
+                        + '<text>' + this.encodeTextNotification(text) + '</text>'
                         + '</binding>'
                         + '</visual>'
                         + '<actions>'
-                        + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
-                        + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + replyOptions.args + '" />'
+                        + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
+                        + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
                         + '</actions>'
                         + '</toast>';
-                    toast = toast.replace(/&/g, '&amp;');
                     this.sendGenericToast(toast);
                 }
             };
@@ -1817,7 +1818,7 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var ChatCtrl = (function () {
-            function ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService) {
+            function ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService) {
                 if (!RoomsService.currentRoom) {
                     console.error('no room selected...');
                     $state.go('error', { errorType: 'noRoomSelected' });
@@ -1850,6 +1851,9 @@ var Application;
                 };
                 LocalSettingsService.set('lastPage', 'chat');
                 LocalSettingsService.set('lastRoom', $scope.room.name);
+                if (FeatureToggleService.isDebugMode()) {
+                    ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', 'action=viewRoom&roomId=' + $scope.room.id);
+                }
             }
             return ChatCtrl;
         }());
@@ -1987,7 +1991,7 @@ appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
-appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, FeatureToggleService); });
+appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService); });
 appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });

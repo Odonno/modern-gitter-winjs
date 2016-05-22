@@ -15,7 +15,7 @@ module Application.Controllers {
     }
 
     export class ChatCtrl {
-        constructor($scope: IChatScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, NavigationService: Services.NavigationService, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
+        constructor($scope: IChatScope, $state: ng.ui.IStateService, ApiService: Services.ApiService, RoomsService: Services.RoomsService, NavigationService: Services.NavigationService, LocalSettingsService: Services.LocalSettingsService, ToastNotificationService: Services.ToastNotificationService, FeatureToggleService: Services.FeatureToggleService) {
             // navigate to error page when there is no selected room
             if (!RoomsService.currentRoom) {
                 console.error('no room selected...');
@@ -57,6 +57,12 @@ module Application.Controllers {
             // update local storage
             LocalSettingsService.set('lastPage', 'chat');
             LocalSettingsService.set('lastRoom', $scope.room.name);
+            
+            // initialize controller
+            if (FeatureToggleService.isDebugMode()) {
+                // send test notification
+                ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', 'action=viewRoom&roomId=' + $scope.room.id);
+            }
         }
     }
 }
