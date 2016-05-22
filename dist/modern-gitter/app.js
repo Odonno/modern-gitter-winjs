@@ -530,7 +530,7 @@ var Application;
                         }
                     ];
                 }
-                this.currentVersion = 'v0.7';
+                this.currentVersion = 'v0.8';
             }
             BackgroundTaskService.prototype.register = function (taskEntryPoint, taskName, trigger, condition, cancelOnConditionLoss) {
                 if (this.isRegistered(taskName)) {
