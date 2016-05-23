@@ -30,7 +30,7 @@ module Application.Services {
                     }
                 ];
             }
-            this.currentVersion = 'v0.7';
+            this.currentVersion = 'v0.8';
         }
         
         // private methods

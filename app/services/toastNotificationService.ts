@@ -9,9 +9,17 @@ module Application.Services {
                 this.toastNotifier = Windows.UI.Notifications.ToastNotificationManager.createToastNotifier();
             }
         }
-        
+
         // private methods
-        private sendGenericToast(toast: string) {
+        private encodeArgsNotification(args: string): string {
+            return args.replace(/&/g, '&amp;');
+        }
+
+        private encodeTextNotification(text: string): string {
+            return text.replace('<', '&lt;').replace('>', '&gt;');
+        }
+
+        private sendGenericToast(toast: string): void {
             // generate XML from toast content
             let toastXml = new Windows.Data.Xml.Dom.XmlDocument();
             toastXml.loadXml(toast);
@@ -24,15 +32,15 @@ module Application.Services {
         // public methods
         public sendTextNotification(text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                let toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<text></text>'
-                    + '<text>' + text + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                toast = toast.replace(/&/g, '&amp;');
+                    
                 this.sendGenericToast(toast);
             } else {
                 let template = Windows.UI.Notifications.ToastTemplateType.toastText01;
@@ -48,15 +56,15 @@ module Application.Services {
 
         public sendTitleAndTextNotification(title: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                let toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
-                    + '<text>' + title + '</text>'
-                    + '<text>' + text + '</text>'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                toast = toast.replace(/&/g, '&amp;');
+                    
                 this.sendGenericToast(toast);
             } else {
                 let template = Windows.UI.Notifications.ToastTemplateType.toastText02;
@@ -73,16 +81,16 @@ module Application.Services {
 
         public sendImageAndTextNotification(image: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                let toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<image placement="appLogoOverride" src="' + image + '" />'
                     + '<text></text>'
-                    + '<text>' + text + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                toast = toast.replace(/&/g, '&amp;');
+                    
                 this.sendGenericToast(toast);
             } else {
                 let template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
@@ -101,16 +109,16 @@ module Application.Services {
 
         public sendImageTitleAndTextNotification(image: string, title: string, text: string, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                let toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<image placement="appLogoOverride" src="' + image + '" />'
-                    + '<text>' + title + '</text>'
-                    + '<text>' + text + '</text>'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                toast = toast.replace(/&/g, '&amp;');
+                
                 this.sendGenericToast(toast);
             } else {
                 let template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
@@ -130,20 +138,20 @@ module Application.Services {
 
         public sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: any, args?: string) {
             if (this.FeatureToggleService.isLaunchHandled()) {
-                let toast = (args ? '<toast launch="' + args + '">' : '<toast>')
+                let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
                     + '<image placement="appLogoOverride" src="' + image + '" />'
-                    + '<text>' + title + '</text>'
-                    + '<text>' + text + '</text>'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '<actions>'
-                    + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + replyOptions.text + '" />'
-                    + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + replyOptions.args + '" />'
+                    + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
+                    + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
                     + '</actions>'
                     + '</toast>';
-                toast = toast.replace(/&/g, '&amp;');
+                    
                 this.sendGenericToast(toast);
             }
         }

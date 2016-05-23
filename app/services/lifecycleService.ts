@@ -3,27 +3,20 @@
 module Application.Services {
     export class LifecycleService {
         // properties
-        private app;
-        private activation;
         public ontoast: { (action: string, data?: any): void; };
 
-        constructor(FeatureToggleService: FeatureToggleService) {
+        constructor(FeatureToggleService: FeatureToggleService, LocalSettingsService: LocalSettingsService) {
             if (!FeatureToggleService.isWindowsApp()) {
                 return;
             }
-            
-            this.app = WinJS.Application;
-            this.activation = Windows.ApplicationModel.Activation;
-            
-            this.app.onactivated = function(args) {
+
+            WinJS.Application.onactivated = (args) => {
                 if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch) {
                     if (args.detail.previousExecutionState !== Windows.ApplicationModel.Activation.ApplicationExecutionState.terminated) {
                         // TODO : this application has been newly launched, initialize your application here
                     } else {
                         // TODO : this application was suspended and then terminated
                     }
-
-                    args.setPromise(WinJS.UI.processAll());
                 }
 
                 if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.toastNotification) {
@@ -34,25 +27,29 @@ module Application.Services {
                     let action = this.getQueryValue(toastQuery, 'action');
 
                     if (action == 'viewRoom') {
+                        // remove navigation history
+                        LocalSettingsService.remove('lastPage');
+
+                        // navigate to room via 'ontoast' event
                         let roomId = this.getQueryValue(toastQuery, 'roomId');
-                        
-                        // TODO : navigate to room
                         if (this.ontoast) {
-                            this.ontoast(action, { room: roomId });
+                            this.ontoast(action, { roomId: roomId });
                         }
                     }
                 }
+
+                args.setPromise(WinJS.UI.processAll());
             };
 
-            this.app.oncheckpoint = function(args) {
+            WinJS.Application.oncheckpoint = (args) => {
                 // TODO : this application is about to be suspended, save any state that needs to persist across suspensions here
             };
 
-            this.app.start();
+            WinJS.Application.start();
         }
-        
+
         // private methods
-        private getQueryValue(query, key) {
+        private getQueryValue(query: string, key: string) {
             let vars: string[] = query.split('&');
             for (let i = 0; i < vars.length; i++) {
                 let pair = vars[i].split('=');

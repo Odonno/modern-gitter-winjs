@@ -102,6 +102,7 @@ module Application.Controllers {
             });
         }
 
+        // private methods
         private invertCssClass = (oldClass: string, newCLass: string) => {
             let elements = document.getElementsByClassName(oldClass);
             for (let i in elements) {

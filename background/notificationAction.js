@@ -1,84 +1,71 @@
-﻿(function () {
-    "use strict";
-
-    // import WinJS
-    importScripts("/dist/winjs/js/base.js");
-
-    // get information about the current instance of the background task
-    var cancel = false;
-    var token = '';
-    var backgroundTaskInstance = Windows.UI.WebUI.WebUIBackgroundTaskInstance.current;
-
-    // associate a cancellation handler with the background task
-    function onCanceled(cancelEventArg) {
-        cancel = true;
-        cancelReason = cancelEventArg;
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var BackgroundTask = (function () {
+    function BackgroundTask() {
+        this.settings = Windows.Storage.ApplicationData.current.localSettings;
+        this.backgroundTaskInstance = Windows.UI.WebUI.WebUIBackgroundTaskInstance.current;
+        this.backgroundTaskInstance.addEventListener("canceled", this.oncanceled);
     }
-    backgroundTaskInstance.addEventListener("canceled", onCanceled);
-
-    // execute background task
-    function execute() {
-        var key = null;
-        var settings = Windows.Storage.ApplicationData.current.localSettings;
-
-        // you need to be authenticated first to get current notifications
-        token = retrieveTokenFromVault();
-
-        if (token) {
-            var details = backgroundTaskInstance.triggerDetails;
-            if (details) {
-                var args = details.argument;
-                var userInput = details.userInput;
-
-                // retrieve room id and text message
-                var roomId = getQueryValue(args, 'roomId');
-                var text = userInput['message'];
-
-                // send the message
-                WinJS.xhr({
-                    type: 'POST',
-                    url: "https://api.gitter.im/v1/rooms/" + room.id + "/chatMessages",
-                    data: JSON.stringify({ text: text }),
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token
-                    }
-                }).then((success) => {
-                    // record information in LocalSettings to communicate with the app
-                    key = backgroundTaskInstance.task.taskId.toString();
-                    settings.values[key] = "Succeeded";
-
-                    // background task must call close when it is done
-                    close();
-                });
-            }
-        } else {
-            // record information in LocalSettings to communicate with the app
-            key = backgroundTaskInstance.task.taskId.toString();
-            settings.values[key] = "Failed";
-
-            // background task must call close when it is done
-            close();
-        }
-    }
-
-    // methods
-    function retrieveTokenFromVault() {
+    BackgroundTask.prototype.oncanceled = function (cancelEventArg) {
+        this.cancel = true;
+        this.cancelReason = cancelEventArg;
+    };
+    BackgroundTask.prototype.onclose = function (reason) {
+        var key = this.backgroundTaskInstance.task.taskId.toString();
+        this.settings.values[key] = reason;
+        close();
+    };
+    BackgroundTask.prototype.retrieveTokenFromVault = function () {
         var passwordVault = new Windows.Security.Credentials.PasswordVault();
         var storedToken;
-
         try {
             var credential = passwordVault.retrieve("OauthToken", "CurrentUser");
             storedToken = credential.password;
-        } catch (e) {
-            // no stored credentials
         }
-
+        catch (e) {
+        }
         return storedToken;
+    };
+    return BackgroundTask;
+}());
+var NotificationActionTask = (function (_super) {
+    __extends(NotificationActionTask, _super);
+    function NotificationActionTask() {
+        _super.apply(this, arguments);
     }
-
-    function getQueryValue(query, key) {
+    NotificationActionTask.prototype.canExecute = function () {
+        if (this.cancel) {
+            this.onclose("Canceled");
+            return false;
+        }
+        this.token = this.retrieveTokenFromVault();
+        if (!this.token) {
+            this.onclose("Failed");
+            return false;
+        }
+        return true;
+    };
+    NotificationActionTask.prototype.execute = function () {
+        var _this = this;
+        if (!this.canExecute()) {
+            return;
+        }
+        var details = this.backgroundTaskInstance.triggerDetails;
+        if (details) {
+            var args = details.argument;
+            var userInput = details.userInput;
+            var roomId = this.getQueryValue(args, 'roomId');
+            var text = userInput['message'];
+            this.sendMessage(roomId, text)
+                .then(function (success) {
+                _this.onclose("Succeeded");
+            });
+        }
+    };
+    NotificationActionTask.prototype.getQueryValue = function (query, key) {
         var vars = query.split('&');
         for (var i = 0; i < vars.length; i++) {
             var pair = vars[i].split('=');
@@ -86,17 +73,21 @@
                 return pair[1];
             }
         }
-    }
-
-    // execute or not the background task
-    if (cancel) {
-        // record information in LocalSettings to communicate with the app
-        key = backgroundTaskInstance.task.taskId.toString();
-        settings.values[key] = "Canceled";
-
-        // background task must call close when it is done.
-        close();
-    } else {
-        execute();
-    }
-})();
+    };
+    NotificationActionTask.prototype.sendMessage = function (roomId, text) {
+        return WinJS.xhr({
+            type: 'POST',
+            url: "https://api.gitter.im/v1/rooms/" + roomId + "/chatMessages",
+            data: JSON.stringify({ text: text }),
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this.token
+            }
+        });
+    };
+    return NotificationActionTask;
+}(BackgroundTask));
+importScripts("/dist/winjs/js/base.js");
+var backgroundTask = new NotificationActionTask();
+backgroundTask.execute();
