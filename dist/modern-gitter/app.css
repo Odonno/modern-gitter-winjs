@@ -195,6 +195,10 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	height: calc(100vh - 60px);
 }
 
+.selected-item {
+    border: 2px solid #0078D7;
+}
+
 /* add a room - existing room view style */
 #existingRoomsHeader {
 	max-width: 100%;
@@ -202,7 +206,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 #existingRoomsListView {
-	height: calc(100vh - 220px);
+	height: calc(100vh - 200px);
     overflow-y: auto;
 }
 
@@ -220,15 +224,19 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 .existing-room-name {
 	margin-top: 6px !important;
 	padding-top: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .existing-room-description {
 	font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* add a room - repository view style */
 #repositoriesListView {
-	height: calc(100vh - 180px);
+	height: calc(100vh - 155px);
     overflow-y: auto;
 }
 
@@ -246,14 +254,19 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 .repository-name {
 	margin-top: 6px !important;
 	padding-top: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .repository-description {
 	font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* add a room - channel view style */
 #channelView {
+    height: calc(100vh - 110px);
     overflow-y: auto;
 }
 
@@ -284,7 +297,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 }
 
 #usersListView {
-	height: calc(100vh - 220px);
+	height: calc(100vh - 200px);
     overflow-y: auto;
 }
 
@@ -486,7 +499,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 @media screen and (min-width: 400px) and (max-width: 700px) {
 	/* addRoom view style */
     .addRoomTab {
-        font-size: 18px !important;
+        font-size: 16px !important;
     }
 }
 
