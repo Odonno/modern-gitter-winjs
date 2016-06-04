@@ -2,6 +2,9 @@
 
 module Application.Services {
     export interface IToastOptions {
+        tag?: string;
+        group?: string;
+        expirationTime?: number;
         launch: string;
         duration?: string;
         activationType?: string;
@@ -38,13 +41,29 @@ module Application.Services {
             return text.replace('<', '&lt;').replace('>', '&gt;');
         }
 
-        private sendGenericToast(toast: string): void {
+        private send(toast: string, args: IToastOptions): void {
             // generate XML from toast content
             let toastXml = new Windows.Data.Xml.Dom.XmlDocument();
             toastXml.loadXml(toast);
 
-            // create toast notification and display it
+            // create toast notification and add properties to toast notification
             let toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+            if (args) {
+                if (args.tag) {
+                    toastNotification.tag = args.tag;
+                }
+                if (args.group) {
+                    toastNotification.group = args.group;
+                }
+                if (args.expirationTime) {
+                    let expiration = new Date();
+                    expiration.setSeconds(expiration.getSeconds() + args.expirationTime);
+                    
+                    toastNotification.expirationTime = expiration;
+                }
+            }
+
+            // display notification
             this.toastNotifier.show(toastNotification);
         }
 
@@ -64,7 +83,7 @@ module Application.Services {
                 + '</visual>'
                 + '</toast>';
 
-            this.sendGenericToast(toast);
+            this.send(toast, toastOptions);
         }
 
         public sendTitleAndTextNotification(title: string, text: string, toastOptions?: IToastOptions) {
@@ -82,7 +101,7 @@ module Application.Services {
                 + '</visual>'
                 + '</toast>';
 
-            this.sendGenericToast(toast);
+            this.send(toast, toastOptions);
         }
 
         public sendImageAndTextNotification(image: string, text: string, toastOptions?: IToastOptions) {
@@ -101,7 +120,7 @@ module Application.Services {
                 + '</visual>'
                 + '</toast>';
 
-            this.sendGenericToast(toast);
+            this.send(toast, toastOptions);
         }
 
         public sendImageTitleAndTextNotification(image: string, title: string, text: string, toastOptions?: IToastOptions) {
@@ -120,7 +139,7 @@ module Application.Services {
                 + '</visual>'
                 + '</toast>';
 
-            this.sendGenericToast(toast);
+            this.send(toast, toastOptions);
         }
 
         public sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: IReplyOptions, toastOptions?: IToastOptions) {
@@ -143,7 +162,7 @@ module Application.Services {
                 + '</actions>'
                 + '</toast>';
 
-            this.sendGenericToast(toast);
+            this.send(toast, toastOptions);
         }
     }
 }

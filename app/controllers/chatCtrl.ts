@@ -61,7 +61,10 @@ module Application.Controllers {
             // initialize controller
             if (FeatureToggleService.isDebugMode()) {
                 // send test notification (new message)
-                ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', { launch: `action=viewRoom&roomId=${$scope.room.id}` });
+                let toastOptions: Services.IToastOptions = {
+                    launch: `action=viewRoom&roomId=${$scope.room.id}`
+                };
+                ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', toastOptions);
 
                 // send test notification (mention with reply feature)
                 let username = 'gitter-bot';
@@ -75,7 +78,7 @@ module Application.Controllers {
                     image: 'assets/icons/send.png',
                     activationType: 'background'
                 };
-                ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, `${username} mentioned you`, 'This is a test message, please respond', replyOptions, { launch: `action=viewRoom&roomId=${$scope.room.id}` });
+                ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, `${username} mentioned you`, 'This is a test message, please respond', replyOptions, toastOptions);
             }
         }
     }

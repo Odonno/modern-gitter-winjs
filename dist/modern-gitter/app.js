@@ -1300,10 +1300,23 @@ var Application;
             ToastNotificationService.prototype.encodeTextNotification = function (text) {
                 return text.replace('<', '&lt;').replace('>', '&gt;');
             };
-            ToastNotificationService.prototype.sendGenericToast = function (toast) {
+            ToastNotificationService.prototype.send = function (toast, args) {
                 var toastXml = new Windows.Data.Xml.Dom.XmlDocument();
                 toastXml.loadXml(toast);
                 var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
+                if (args) {
+                    if (args.tag) {
+                        toastNotification.tag = args.tag;
+                    }
+                    if (args.group) {
+                        toastNotification.group = args.group;
+                    }
+                    if (args.expirationTime) {
+                        var expiration = new Date();
+                        expiration.setSeconds(expiration.getSeconds() + args.expirationTime);
+                        toastNotification.expirationTime = expiration;
+                    }
+                }
                 this.toastNotifier.show(toastNotification);
             };
             ToastNotificationService.prototype.sendTextNotification = function (text, toastOptions) {
@@ -1319,7 +1332,7 @@ var Application;
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                this.sendGenericToast(toast);
+                this.send(toast, toastOptions);
             };
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text, toastOptions) {
                 var toastArgs = '';
@@ -1334,7 +1347,7 @@ var Application;
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                this.sendGenericToast(toast);
+                this.send(toast, toastOptions);
             };
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text, toastOptions) {
                 var toastArgs = '';
@@ -1350,7 +1363,7 @@ var Application;
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                this.sendGenericToast(toast);
+                this.send(toast, toastOptions);
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text, toastOptions) {
                 var toastArgs = '';
@@ -1366,7 +1379,7 @@ var Application;
                     + '</binding>'
                     + '</visual>'
                     + '</toast>';
-                this.sendGenericToast(toast);
+                this.send(toast, toastOptions);
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, toastOptions) {
                 var toastArgs = '';
@@ -1386,7 +1399,7 @@ var Application;
                     + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
                     + '</actions>'
                     + '</toast>';
-                this.sendGenericToast(toast);
+                this.send(toast, toastOptions);
             };
             return ToastNotificationService;
         }());
@@ -1581,7 +1594,11 @@ var Application;
                 };
                 $scope.createRoom = function () {
                     RoomsService.createChannel($scope.channel, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, "The channel " + room.name + " has been successfully created", { launch: "action=viewRoom&roomId=" + room.id });
+                        var toastOptions = {
+                            launch: "action=viewRoom&roomId=" + room.id,
+                            expirationTime: 5
+                        };
+                        ToastNotificationService.sendImageAndTextNotification(room.image, "The channel " + room.name + " has been successfully created", toastOptions);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
@@ -1623,7 +1640,11 @@ var Application;
                 };
                 $scope.joinRoom = function () {
                     RoomsService.createRoom($scope.selectedRoom.uri, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, "You joined the room " + room.name, { launch: "action=viewRoom&roomId=" + room.id });
+                        var toastOptions = {
+                            launch: "action=viewRoom&roomId=" + room.id,
+                            expirationTime: 5
+                        };
+                        ToastNotificationService.sendImageAndTextNotification(room.image, "You joined the room " + room.name, toastOptions);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
@@ -1664,7 +1685,11 @@ var Application;
                 };
                 $scope.createRoom = function () {
                     RoomsService.createRoom($scope.selectedUser.username, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, "You can now chat with " + room.name, { launch: "action=viewRoom&roomId=" + room.id });
+                        var toastOptions = {
+                            launch: "action=viewRoom&roomId=" + room.id,
+                            expirationTime: 5
+                        };
+                        ToastNotificationService.sendImageAndTextNotification(room.image, "You can now chat with " + room.name, toastOptions);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
@@ -1695,7 +1720,11 @@ var Application;
                 };
                 $scope.createRoom = function () {
                     RoomsService.createRoom($scope.selectedRepository.uri, function (room) {
-                        ToastNotificationService.sendImageAndTextNotification(room.image, "The room " + room.name + " has been successfully created", { launch: "action=viewRoom&roomId=" + room.id });
+                        var toastOptions = {
+                            launch: "action=viewRoom&roomId=" + room.id,
+                            expirationTime: 5
+                        };
+                        ToastNotificationService.sendImageAndTextNotification(room.image, "The room " + room.name + " has been successfully created", toastOptions);
                         RoomsService.selectRoom(room);
                         $state.go('chat');
                     });
@@ -1851,7 +1880,10 @@ var Application;
                 LocalSettingsService.set('lastPage', 'chat');
                 LocalSettingsService.set('lastRoom', $scope.room.name);
                 if (FeatureToggleService.isDebugMode()) {
-                    ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', { launch: "action=viewRoom&roomId=" + $scope.room.id });
+                    var toastOptions = {
+                        launch: "action=viewRoom&roomId=" + $scope.room.id
+                    };
+                    ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', toastOptions);
                     var username = 'gitter-bot';
                     var replyOptions = {
                         id: 'message',
@@ -1863,7 +1895,7 @@ var Application;
                         image: 'assets/icons/send.png',
                         activationType: 'background'
                     };
-                    ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, username + " mentioned you", 'This is a test message, please respond', replyOptions, { launch: "action=viewRoom&roomId=" + $scope.room.id });
+                    ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, username + " mentioned you", 'This is a test message, please respond', replyOptions, toastOptions);
                 }
             }
             return ChatCtrl;
