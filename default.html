@@ -47,7 +47,7 @@
 
             <div class="split-view-commands">
                 <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}" ui-sref="home"></div>
-                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Join a room', icon: 'add'}" ng-show="loggedIn" ui-sref="addRoom.existing"></div>
+                <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Join a room', icon: 'add'}" ng-show="loggedIn && betaVersionEnabled" ui-sref="addRoom.existing"></div>
                 <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Rooms', icon: 'find'}" ng-show="loggedIn" ui-sref="rooms"></div>
                 <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Chat', icon: 'message'}" ng-show="loggedIn" ui-sref="chat"></div>
                 <div class="unselectable" data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}" ng-show="loggedIn" ui-sref="settings"></div>

@@ -69,6 +69,16 @@ module Application.Services {
         };
 
         // Settings Toggles
+        public isBetaVersionEnabled(): boolean {
+            this.inject();
+
+            if (this._localSettingsService.contains('isBetaVersionEnabled')) {
+                return this._localSettingsService.get('isBetaVersionEnabled');
+            } else {
+                return false;
+            }
+        };
+        
         public isLineReturnShouldSendChatMessage(): boolean {
             this.inject();
 

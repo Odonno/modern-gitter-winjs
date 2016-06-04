@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -674,6 +674,16 @@ var Application;
             ;
             FeatureToggleService.prototype.isSignOutHandled = function () {
                 return true;
+            };
+            ;
+            FeatureToggleService.prototype.isBetaVersionEnabled = function () {
+                this.inject();
+                if (this._localSettingsService.contains('isBetaVersionEnabled')) {
+                    return this._localSettingsService.get('isBetaVersionEnabled');
+                }
+                else {
+                    return false;
+                }
             };
             ;
             FeatureToggleService.prototype.isLineReturnShouldSendChatMessage = function () {
@@ -1768,6 +1778,7 @@ var Application;
                 };
                 $scope.loggedIn = RoomsService.loggedIn;
                 $scope.isSignOutHandled = FeatureToggleService.isSignOutHandled();
+                $scope.betaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
                 $scope.tryLogin = function () {
                     RoomsService.logIn(function () {
                         $scope.loggedIn = RoomsService.loggedIn;
@@ -1819,6 +1830,9 @@ var Application;
                             splitView.paneOpened = false;
                         }
                     }
+                });
+                $rootScope.$on('updateSetting', function () {
+                    $scope.betaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
                 });
             }
             return AppCtrl;
@@ -1947,7 +1961,8 @@ var Application;
     var Controllers;
     (function (Controllers) {
         var SettingsCtrl = (function () {
-            function SettingsCtrl($scope, LocalSettingsService, FeatureToggleService) {
+            function SettingsCtrl($scope, $rootScope, LocalSettingsService, FeatureToggleService) {
+                $scope.isBetaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
                 $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
                 $scope.isUnreadItemsNotificationsEnabled = FeatureToggleService.isUnreadItemsNotificationsEnabled();
                 $scope.isUnreadMentionsNotificationsEnabled = FeatureToggleService.isUnreadMentionsNotificationsEnabled();
@@ -1960,6 +1975,7 @@ var Application;
                     else {
                         LocalSettingsService.set(property, !$scope[property]);
                     }
+                    $rootScope.$emit('updateSetting');
                 };
             }
             return SettingsCtrl;
@@ -2015,5 +2031,5 @@ appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsServ
 appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });
 appModule.controller('HomeCtrl', function ($scope, $state, RoomsService, ToastNotificationService) { return new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService); });
 appModule.controller('RoomsCtrl', function ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService); });
-appModule.controller('SettingsCtrl', function ($scope, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService); });
+appModule.controller('SettingsCtrl', function ($scope, $rootScope, LocalSettingsService, FeatureToggleService) { return new Application.Controllers.SettingsCtrl($scope, $rootScope, LocalSettingsService, FeatureToggleService); });
 appModule.controller('SplashscreenCtrl', function ($scope) { return new Application.Controllers.SplashscreenCtrl($scope); });

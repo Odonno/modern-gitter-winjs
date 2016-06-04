@@ -2,6 +2,9 @@
 
 module Application.Controllers {
     export interface ISettingsScope extends ng.IScope {
+        // app settings
+        isBetaVersionEnabled: boolean;
+        
         // chat settings
         isLineReturnShouldSendChatMessage: boolean;        
         
@@ -14,8 +17,10 @@ module Application.Controllers {
     }
 
     export class SettingsCtrl {
-        constructor($scope: ISettingsScope, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
+        constructor($scope: ISettingsScope, $rootScope: ng.IRootScopeService, LocalSettingsService: Services.LocalSettingsService, FeatureToggleService: Services.FeatureToggleService) {
             // properties
+            $scope.isBetaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
+            
             $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
             
             $scope.isUnreadItemsNotificationsEnabled = FeatureToggleService.isUnreadItemsNotificationsEnabled();
@@ -31,6 +36,8 @@ module Application.Controllers {
                 } else {
                     LocalSettingsService.set(property, !$scope[property]);
                 }
+                
+                $rootScope.$emit('updateSetting');
             };
         }
     }

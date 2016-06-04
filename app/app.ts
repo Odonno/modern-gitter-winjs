@@ -89,5 +89,5 @@ appModule.controller('ChatCtrl', ($scope, $state, ApiService, RoomsService, Navi
 appModule.controller('ErrorCtrl', ($scope, $state) => new Application.Controllers.ErrorCtrl($scope, $state));
 appModule.controller('HomeCtrl', ($scope, $state, RoomsService, ToastNotificationService) => new Application.Controllers.HomeCtrl($scope, $state, RoomsService, ToastNotificationService));
 appModule.controller('RoomsCtrl', ($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) => new Application.Controllers.RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService));
-appModule.controller('SettingsCtrl', ($scope, LocalSettingsService, FeatureToggleService) => new Application.Controllers.SettingsCtrl($scope, LocalSettingsService, FeatureToggleService));
+appModule.controller('SettingsCtrl', ($scope, $rootScope, LocalSettingsService, FeatureToggleService) => new Application.Controllers.SettingsCtrl($scope, $rootScope, LocalSettingsService, FeatureToggleService));
 appModule.controller('SplashscreenCtrl', ($scope) => new Application.Controllers.SplashscreenCtrl($scope));

@@ -4,6 +4,7 @@ module Application.Controllers {
     export interface IAppScope extends ng.IScope {
         loggedIn: boolean;
         isSignOutHandled: boolean;
+        betaVersionEnabled: boolean;
 
         tryLogin();
         logout(): void;
@@ -14,7 +15,8 @@ module Application.Controllers {
             // properties
             $scope.loggedIn = RoomsService.loggedIn;
             $scope.isSignOutHandled = FeatureToggleService.isSignOutHandled();
-            
+            $scope.betaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
+
             // methods
             $scope.tryLogin = () => {
                 RoomsService.logIn(() => {
@@ -56,10 +58,10 @@ module Application.Controllers {
                     // disconnect user from current session
                     OAuthService.disconnect();
                     RoomsService.reset();
-                    
+
                     // check if user is now logged in
                     $scope.loggedIn = RoomsService.loggedIn;
-                    
+
                     console.log('Succesfully logged out');
                 }
             };
@@ -92,13 +94,18 @@ module Application.Controllers {
                 } else {
                     // make visible pane splitview
                     this.invertCssClass('win-splitview-pane-hidden', 'win-splitview-pane');
-                    
+
                     // close pane splitview if we are on mobile
                     if (FeatureToggleService.isRunningWindowsMobile()) {
                         var splitView = document.querySelector(".splitView").winControl;
                         splitView.paneOpened = false;
                     }
                 }
+            });
+
+            // detect setting change
+            $rootScope.$on('updateSetting', () => {
+                $scope.betaVersionEnabled = FeatureToggleService.isBetaVersionEnabled();
             });
         }
 

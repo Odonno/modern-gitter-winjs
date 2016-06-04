@@ -2,6 +2,23 @@
     <div class="content">
         <h2 class="win-h2">Settings</h2>
         
+        <!-- app options -->
+        <h3 class="win-h3">App</h3>
+
+        <div class="toggle-switch-group">
+            <div>
+                Enable beta version<br />
+                <em>You will have access to more features but the app could be less stable</em>
+            </div>
+            <div class="btn-group toggle-switch-settings">
+                <button ng-class="{ active: isBetaVersionEnabled }" ng-click="saveSetting('isBetaVersionEnabled')"
+                    type="button" data-toggle="button" class="btn btn-toggle-switch" autocomplete="off" aria-pressed="false">
+                    <span class="stateLabel stateLabel-on">On</span>
+                    <span class="stateLabel stateLabel-off">Off</span>
+                </button>
+            </div>
+        </div>
+        
         <!-- chat options -->
         <h3 class="win-h3">Chat</h3>
 
