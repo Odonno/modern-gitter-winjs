@@ -2,6 +2,7 @@
 
 module Application.Controllers {
     export interface IAddOneToOneRoomScope extends ng.IScope {
+        canJoin: boolean;
         search: string;
         users: Models.User[];
         selectedUser: Models.User;
@@ -19,6 +20,7 @@ module Application.Controllers {
             // methods
             $scope.selectUser = (user: Models.User) => {
                 $scope.selectedUser = user;
+                $scope.canJoin = RoomsService.canJoin($scope.selectedUser.displayName);
             };
 
             $scope.createRoom = () => {

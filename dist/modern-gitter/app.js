@@ -1256,6 +1256,9 @@ var Application;
                     this.onroomselected();
                 }
             };
+            RoomsService.prototype.canJoin = function (name) {
+                return !this.getRoom(name);
+            };
             RoomsService.prototype.createRoom = function (name, callback) {
                 var _this = this;
                 this.ApiService.joinRoom(name).then(function (room) {
@@ -1296,6 +1299,9 @@ var Application;
             }
             ToastNotificationService.prototype.encodeLaunchArg = function (launch) {
                 return launch.replace(/&/g, '&amp;');
+            };
+            ToastNotificationService.prototype.encodeImageArg = function (image) {
+                return image.replace(/&/g, '&amp;');
             };
             ToastNotificationService.prototype.encodeTextNotification = function (text) {
                 return text.replace('<', '&lt;').replace('>', '&gt;');
@@ -1357,7 +1363,7 @@ var Application;
                 var toast = '<toast' + toastArgs + '>'
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
-                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                     + '<text></text>'
                     + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
@@ -1373,7 +1379,7 @@ var Application;
                 var toast = '<toast' + toastArgs + '>'
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
-                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                     + '<text>' + this.encodeTextNotification(title) + '</text>'
                     + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
@@ -1389,14 +1395,14 @@ var Application;
                 var toast = '<toast' + toastArgs + '>'
                     + '<visual>'
                     + '<binding template="ToastGeneric">'
-                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                     + '<text>' + this.encodeTextNotification(title) + '</text>'
                     + '<text>' + this.encodeTextNotification(text) + '</text>'
                     + '</binding>'
                     + '</visual>'
                     + '<actions>'
                     + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
-                    + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
+                    + '<action content="' + replyOptions.content + '" imageUri="' + this.encodeImageArg(replyOptions.image) + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
                     + '</actions>'
                     + '</toast>';
                 this.send(toast, toastOptions);
@@ -1637,6 +1643,7 @@ var Application;
                 $scope.existingRooms = [];
                 $scope.selectRoom = function (room) {
                     $scope.selectedRoom = room;
+                    $scope.canJoin = RoomsService.canJoin($scope.selectedRoom.name);
                 };
                 $scope.joinRoom = function () {
                     RoomsService.createRoom($scope.selectedRoom.uri, function (room) {
@@ -1682,6 +1689,7 @@ var Application;
                 $scope.users = [];
                 $scope.selectUser = function (user) {
                     $scope.selectedUser = user;
+                    $scope.canJoin = RoomsService.canJoin($scope.selectedUser.displayName);
                 };
                 $scope.createRoom = function () {
                     RoomsService.createRoom($scope.selectedUser.username, function (room) {
@@ -1717,6 +1725,7 @@ var Application;
             function AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
                 $scope.selectRepository = function (repository) {
                     $scope.selectedRepository = repository;
+                    $scope.canJoin = RoomsService.canJoin($scope.selectedRepository.uri);
                 };
                 $scope.createRoom = function () {
                     RoomsService.createRoom($scope.selectedRepository.uri, function (room) {

@@ -2,6 +2,7 @@
 
 module Application.Controllers {
     export interface IAddRepositoryRoomScope extends ng.IScope {
+        canJoin: boolean;
         selectedRepository: Models.Repository;
         repositories: Models.Repository[];
         repositoriesWithoutRoom: Models.Repository[];
@@ -15,6 +16,7 @@ module Application.Controllers {
             // methods
             $scope.selectRepository = (repository: Models.Repository) => {
                 $scope.selectedRepository = repository;
+                $scope.canJoin = RoomsService.canJoin($scope.selectedRepository.uri);
             };
 
             $scope.createRoom = () => {

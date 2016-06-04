@@ -133,6 +133,9 @@ var UnreadItemsNotificationsTask = (function (_super) {
     UnreadItemsNotificationsTask.prototype.encodeLaunchArg = function (launch) {
         return launch.replace(/&/g, '&amp;');
     };
+    UnreadItemsNotificationsTask.prototype.encodeImageArg = function (image) {
+        return image.replace(/&/g, '&amp;');
+    };
     UnreadItemsNotificationsTask.prototype.encodeTextNotification = function (text) {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     };
@@ -144,7 +147,7 @@ var UnreadItemsNotificationsTask = (function (_super) {
         var toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
-            + '<image placement="appLogoOverride" src="' + image + '" />'
+            + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
             + '<text>' + this.encodeTextNotification(title) + '</text>'
             + '<text>' + this.encodeTextNotification(text) + '</text>'
             + '</binding>'

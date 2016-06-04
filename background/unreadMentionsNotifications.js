@@ -204,6 +204,9 @@ var UnreadMentionsNotificationsTask = (function (_super) {
     UnreadMentionsNotificationsTask.prototype.encodeLaunchArg = function (launch) {
         return launch.replace(/&/g, '&amp;');
     };
+    UnreadMentionsNotificationsTask.prototype.encodeImageArg = function (image) {
+        return image.replace(/&/g, '&amp;');
+    };
     UnreadMentionsNotificationsTask.prototype.encodeTextNotification = function (text) {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     };
@@ -215,14 +218,14 @@ var UnreadMentionsNotificationsTask = (function (_super) {
         var toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
-            + '<image placement="appLogoOverride" src="' + image + '" />'
+            + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
             + '<text>' + this.encodeTextNotification(title) + '</text>'
             + '<text>' + this.encodeTextNotification(text) + '</text>'
             + '</binding>'
             + '</visual>'
             + '<actions>'
             + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
-            + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
+            + '<action content="' + replyOptions.content + '" imageUri="' + this.encodeImageArg(replyOptions.image) + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
             + '</actions>'
             + '</toast>';
         var toastXml = new Windows.Data.Xml.Dom.XmlDocument();

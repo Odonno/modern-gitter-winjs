@@ -36,6 +36,10 @@ module Application.Services {
         private encodeLaunchArg(launch: string): string {
             return launch.replace(/&/g, '&amp;');
         }
+        
+        private encodeImageArg(image: string): string {
+            return image.replace(/&/g, '&amp;');
+        }
 
         private encodeTextNotification(text: string): string {
             return text.replace('<', '&lt;').replace('>', '&gt;');
@@ -113,7 +117,7 @@ module Application.Services {
             let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
-                + '<image placement="appLogoOverride" src="' + image + '" />'
+                + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                 + '<text></text>'
                 + '<text>' + this.encodeTextNotification(text) + '</text>'
                 + '</binding>'
@@ -132,7 +136,7 @@ module Application.Services {
             let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
-                + '<image placement="appLogoOverride" src="' + image + '" />'
+                + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                 + '<text>' + this.encodeTextNotification(title) + '</text>'
                 + '<text>' + this.encodeTextNotification(text) + '</text>'
                 + '</binding>'
@@ -151,14 +155,14 @@ module Application.Services {
             let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
-                + '<image placement="appLogoOverride" src="' + image + '" />'
+                + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
                 + '<text>' + this.encodeTextNotification(title) + '</text>'
                 + '<text>' + this.encodeTextNotification(text) + '</text>'
                 + '</binding>'
                 + '</visual>'
                 + '<actions>'
                 + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
-                + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
+                + '<action content="' + replyOptions.content + '" imageUri="' + this.encodeImageArg(replyOptions.image) + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
                 + '</actions>'
                 + '</toast>';
 

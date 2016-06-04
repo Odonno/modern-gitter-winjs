@@ -32,7 +32,7 @@ module Application.Controllers {
             };
 
             $scope.createRoom = () => {
-                RoomsService.createChannel($scope.channel, (room) => {
+                RoomsService.createChannel($scope.channel, room => {
                     let toastOptions: Services.IToastOptions = {
                         launch: `action=viewRoom&roomId=${room.id}`,
                         expirationTime: 5

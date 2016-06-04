@@ -218,6 +218,10 @@ class UnreadItemsNotificationsTask extends BackgroundTask {
         return launch.replace(/&/g, '&amp;');
     }
 
+    private encodeImageArg(image: string): string {
+        return image.replace(/&/g, '&amp;');
+    }
+
     private encodeTextNotification(text: string): string {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     }
@@ -232,7 +236,7 @@ class UnreadItemsNotificationsTask extends BackgroundTask {
         let toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
-            + '<image placement="appLogoOverride" src="' + image + '" />'
+            + '<image placement="appLogoOverride" src="' + this.encodeImageArg(image) + '" />'
             + '<text>' + this.encodeTextNotification(title) + '</text>'
             + '<text>' + this.encodeTextNotification(text) + '</text>'
             + '</binding>'

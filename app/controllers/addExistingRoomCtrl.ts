@@ -2,6 +2,7 @@
 
 module Application.Controllers {
     export interface IAddExistingRoomScope extends ng.IScope {
+        canJoin: boolean;
         search: string;
         existingRooms: Models.Room[];
         selectedRoom: Models.Room;
@@ -19,6 +20,7 @@ module Application.Controllers {
             // methods
             $scope.selectRoom = (room: Models.Room) => {
                 $scope.selectedRoom = room;
+                $scope.canJoin = RoomsService.canJoin($scope.selectedRoom.name);
             }
 
             $scope.joinRoom = () => {

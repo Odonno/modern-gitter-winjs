@@ -34,7 +34,7 @@ module Application.Services {
         }
 
         // private methods
-        private addRoom(room: Models.Room) {
+        private addRoom(room: Models.Room): void {
             // compute room image
             if (room.user) {
                 room.image = room.user.avatarUrlMedium;
@@ -52,7 +52,7 @@ module Application.Services {
             this.rooms.push(room);
         }
 
-        private receiveMessage(room: Models.Room, message: Models.Message) {
+        private receiveMessage(room: Models.Room, message: Models.Message): void {
             if (this.onmessagereceived) {
                 this.onmessagereceived(room.id, message);
             }
@@ -68,7 +68,7 @@ module Application.Services {
             this.notifyNewUnreadMentions(room, message);
         }
 
-        private notifyNewUnreadMessage(room: Models.Room, message: Models.Message) {
+        private notifyNewUnreadMessage(room: Models.Room, message: Models.Message): void {
             // push unread message if notifications are globally enabled for this room
             if (!room.lurk) {
                 // increment unread count
@@ -81,7 +81,7 @@ module Application.Services {
             }
         }
 
-        private notifyNewUnreadMentions(room: Models.Room, message: Models.Message) {
+        private notifyNewUnreadMentions(room: Models.Room, message: Models.Message): void {
             // for each mention contained in the message
             for (let i = 0; i < message.mentions.length; i++) {
                 // push mention (count + notification)
@@ -108,7 +108,7 @@ module Application.Services {
         }
 
         // public methods
-        public logIn(callback?: { (): void }) {
+        public logIn(callback?: { (): void }): void {
             if (this.loggedIn) {
                 if (callback) {
                     callback();
@@ -179,28 +179,32 @@ module Application.Services {
             }
         }
 
-        public selectRoom(room: Models.Room) {
+        public selectRoom(room: Models.Room): void {
             this.currentRoom = room;
             if (this.onroomselected) {
                 this.onroomselected();
             }
         }
 
-        public createRoom(name: string, callback: { (room: Models.Room): void }) {
+        public canJoin(name: string): boolean {
+            return !this.getRoom(name);
+        }
+
+        public createRoom(name: string, callback: { (room: Models.Room): void }): void {
             this.ApiService.joinRoom(name).then(room => {
                 this.addRoom(room);
                 callback(room);
             });
         }
 
-        public createChannel(channel: Models.NewChannel, callback: { (room: Models.Room): void }) {
+        public createChannel(channel: Models.NewChannel, callback: { (room: Models.Room): void }): void {
             this.ApiService.createChannel(channel).then(room => {
                 this.addRoom(room);
                 callback(room);
             });
         }
 
-        public markUnreadMessages(messageIds: string[]) {
+        public markUnreadMessages(messageIds: string[]): void {
             this.ApiService.markUnreadMessages(this.currentUser.id, this.currentRoom.id, messageIds).then(response => {
                 if (response) {
                     this.currentRoom.unreadItems -= messageIds.length;
