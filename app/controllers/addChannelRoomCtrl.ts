@@ -33,7 +33,8 @@ module Application.Controllers {
 
             $scope.createRoom = () => {
                 RoomsService.createChannel($scope.channel, (room) => {
-                    ToastNotificationService.sendImageAndTextNotification(room.image, 'The channel ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
+                    ToastNotificationService.sendImageAndTextNotification(room.image, `The channel ${room.name} has been successfully created`, { launch: `action=viewRoom&roomId=${room.id}` });
+                    
                     RoomsService.selectRoom(room);
                     $state.go('chat');
                 });

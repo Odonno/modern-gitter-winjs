@@ -1,4 +1,4 @@
-﻿var __extends = (this && this.__extends) || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -186,24 +186,33 @@ var UnreadMentionsNotificationsTask = (function (_super) {
             var id = room.id + "_mention_" + messageId;
             if (!_this.settings.values[id]) {
                 var replyOptions = {
-                    args: 'action=reply&roomId=' + room.id,
-                    text: '@' + message.fromUser.username + ' ',
-                    image: 'assets/icons/send.png'
+                    id: 'message',
+                    type: 'text',
+                    content: 'Send',
+                    placeHolderContent: 'Type a reply',
+                    arguments: "action=reply&roomId=" + room.id,
+                    defaultInput: "@" + message.fromUser.username + " ",
+                    image: 'assets/icons/send.png',
+                    activationType: 'background'
                 };
-                _this.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                _this.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, { launch: "action=viewRoom&roomId=" + room.id });
                 _this.settings.values[id] = true;
             }
             onmentionnotified();
         });
     };
-    UnreadMentionsNotificationsTask.prototype.encodeArgsNotification = function (args) {
-        return args.replace(/&/g, '&amp;');
+    UnreadMentionsNotificationsTask.prototype.encodeLaunchArg = function (launch) {
+        return launch.replace(/&/g, '&amp;');
     };
     UnreadMentionsNotificationsTask.prototype.encodeTextNotification = function (text) {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     };
-    UnreadMentionsNotificationsTask.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, args) {
-        var toast = '<toast launch="' + this.encodeArgsNotification(args) + '">'
+    UnreadMentionsNotificationsTask.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, toastOptions) {
+        var toastArgs = '';
+        if (toastOptions) {
+            toastArgs += (toastOptions.launch ? " launch=\"" + this.encodeLaunchArg(toastOptions.launch) + "\"" : '');
+        }
+        var toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
             + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -212,8 +221,8 @@ var UnreadMentionsNotificationsTask = (function (_super) {
             + '</binding>'
             + '</visual>'
             + '<actions>'
-            + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
-            + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
+            + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
+            + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
             + '</actions>'
             + '</toast>';
         var toastXml = new Windows.Data.Xml.Dom.XmlDocument();

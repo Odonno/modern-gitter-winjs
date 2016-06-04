@@ -1,5 +1,23 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
 
+interface IToastOptions {
+    launch: string;
+    duration?: string;
+    activationType?: string;
+    scenario?: string;
+}
+
+interface IReplyOptions {
+    id: string;
+    type: string;
+    content: string;
+    arguments: string;
+    defaultInput: string;
+    placeHolderContent: string;
+    image?: string;
+    activationType: string;
+}
+
 class User {
     public id: string;
     public username: string;
@@ -253,18 +271,23 @@ class UnreadMentionsNotificationsTask extends BackgroundTask {
             .then(success => {
                 // retrieve message
                 let message = JSON.parse(success.response);
-                let id = room.id + "_mention_" + messageId;
+                let id = `${room.id}_mention_${messageId}`;
 
                 if (!this.settings.values[id]) {
                     // add ability to answer to the message directly inside notification
-                    let replyOptions = {
-                        args: 'action=reply&roomId=' + room.id,
-                        text: '@' + message.fromUser.username + ' ',
-                        image: 'assets/icons/send.png'
+                    let replyOptions: IReplyOptions = {
+                        id: 'message',
+                        type: 'text',
+                        content: 'Send',
+                        placeHolderContent: 'Type a reply',
+                        arguments: `action=reply&roomId=${room.id}`,
+                        defaultInput: `@${message.fromUser.username} `,
+                        image: 'assets/icons/send.png',
+                        activationType: 'background'
                     };
 
                     // show notifications (toast notifications)
-                    this.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                    this.sendImageTitleAndTextNotificationWithReply(room.image, `${message.fromUser.username} mentioned you`, message.text, replyOptions, { launch: `action=viewRoom&roomId=${room.id}` });
                     this.settings.values[id] = true;
                 }
 
@@ -272,17 +295,22 @@ class UnreadMentionsNotificationsTask extends BackgroundTask {
             });
     }
 
-    private encodeArgsNotification(args: string): string {
-        return args.replace(/&/g, '&amp;');
+    private encodeLaunchArg(launch: string): string {
+        return launch.replace(/&/g, '&amp;');
     }
 
     private encodeTextNotification(text: string): string {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     }
 
-    private sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: any, args: any) {
+    private sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: IReplyOptions, toastOptions?: IToastOptions) {
         // create toast content
-        var toast = '<toast launch="' + this.encodeArgsNotification(args) + '">'
+        let toastArgs = '';
+        if (toastOptions) {
+            toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+        }
+
+        let toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
             + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -291,8 +319,8 @@ class UnreadMentionsNotificationsTask extends BackgroundTask {
             + '</binding>'
             + '</visual>'
             + '<actions>'
-            + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
-            + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
+            + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
+            + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
             + '</actions>'
             + '</toast>';
 

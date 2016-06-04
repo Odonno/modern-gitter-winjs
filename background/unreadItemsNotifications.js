@@ -1,4 +1,4 @@
-﻿var __extends = (this && this.__extends) || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -126,18 +126,22 @@ var UnreadItemsNotificationsTask = (function (_super) {
             else {
                 room.image = "https://avatars.githubusercontent.com/" + room.name.split('/')[0];
             }
-            this.sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", 'action=viewRoom&roomId=' + room.id);
+            this.sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", { launch: "action=viewRoom&roomId=" + room.id });
             this.settings.values[id] = room.unreadItems;
         }
     };
-    UnreadItemsNotificationsTask.prototype.encodeArgsNotification = function (args) {
-        return args.replace(/&/g, '&amp;');
+    UnreadItemsNotificationsTask.prototype.encodeLaunchArg = function (launch) {
+        return launch.replace(/&/g, '&amp;');
     };
     UnreadItemsNotificationsTask.prototype.encodeTextNotification = function (text) {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     };
-    UnreadItemsNotificationsTask.prototype.sendImageTitleAndTextNotification = function (image, title, text, args) {
-        var toast = '<toast launch="' + this.encodeArgsNotification(args) + '">'
+    UnreadItemsNotificationsTask.prototype.sendImageTitleAndTextNotification = function (image, title, text, toastOptions) {
+        var toastArgs = '';
+        if (toastOptions) {
+            toastArgs += (toastOptions.launch ? " launch=\"" + this.encodeLaunchArg(toastOptions.launch) + "\"" : '');
+        }
+        var toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
             + '<image placement="appLogoOverride" src="' + image + '" />'

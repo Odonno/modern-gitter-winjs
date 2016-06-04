@@ -61,16 +61,21 @@ module Application.Controllers {
             // initialize controller
             if (FeatureToggleService.isDebugMode()) {
                 // send test notification (new message)
-                ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', 'action=viewRoom&roomId=' + $scope.room.id);
-                
+                ToastNotificationService.sendImageTitleAndTextNotification($scope.room.image, 'Title of notification', 'A message with a < or a >', { launch: `action=viewRoom&roomId=${$scope.room.id}` });
+
                 // send test notification (mention with reply feature)
-                var username = 'gitter-bot';
-                var replyOptions = {
-                    args: 'action=reply&roomId=' + $scope.room.id,
-                    text: '@' + username + ' ',
-                    image: 'assets/icons/send.png'
+                let username = 'gitter-bot';
+                let replyOptions: Services.IReplyOptions = {
+                    id: 'message',
+                    type: 'text',
+                    content: 'Send',
+                    placeHolderContent: 'Type a reply',
+                    arguments: `action=reply&roomId=${$scope.room.id}`,
+                    defaultInput: `@${username} `,
+                    image: 'assets/icons/send.png',
+                    activationType: 'background'
                 };
-                ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, username + ' mentioned you', 'This is a test message, please respond', replyOptions, 'action=viewRoom&roomId=' + $scope.room.id);
+                ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, `${username} mentioned you`, 'This is a test message, please respond', replyOptions, { launch: `action=viewRoom&roomId=${$scope.room.id}` });
             }
         }
     }

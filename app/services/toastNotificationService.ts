@@ -1,6 +1,24 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module Application.Services {
+    export interface IToastOptions {
+        launch: string;
+        duration?: string;
+        activationType?: string;
+        scenario?: string;
+    }
+
+    export interface IReplyOptions {
+        id: string;
+        type: string;
+        content: string;
+        arguments: string;
+        defaultInput: string;
+        placeHolderContent: string;
+        image?: string;
+        activationType: string;
+    }
+
     export class ToastNotificationService {
         // properties
         private toastNotifier: Windows.UI.Notifications.ToastNotifier;
@@ -12,8 +30,8 @@ module Application.Services {
         }
 
         // private methods
-        private encodeArgsNotification(args: string): string {
-            return args.replace(/&/g, '&amp;');
+        private encodeLaunchArg(launch: string): string {
+            return launch.replace(/&/g, '&amp;');
         }
 
         private encodeTextNotification(text: string): string {
@@ -31,8 +49,13 @@ module Application.Services {
         }
 
         // public methods
-        public sendTextNotification(text: string, args?: string) {
-            let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+        public sendTextNotification(text: string, toastOptions?: IToastOptions) {
+            let toastArgs = '';
+            if (toastOptions) {
+                toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+            }
+
+            let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
                 + '<text></text>'
@@ -44,8 +67,13 @@ module Application.Services {
             this.sendGenericToast(toast);
         }
 
-        public sendTitleAndTextNotification(title: string, text: string, args?: string) {
-            let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+        public sendTitleAndTextNotification(title: string, text: string, toastOptions?: IToastOptions) {
+            let toastArgs = '';
+            if (toastOptions) {
+                toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+            }
+
+            let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
                 + '<text>' + this.encodeTextNotification(title) + '</text>'
@@ -57,8 +85,13 @@ module Application.Services {
             this.sendGenericToast(toast);
         }
 
-        public sendImageAndTextNotification(image: string, text: string, args?: string) {
-            let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+        public sendImageAndTextNotification(image: string, text: string, toastOptions?: IToastOptions) {
+            let toastArgs = '';
+            if (toastOptions) {
+                toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+            }
+
+            let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
                 + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -71,8 +104,13 @@ module Application.Services {
             this.sendGenericToast(toast);
         }
 
-        public sendImageTitleAndTextNotification(image: string, title: string, text: string, args?: string) {
-            let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+        public sendImageTitleAndTextNotification(image: string, title: string, text: string, toastOptions?: IToastOptions) {
+            let toastArgs = '';
+            if (toastOptions) {
+                toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+            }
+
+            let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
                 + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -85,8 +123,13 @@ module Application.Services {
             this.sendGenericToast(toast);
         }
 
-        public sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: any, args?: string) {
-            let toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+        public sendImageTitleAndTextNotificationWithReply(image: string, title: string, text: string, replyOptions: IReplyOptions, toastOptions?: IToastOptions) {
+            let toastArgs = '';
+            if (toastOptions) {
+                toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+            }
+
+            let toast = '<toast' + toastArgs + '>'
                 + '<visual>'
                 + '<binding template="ToastGeneric">'
                 + '<image placement="appLogoOverride" src="' + image + '" />'
@@ -95,8 +138,8 @@ module Application.Services {
                 + '</binding>'
                 + '</visual>'
                 + '<actions>'
-                + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
-                + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
+                + '<input id="' + replyOptions.id + '" type="' + replyOptions.type + '" placeHolderContent="' + replyOptions.placeHolderContent + '" defaultInput="' + this.encodeTextNotification(replyOptions.defaultInput) + '" />'
+                + '<action content="' + replyOptions.content + '" imageUri="' + replyOptions.image + '" hint-inputId="' + replyOptions.id + '" activationType="' + replyOptions.activationType + '" arguments="' + this.encodeLaunchArg(replyOptions.arguments) + '" />'
                 + '</actions>'
                 + '</toast>';
 

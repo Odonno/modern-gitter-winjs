@@ -1,5 +1,23 @@
 ﻿/// <reference path="../typings/tsd.d.ts" />
 
+interface IToastOptions {
+    launch: string;
+    duration?: string;
+    activationType?: string;
+    scenario?: string;
+}
+
+interface IReplyOptions {
+    id: string;
+    type: string;
+    content: string;
+    arguments: string;
+    defaultInput: string;
+    placeHolderContent: string;
+    image?: string;
+    activationType: string;
+}
+
 class User {
     public id: string;
     public username: string;
@@ -118,10 +136,10 @@ class UnreadItemsNotificationsTask extends BackgroundTask {
             this.onclose("Failed");
             return false;
         }
-        
+
         return true;
     }
-    
+
     public execute() {
         if (!this.canExecute()) {
             return;
@@ -191,22 +209,27 @@ class UnreadItemsNotificationsTask extends BackgroundTask {
             }
 
             // show notifications (toast notifications)
-            this.sendImageTitleAndTextNotification(room.image, "New messages", room.name + ": " + room.unreadItems + " unread messages", 'action=viewRoom&roomId=' + room.id);
+            this.sendImageTitleAndTextNotification(room.image, "New messages", `${room.name}: ${room.unreadItems} unread messages`, { launch: `action=viewRoom&roomId=${room.id}` });
             this.settings.values[id] = room.unreadItems;
         }
     }
 
-    private encodeArgsNotification(args: string): string {
-        return args.replace(/&/g, '&amp;');
+    private encodeLaunchArg(launch: string): string {
+        return launch.replace(/&/g, '&amp;');
     }
 
     private encodeTextNotification(text: string): string {
         return text.replace('<', '&lt;').replace('>', '&gt;');
     }
 
-    private sendImageTitleAndTextNotification(image: string, title: string, text: string, args: string) {
+    private sendImageTitleAndTextNotification(image: string, title: string, text: string, toastOptions?: IToastOptions) {
         // create toast content
-        let toast = '<toast launch="' + this.encodeArgsNotification(args) + '">'
+        let toastArgs = '';
+        if (toastOptions) {
+            toastArgs += (toastOptions.launch ? ` launch="${this.encodeLaunchArg(toastOptions.launch)}"` : '')
+        }
+
+        let toast = '<toast' + toastArgs + '>'
             + '<visual>'
             + '<binding template="ToastGeneric">'
             + '<image placement="appLogoOverride" src="' + image + '" />'

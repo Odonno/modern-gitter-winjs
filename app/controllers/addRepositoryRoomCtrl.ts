@@ -19,7 +19,8 @@ module Application.Controllers {
 
             $scope.createRoom = () => {
                 RoomsService.createRoom($scope.selectedRepository.uri, room => {
-                    ToastNotificationService.sendImageAndTextNotification(room.image, 'The room ' + room.name + ' has been successfully created', 'action=viewRoom&roomId=' + room.id);
+                    ToastNotificationService.sendImageAndTextNotification(room.image, `The room ${room.name} has been successfully created`, { launch: `action=viewRoom&roomId=${room.id}` });
+                    
                     RoomsService.selectRoom(room);
                     $state.go('chat');
                 });

@@ -76,7 +76,7 @@ module Application.Services {
 
                 // send notification if settings enabled
                 if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
-                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, 'New message - ' + room.name, message.text, 'action=viewRoom&roomId=' + room.id);
+                    this.ToastNotificationService.sendImageTitleAndTextNotification(room.image, `New message - ${room.name}`, message.text, { launch: `action=viewRoom&roomId=${room.id}` });
                 }
             }
         }
@@ -91,12 +91,17 @@ module Application.Services {
 
                     // send notification if settings enabled
                     if (this.FeatureToggleService.isNewMessageNotificationEnabled()) {
-                        let replyOptions = {
-                            args: 'action=reply&roomId=' + room.id,
-                            text: '@' + message.fromUser.username + ' ',
-                            image: 'assets/icons/send.png'
+                        let replyOptions: IReplyOptions = {
+                            id: 'message',
+                            type: 'text',
+                            content: 'Send',
+                            placeHolderContent: 'Type a reply',
+                            arguments: `action=reply&roomId=${room.id}`,
+                            defaultInput: `@${message.fromUser.username} `,
+                            image: 'assets/icons/send.png',
+                            activationType: 'background'
                         };
-                        this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, message.fromUser.username + " mentioned you", message.text, replyOptions, 'action=viewRoom&roomId=' + room.id);
+                        this.ToastNotificationService.sendImageTitleAndTextNotificationWithReply(room.image, `${message.fromUser.username} mentioned you`, message.text, replyOptions, { launch: `action=viewRoom&roomId=${room.id}` });
                     }
                 }
             }
