@@ -60,10 +60,6 @@ module Application.Services {
         };
 
         // Experiment Toggles
-        public isLaunchHandled(): boolean {
-            return true;
-        };
-
         public isSignOutHandled(): boolean {
             return true;
         };
@@ -127,7 +123,6 @@ module Application.Services {
                 isNotificationBackgroundTasksEnabled: this.isNotificationBackgroundTasksEnabled,
                 useFeedbackHubApp: this.useFeedbackHubApp,
                 isRunningWindowsMobile: this.isRunningWindowsMobile,
-                isLaunchHandled: this.isLaunchHandled,
                 isSignOutHandled: this.isSignOutHandled
             };
         } 

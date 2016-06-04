@@ -1,4 +1,4 @@
-﻿var Application;
+var Application;
 (function (Application) {
     var Models;
     (function (Models) {
@@ -668,10 +668,6 @@ var Application;
                 }
             };
             ;
-            FeatureToggleService.prototype.isLaunchHandled = function () {
-                return true;
-            };
-            ;
             FeatureToggleService.prototype.isSignOutHandled = function () {
                 return true;
             };
@@ -733,7 +729,6 @@ var Application;
                     isNotificationBackgroundTasksEnabled: this.isNotificationBackgroundTasksEnabled,
                     useFeedbackHubApp: this.useFeedbackHubApp,
                     isRunningWindowsMobile: this.isRunningWindowsMobile,
-                    isLaunchHandled: this.isLaunchHandled,
                     isSignOutHandled: this.isSignOutHandled
                 };
             };
@@ -1307,114 +1302,66 @@ var Application;
                 this.toastNotifier.show(toastNotification);
             };
             ToastNotificationService.prototype.sendTextNotification = function (text, args) {
-                if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
-                        + '<visual>'
-                        + '<binding template="ToastGeneric">'
-                        + '<text></text>'
-                        + '<text>' + this.encodeTextNotification(text) + '</text>'
-                        + '</binding>'
-                        + '</visual>'
-                        + '</toast>';
-                    this.sendGenericToast(toast);
-                }
-                else {
-                    var template = Windows.UI.Notifications.ToastTemplateType.toastText01;
-                    var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-                    var toastTextElements = toastXml.getElementsByTagName('text');
-                    toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toastNotification);
-                }
+                var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<text></text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '</toast>';
+                this.sendGenericToast(toast);
             };
             ToastNotificationService.prototype.sendTitleAndTextNotification = function (title, text, args) {
-                if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
-                        + '<visual>'
-                        + '<binding template="ToastGeneric">'
-                        + '<text>' + this.encodeTextNotification(title) + '</text>'
-                        + '<text>' + this.encodeTextNotification(text) + '</text>'
-                        + '</binding>'
-                        + '</visual>'
-                        + '</toast>';
-                    this.sendGenericToast(toast);
-                }
-                else {
-                    var template = Windows.UI.Notifications.ToastTemplateType.toastText02;
-                    var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-                    var toastTextElements = toastXml.getElementsByTagName('text');
-                    toastTextElements[0].appendChild(toastXml.createTextNode(title));
-                    toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toastNotification);
-                }
+                var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '</toast>';
+                this.sendGenericToast(toast);
             };
             ToastNotificationService.prototype.sendImageAndTextNotification = function (image, text, args) {
-                if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
-                        + '<visual>'
-                        + '<binding template="ToastGeneric">'
-                        + '<image placement="appLogoOverride" src="' + image + '" />'
-                        + '<text></text>'
-                        + '<text>' + this.encodeTextNotification(text) + '</text>'
-                        + '</binding>'
-                        + '</visual>'
-                        + '</toast>';
-                    this.sendGenericToast(toast);
-                }
-                else {
-                    var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText01;
-                    var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-                    var toastImageElements = toastXml.getElementsByTagName('image');
-                    toastImageElements[0].setAttribute('src', image);
-                    var toastTextElements = toastXml.getElementsByTagName('text');
-                    toastTextElements[0].appendChild(toastXml.createTextNode(text));
-                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toastNotification);
-                }
+                var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text></text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '</toast>';
+                this.sendGenericToast(toast);
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotification = function (image, title, text, args) {
-                if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
-                        + '<visual>'
-                        + '<binding template="ToastGeneric">'
-                        + '<image placement="appLogoOverride" src="' + image + '" />'
-                        + '<text>' + this.encodeTextNotification(title) + '</text>'
-                        + '<text>' + this.encodeTextNotification(text) + '</text>'
-                        + '</binding>'
-                        + '</visual>'
-                        + '</toast>';
-                    this.sendGenericToast(toast);
-                }
-                else {
-                    var template = Windows.UI.Notifications.ToastTemplateType.toastImageAndText02;
-                    var toastXml = Windows.UI.Notifications.ToastNotificationManager.getTemplateContent(template);
-                    var toastImageElements = toastXml.getElementsByTagName('image');
-                    toastImageElements[0].setAttribute('src', image);
-                    var toastTextElements = toastXml.getElementsByTagName('text');
-                    toastTextElements[0].appendChild(toastXml.createTextNode(title));
-                    toastTextElements[1].appendChild(toastXml.createTextNode(text));
-                    var toastNotification = new Windows.UI.Notifications.ToastNotification(toastXml);
-                    this.toastNotifier.show(toastNotification);
-                }
+                var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '</toast>';
+                this.sendGenericToast(toast);
             };
             ToastNotificationService.prototype.sendImageTitleAndTextNotificationWithReply = function (image, title, text, replyOptions, args) {
-                if (this.FeatureToggleService.isLaunchHandled()) {
-                    var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
-                        + '<visual>'
-                        + '<binding template="ToastGeneric">'
-                        + '<image placement="appLogoOverride" src="' + image + '" />'
-                        + '<text>' + this.encodeTextNotification(title) + '</text>'
-                        + '<text>' + this.encodeTextNotification(text) + '</text>'
-                        + '</binding>'
-                        + '</visual>'
-                        + '<actions>'
-                        + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
-                        + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
-                        + '</actions>'
-                        + '</toast>';
-                    this.sendGenericToast(toast);
-                }
+                var toast = (args ? '<toast launch="' + this.encodeArgsNotification(args) + '">' : '<toast>')
+                    + '<visual>'
+                    + '<binding template="ToastGeneric">'
+                    + '<image placement="appLogoOverride" src="' + image + '" />'
+                    + '<text>' + this.encodeTextNotification(title) + '</text>'
+                    + '<text>' + this.encodeTextNotification(text) + '</text>'
+                    + '</binding>'
+                    + '</visual>'
+                    + '<actions>'
+                    + '<input id="message" type="text" placeHolderContent="Type a reply" defaultInput="' + this.encodeTextNotification(replyOptions.text) + '" />'
+                    + '<action content="Send" imageUri="' + replyOptions.image + '" hint-inputId="message" activationType="background" arguments="' + this.encodeArgsNotification(replyOptions.args) + '" />'
+                    + '</actions>'
+                    + '</toast>';
+                this.sendGenericToast(toast);
             };
             return ToastNotificationService;
         }());
