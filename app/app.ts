@@ -41,22 +41,16 @@
 /// <reference path="./controllers/splashscreenCtrl.ts"/>
 
 // create module with references
-let appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji', 'ApplicationInsightsModule']);
+let appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
 
 // inject constants
-appModule.constant('_', window._);
+appModule.constant('_', window['_']);
 
 // inject providers
 appModule.provider('FeatureToggle', ($injector) => new Application.Services.FeatureToggleService($injector));
 
 // inject config
 appModule.config(($stateProvider: ng.ui.IStateProvider, $urlRouterProvider: ng.ui.IUrlRouterProvider) => new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider));
-appModule.config((applicationInsightsServiceProvider, FeatureToggleProvider: Application.Services.FeatureToggleService) => {
-    var options = { applicationName: 'moderngitter' };
-    if (!FeatureToggleProvider.isDebugMode()) {
-        applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
-    }
-});
 appModule.run(($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) => new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService));
 
 // inject services

@@ -1995,16 +1995,10 @@ var Application;
         Controllers.SplashscreenCtrl = SplashscreenCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
-var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji', 'ApplicationInsightsModule']);
-appModule.constant('_', window._);
+var appModule = angular.module('modern-gitter', ['ngSanitize', 'ui.router', 'yaru22.angular-timeago', 'emoji']);
+appModule.constant('_', window['_']);
 appModule.provider('FeatureToggle', function ($injector) { return new Application.Services.FeatureToggleService($injector); });
 appModule.config(function ($stateProvider, $urlRouterProvider) { return new Application.Configs.RoutingConfig($stateProvider, $urlRouterProvider); });
-appModule.config(function (applicationInsightsServiceProvider, FeatureToggleProvider) {
-    var options = { applicationName: 'moderngitter' };
-    if (!FeatureToggleProvider.isDebugMode()) {
-        applicationInsightsServiceProvider.configure('43cde3af-0667-4ad3-aa24-da0b6dc0c73e', options);
-    }
-});
 appModule.run(function ($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService) { return new Application.Configs.NavigationConfig($rootScope, $state, RoomsService, NetworkService, NavigationService, FeatureToggleService); });
 appModule.service('ApiService', function (ConfigService, OAuthService) { return new Application.Services.ApiService(ConfigService, OAuthService); });
 appModule.service('BackgroundTaskService', function (FeatureToggleService) { return new Application.Services.BackgroundTaskService(FeatureToggleService); });
