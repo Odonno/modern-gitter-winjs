@@ -1443,6 +1443,28 @@ var Application;
 (function (Application) {
     var Directives;
     (function (Directives) {
+        var NgEscape = (function () {
+            function NgEscape() {
+                this.link = function (scope, element, attrs) {
+                    element.bind("keydown keypress", function (event) {
+                        if (event.which === 27) {
+                            scope.$apply(function () {
+                                scope.$eval(attrs['ngEscape']);
+                            });
+                            event.preventDefault();
+                        }
+                    });
+                };
+            }
+            return NgEscape;
+        }());
+        Directives.NgEscape = NgEscape;
+    })(Directives = Application.Directives || (Application.Directives = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Directives;
+    (function (Directives) {
         var MessageList = (function () {
             function MessageList(_, $timeout, $location, ApiService, RoomsService) {
                 var _this = this;
@@ -2134,6 +2156,7 @@ appModule.service('RealtimeApiService', function (OAuthService) { return new App
 appModule.service('RoomsService', function ($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService) { return new Application.Services.RoomsService($state, $timeout, OAuthService, NetworkService, ApiService, RealtimeApiService, ToastNotificationService, LifecycleService, FeatureToggleService); });
 appModule.service('ToastNotificationService', function (FeatureToggleService) { return new Application.Services.ToastNotificationService(FeatureToggleService); });
 appModule.directive('ngEnter', function () { return new Application.Directives.NgEnter(); });
+appModule.directive('ngEscape', function () { return new Application.Directives.NgEscape(); });
 appModule.directive('messageList', function (_, $timeout, $location, ApiService, RoomsService) { return new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService); });
 appModule.controller('AboutCtrl', function ($scope, FeatureToggleService) { return new Application.Controllers.AboutCtrl($scope, FeatureToggleService); });
 appModule.controller('AddChannelRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddChannelRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });

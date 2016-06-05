@@ -23,7 +23,7 @@
                     <span ng-hide="message.html"><em>Message deleted</em></span>
                 </div>
 
-                <textarea class="form-control form-control-full" ng-model="$parent.editedText" ng-enter="completeEdit()" ng-show="editedMessage && editedMessage.id == message.id"></textarea>
+                <textarea class="form-control form-control-full" ng-model="$parent.editedText" ng-enter="completeEdit()" ng-escape="stopEdit()" ng-show="editedMessage && editedMessage.id == message.id"></textarea>
             </div>
         </div>
     </div>

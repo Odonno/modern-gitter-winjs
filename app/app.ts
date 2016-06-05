@@ -24,6 +24,7 @@
 /// <reference path="./services/toastNotificationService.ts"/>
 
 /// <reference path="./directives/ngEnter.ts"/>
+/// <reference path="./directives/ngEscape.ts"/>
 /// <reference path="./directives/messageList.ts"/>
 
 /// <reference path="./controllers/aboutCtrl.ts"/>
@@ -69,6 +70,7 @@ appModule.service('ToastNotificationService', (FeatureToggleService) => new Appl
 
 // inject directives
 appModule.directive('ngEnter', () => new Application.Directives.NgEnter());
+appModule.directive('ngEscape', () => new Application.Directives.NgEscape());
 appModule.directive('messageList', (_, $timeout, $location, ApiService, RoomsService) => new Application.Directives.MessageList(_, $timeout, $location, ApiService, RoomsService));
 
 // inject controllers
