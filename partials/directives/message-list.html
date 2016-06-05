@@ -11,12 +11,19 @@
         <div ng-repeat="message in messages track by message.id" id="message-{{ message.id }}" class="message-container clickable"
             ng-class="message.unread ? 'unread' : 'read'">
             <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
+
             <div class="message-subcontainer" data-message-id="{{ message.id }}">
                 <div class="message-username">
                     <span>{{ message.fromUser.username }}</span>
                     <span class="message-timestamp">{{ message.sent | timeAgo }}</span>
                 </div>
-                <div class="message-content" ng-bind-html="message.html | emoji"></div>
+
+                <div class="message-content" ng-hide="editedMessage && editedMessage.id == message.id">
+                    <span ng-show="message.html" ng-bind-html="message.html | emoji"></span>
+                    <span ng-hide="message.html"><em>Message deleted</em></span>
+                </div>
+
+                <textarea class="form-control form-control-full" ng-model="$parent.editedText" ng-enter="completeEdit()" ng-show="editedMessage && editedMessage.id == message.id"></textarea>
             </div>
         </div>
     </div>

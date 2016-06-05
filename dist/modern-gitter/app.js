@@ -277,7 +277,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.joinRoom = function (name) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -295,7 +294,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.createChannel = function (channel) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -336,7 +334,6 @@ var Application;
                     }
                 });
             };
-            ;
             ApiService.prototype.deleteRoom = function (roomId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -353,7 +350,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.getMessages = function (roomId, beforeId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -374,7 +370,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.sendMessage = function (roomId, text) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -392,7 +387,23 @@ var Application;
                     });
                 });
             };
-            ;
+            ApiService.prototype.updateMessage = function (roomId, messageId, text) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'PUT',
+                        url: _this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages/" + messageId,
+                        data: JSON.stringify({ text: text }),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
             ApiService.prototype.markUnreadMessages = function (userId, roomId, messageIds) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -410,7 +421,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.getCurrentUser = function () {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -427,7 +437,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.getOrganizations = function (userId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -444,7 +453,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.getRepositories = function (userId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -461,7 +469,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.searchRooms = function (query, limit) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -478,7 +485,6 @@ var Application;
                     });
                 });
             };
-            ;
             ApiService.prototype.searchUsers = function (query, limit) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -495,7 +501,6 @@ var Application;
                     });
                 });
             };
-            ;
             return ApiService;
         }());
         Services.ApiService = ApiService;
@@ -1487,13 +1492,32 @@ var Application;
                                 angular.forEach(anchors, function (anchor) {
                                     anchor.onclick = function (e) {
                                         var messageId = anchor.getAttribute('data-message-id');
+                                        var canEditMessage = scope.canEdit(messageId);
                                         menu.showAt(e);
-                                        document.getElementById("replyMenuCommand").onclick = function () {
+                                        var replyMenuCommand = document.getElementById("replyMenuCommand");
+                                        replyMenuCommand.onclick = function () {
                                             scope.reply(messageId);
                                         };
-                                        document.getElementById("quoteMenuCommand").onclick = function () {
+                                        var quoteMenuCommand = document.getElementById("quoteMenuCommand");
+                                        quoteMenuCommand.onclick = function () {
                                             scope.quote(messageId);
                                         };
+                                        var editMenuCommand = document.getElementById("editMenuCommand");
+                                        editMenuCommand.onclick = function () {
+                                            scope.startEdit(messageId);
+                                        };
+                                        var deleteMenuCommand = document.getElementById("deleteMenuCommand");
+                                        deleteMenuCommand.onclick = function () {
+                                            scope.delete(messageId);
+                                        };
+                                        if (!canEditMessage) {
+                                            editMenuCommand.setAttribute("disabled", "disabled");
+                                            deleteMenuCommand.setAttribute("disabled", "disabled");
+                                        }
+                                        else {
+                                            editMenuCommand.removeAttribute("disabled");
+                                            deleteMenuCommand.removeAttribute("disabled");
+                                        }
                                     };
                                 });
                             });
@@ -1901,6 +1925,48 @@ var Application;
                     if (message) {
                         $scope.textMessage += "> " + message.text;
                     }
+                };
+                $scope.canEdit = function (messageId) {
+                    var message = $scope.getMessageById(messageId);
+                    var isMyMessage = RoomsService.currentUser.id == message.fromUser.id;
+                    var minutesSent = Math.abs(new Date() - new Date(message.sent)) / 1000 / 60;
+                    return (isMyMessage && minutesSent < 10);
+                };
+                $scope.startEdit = function (messageId) {
+                    var message = $scope.getMessageById(messageId);
+                    $scope.editedText = message.text;
+                    $scope.editedMessage = message;
+                    console.log('edition started');
+                };
+                $scope.stopEdit = function () {
+                    $scope.editedMessage = undefined;
+                    $scope.editedText = '';
+                    console.log('edition stopped');
+                };
+                $scope.completeEdit = function () {
+                    if ($scope.editedText) {
+                        console.log($scope.editedText);
+                        ApiService.updateMessage($scope.room.id, $scope.editedMessage.id, $scope.editedText)
+                            .then(function (updatedMessage) {
+                            console.log(updatedMessage);
+                            $scope.editedMessage.editedAt = updatedMessage.editedAt;
+                            $scope.editedMessage.html = updatedMessage.html;
+                            $scope.editedMessage.text = updatedMessage.text;
+                            $scope.editedMessage = undefined;
+                            $scope.editedText = '';
+                            console.log('edition completed');
+                        });
+                    }
+                };
+                $scope.delete = function (messageId) {
+                    var message = $scope.getMessageById(messageId);
+                    ApiService.updateMessage($scope.room.id, messageId, '')
+                        .then(function (updatedMessage) {
+                        message.editedAt = updatedMessage.editedAt;
+                        message.html = updatedMessage.html;
+                        message.text = updatedMessage.text;
+                        console.log('message deleted');
+                    });
                 };
                 $scope.returnLine = function () {
                     if (FeatureToggleService.isLineReturnShouldSendChatMessage()) {

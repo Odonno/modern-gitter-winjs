@@ -6,8 +6,8 @@ module Application.Models {
         public id: string;
         public text: string;
         public html: string;
-        public sent: Date;
-        public editedAt: Date;
+        public sent: string;
+        public editedAt: string;
         public fromUser: User;
         public unread: boolean;
         public readBy: number;

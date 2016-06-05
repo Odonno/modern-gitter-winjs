@@ -9,10 +9,17 @@ module Application.Controllers {
         autoScrollDown: boolean;
         canLoadMoreMessages: boolean;
         fetchingPreviousMessages: boolean;
+        editedMessage: Models.Message;
+        editedText: string;
 
         getMessageById(id: string): Models.Message;
         reply(messageId: string): void;
         quote(messageId: string): void;
+        canEdit(messageId: string): boolean;
+        startEdit(messageId: string): void;
+        stopEdit(): void;
+        completeEdit(): void;
+        delete(messageId: string): void;
         returnLine(): void;
         sendMessage(): void;
     }
@@ -53,6 +60,59 @@ module Application.Controllers {
                 if (message) {
                     $scope.textMessage += `> ${message.text}`;
                 }
+            };
+
+            $scope.canEdit = (messageId: string) => {
+                let message = $scope.getMessageById(messageId);
+                let isMyMessage = RoomsService.currentUser.id == message.fromUser.id;
+                let minutesSent = Math.abs(new Date() - new Date(message.sent)) / 1000 / 60;
+
+                return (isMyMessage && minutesSent < 10);
+            };
+
+            $scope.startEdit = (messageId: string) => {
+                let message = $scope.getMessageById(messageId);
+                $scope.editedText = message.text;
+                $scope.editedMessage = message;
+                
+                console.log('edition started');
+            };
+            
+            $scope.stopEdit = () => {
+                $scope.editedMessage = undefined;
+                $scope.editedText = '';
+                
+                console.log('edition stopped');
+            };
+
+            $scope.completeEdit = () => {
+                if ($scope.editedText) {
+                    console.log($scope.editedText);
+                    ApiService.updateMessage($scope.room.id, $scope.editedMessage.id, $scope.editedText)
+                        .then(updatedMessage => {
+                            console.log(updatedMessage);
+                            $scope.editedMessage.editedAt = updatedMessage.editedAt;
+                            $scope.editedMessage.html = updatedMessage.html;
+                            $scope.editedMessage.text = updatedMessage.text;
+                            
+                            $scope.editedMessage = undefined;
+                            $scope.editedText = '';
+                            
+                            console.log('edition completed');
+                        });
+                }
+            };
+
+            $scope.delete = (messageId: string) => {
+                let message = $scope.getMessageById(messageId);
+                ApiService.updateMessage($scope.room.id, messageId, '')
+                    .then(updatedMessage => {
+                        message.editedAt = updatedMessage.editedAt;
+                        message.html = updatedMessage.html;
+                        message.text = updatedMessage.text;
+                        
+                        console.log('message deleted');
+                    });
             };
 
             $scope.returnLine = () => {

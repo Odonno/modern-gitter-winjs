@@ -59,16 +59,41 @@ module Application.Directives {
                             anchor.onclick = (e) => {
                                 // show menu commands
                                 let messageId = anchor.getAttribute('data-message-id');
+                                let canEditMessage = scope.canEdit(messageId);
                                 menu.showAt(e);
-
+                                
                                 // handle reply
-                                document.getElementById("replyMenuCommand").onclick = () => {
+                                let replyMenuCommand = document.getElementById("replyMenuCommand");
+                                replyMenuCommand.onclick = () => {
                                     scope.reply(messageId);
                                 };
 
-                                document.getElementById("quoteMenuCommand").onclick = () => {
+                                // handle quote
+                                let quoteMenuCommand = document.getElementById("quoteMenuCommand");
+                                quoteMenuCommand.onclick = () => {
                                     scope.quote(messageId);
                                 };
+
+                                // handle edit message
+                                let editMenuCommand = document.getElementById("editMenuCommand");
+                                editMenuCommand.onclick = () => {
+                                    scope.startEdit(messageId);
+                                };
+
+                                // handle delete message
+                                let deleteMenuCommand = document.getElementById("deleteMenuCommand");
+                                deleteMenuCommand.onclick = () => {
+                                    scope.delete(messageId);
+                                };
+                                
+                                // enabled edition & deletion if possible
+                                if (!canEditMessage) {
+                                    editMenuCommand.setAttribute("disabled", "disabled");
+                                    deleteMenuCommand.setAttribute("disabled", "disabled");
+                                } else {
+                                    editMenuCommand.removeAttribute("disabled");
+                                    deleteMenuCommand.removeAttribute("disabled");
+                                }
                             };
                         });
                     });

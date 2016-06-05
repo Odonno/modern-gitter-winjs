@@ -19,7 +19,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public joinRoom(name: string) {
             return new Promise<Models.Room>((done, error) => {
@@ -36,7 +36,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public createChannel(channel: Models.NewChannel) {
             return new Promise<Models.Room>((done, error) => {
@@ -75,7 +75,7 @@ module Application.Services {
                     });
                 }
             });
-        };
+        }
 
         public deleteRoom(roomId: string) {
             return new Promise<{}>((done, error) => {
@@ -91,7 +91,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public getMessages(roomId: string, beforeId?: string) {
             return new Promise<Models.Message[]>((done, error) => {
@@ -113,7 +113,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public sendMessage(roomId: string, text: string) {
             return new Promise<Models.Message>((done, error) => {
@@ -130,7 +130,24 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
+        
+        public updateMessage(roomId: string, messageId: string, text: string) {
+            return new Promise<Models.Message>((done, error) => {
+                WinJS.xhr({
+                    type: 'PUT',
+                    url: this.ConfigService.baseUrl + "rooms/" + roomId + "/chatMessages/" + messageId,
+                    data: JSON.stringify({ text: text }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
 
         public markUnreadMessages(userId: string, roomId: string, messageIds: string[]) {
             return new Promise<{}>((done, error) => {
@@ -147,7 +164,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public getCurrentUser() {
             return new Promise<Models.User>((done, error) => {
@@ -163,7 +180,7 @@ module Application.Services {
                     done(JSON.parse(success.response)[0]);
                 });
             });
-        };
+        }
 
         public getOrganizations(userId: string) {
             return new Promise<Models.Org[]>((done, error) => {
@@ -179,7 +196,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public getRepositories(userId: string) {
             return new Promise<Models.Repository[]>((done, error) => {
@@ -195,7 +212,7 @@ module Application.Services {
                     done(JSON.parse(success.response));
                 });
             });
-        };
+        }
 
         public searchRooms(query: string, limit: number) {
             return new Promise<Models.Room[]>((done, error) => {
@@ -211,7 +228,7 @@ module Application.Services {
                     done(JSON.parse(success.response).results);
                 });
             });
-        };
+        }
 
         public searchUsers(query: string, limit: number) {
             return new Promise<Models.User[]>((done, error) => {
@@ -227,6 +244,6 @@ module Application.Services {
                     done(JSON.parse(success.response).results);
                 });
             });
-        };
+        }
     }
 }
