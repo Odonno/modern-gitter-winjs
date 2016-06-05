@@ -1480,6 +1480,24 @@ var Application;
                             scope.canLoadMoreMessages = true;
                         }, 1000);
                         angularElement.bind("scroll", _this._.throttle(watchScroll, 200));
+                        _this.$timeout(function () {
+                            WinJS.UI.processAll().done(function () {
+                                var menu = document.getElementById("messageMenu").winControl;
+                                var anchors = document.getElementsByClassName("message-subcontainer");
+                                angular.forEach(anchors, function (anchor) {
+                                    anchor.onclick = function (e) {
+                                        var messageId = anchor.getAttribute('data-message-id');
+                                        menu.showAt(e);
+                                        document.getElementById("replyMenuCommand").onclick = function () {
+                                            scope.reply(messageId);
+                                        };
+                                        document.getElementById("quoteMenuCommand").onclick = function () {
+                                            scope.quote(messageId);
+                                        };
+                                    };
+                                });
+                            });
+                        }, 1000);
                     };
                     var fetchPreviousMessages = function () {
                         if (!scope.canLoadMoreMessages)
@@ -1865,6 +1883,25 @@ var Application;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
+                $scope.getMessageById = function (id) {
+                    for (var i = 0; i < $scope.messages.length; i++) {
+                        if ($scope.messages[i].id == id) {
+                            return $scope.messages[i];
+                        }
+                    }
+                };
+                $scope.reply = function (messageId) {
+                    var message = $scope.getMessageById(messageId);
+                    if (message) {
+                        $scope.textMessage += "@" + message.fromUser.username + " ";
+                    }
+                };
+                $scope.quote = function (messageId) {
+                    var message = $scope.getMessageById(messageId);
+                    if (message) {
+                        $scope.textMessage += "> " + message.text;
+                    }
+                };
                 $scope.returnLine = function () {
                     if (FeatureToggleService.isLineReturnShouldSendChatMessage()) {
                         $scope.sendMessage();
@@ -1888,7 +1925,7 @@ var Application;
                 };
                 LocalSettingsService.set('lastPage', 'chat');
                 LocalSettingsService.set('lastRoom', $scope.room.name);
-                if (FeatureToggleService.isDebugMode()) {
+                if (FeatureToggleService.isDebugMode() && false) {
                     var toastOptions = {
                         launch: "action=viewRoom&roomId=" + $scope.room.id
                     };

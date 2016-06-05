@@ -47,6 +47,32 @@ module Application.Directives {
 
                 // add event when user scroll on the list
                 angularElement.bind("scroll", this._.throttle(watchScroll, 200));
+
+                // add flyout on each message container
+                this.$timeout(() => {
+                    WinJS.UI.processAll().done(() => {
+                        let menu = document.getElementById("messageMenu").winControl;
+                        let anchors = document.getElementsByClassName("message-subcontainer");
+
+                        angular.forEach(anchors, (anchor) => {
+                            // handle click on message container
+                            anchor.onclick = (e) => {
+                                // show menu commands
+                                let messageId = anchor.getAttribute('data-message-id');
+                                menu.showAt(e);
+
+                                // handle reply
+                                document.getElementById("replyMenuCommand").onclick = () => {
+                                    scope.reply(messageId);
+                                };
+
+                                document.getElementById("quoteMenuCommand").onclick = () => {
+                                    scope.quote(messageId);
+                                };
+                            };
+                        });
+                    });
+                }, 1000);
             };
 
             // fetch previous messages

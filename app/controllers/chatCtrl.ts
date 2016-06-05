@@ -10,6 +10,9 @@ module Application.Controllers {
         canLoadMoreMessages: boolean;
         fetchingPreviousMessages: boolean;
 
+        getMessageById(id: string): Models.Message;
+        reply(messageId: string): void;
+        quote(messageId: string): void;
         returnLine(): void;
         sendMessage(): void;
     }
@@ -30,6 +33,28 @@ module Application.Controllers {
             $scope.sendingMessage = false;
 
             // methods
+            $scope.getMessageById = (id: string) => {
+                for (let i = 0; i < $scope.messages.length; i++) {
+                    if ($scope.messages[i].id == id) {
+                        return $scope.messages[i];
+                    }
+                }
+            };
+
+            $scope.reply = (messageId: string) => {
+                let message = $scope.getMessageById(messageId);
+                if (message) {
+                    $scope.textMessage += `@${message.fromUser.username} `;
+                }
+            };
+
+            $scope.quote = (messageId: string) => {
+                let message = $scope.getMessageById(messageId);
+                if (message) {
+                    $scope.textMessage += `> ${message.text}`;
+                }
+            };
+
             $scope.returnLine = () => {
                 if (FeatureToggleService.isLineReturnShouldSendChatMessage()) {
                     $scope.sendMessage();
@@ -59,7 +84,7 @@ module Application.Controllers {
             LocalSettingsService.set('lastRoom', $scope.room.name);
 
             // initialize controller
-            if (FeatureToggleService.isDebugMode()) {
+            if (FeatureToggleService.isDebugMode() && false) {
                 // send test notification (new message)
                 let toastOptions: Services.IToastOptions = {
                     launch: `action=viewRoom&roomId=${$scope.room.id}`

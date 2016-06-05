@@ -11,7 +11,7 @@
         <div ng-repeat="message in messages track by message.id" id="message-{{ message.id }}" class="message-container clickable"
             ng-class="message.unread ? 'unread' : 'read'">
             <img class="message-image" ng-src="{{ message.fromUser.avatarUrlSmall }}" />
-            <div class="message-subcontainer">
+            <div class="message-subcontainer" data-message-id="{{ message.id }}">
                 <div class="message-username">
                     <span>{{ message.fromUser.username }}</span>
                     <span class="message-timestamp">{{ message.sent | timeAgo }}</span>

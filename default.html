@@ -36,7 +36,7 @@
 <body ng-controller="AppCtrl" class="win-type-body">
     <div class="splitView" data-win-control="WinJS.UI.SplitView" data-win-options="{ openedDisplayMode: 'overlay', closedDisplayMode: 'inline' }">
         <!-- pane area -->
-        <div>
+        <div class="pane-area">
             <div class="split-view-header">
                 <button class="win-splitviewpanetoggle"
                         data-win-control="WinJS.UI.SplitViewPaneToggle"
@@ -59,6 +59,14 @@
         <div class="content-area">
             <div ui-view></div>
         </div>
+    </div>
+
+    <!-- menu on chat message -->
+    <div id="messageMenu" data-win-control="WinJS.UI.Menu">
+        <button id="replyMenuCommand" data-win-control="WinJS.UI.MenuCommand" data-win-options="{ label: 'Reply', type: 'button' }"></button>
+        <button id="quoteMenuCommand" data-win-control="WinJS.UI.MenuCommand" data-win-options="{ label: 'Quote', type: 'button' }"></button>
+        <button data-win-control="WinJS.UI.MenuCommand" data-win-options="{ label: 'Edit', type: 'button' }" disabled></button>
+        <button data-win-control="WinJS.UI.MenuCommand" data-win-options="{ label: 'Delete', type: 'button' }" disabled></button>
     </div>
 </body>
 </html>
