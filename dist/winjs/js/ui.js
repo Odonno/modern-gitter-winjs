@@ -41341,6 +41341,10 @@ define('WinJS/Controls/Flyout',[
                         return;
                     }
 
+                    if (!this._currentPosition) {
+                        return;
+                    }
+
                     // May need to adjust top by viewport offset
                     if (this._currentPosition.top < 0) {
                         // Need to attach to bottom
