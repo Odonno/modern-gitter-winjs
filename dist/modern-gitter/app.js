@@ -261,6 +261,54 @@ var Application;
                 this.ConfigService = ConfigService;
                 this.OAuthService = OAuthService;
             }
+            ApiService.prototype.getCurrentUser = function () {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response)[0]);
+                    });
+                });
+            };
+            ApiService.prototype.getOrganizations = function (userId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/orgs",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ApiService.prototype.getRepositories = function (userId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/repos",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
             ApiService.prototype.getRooms = function () {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -350,6 +398,22 @@ var Application;
                     });
                 });
             };
+            ApiService.prototype.leaveRoom = function (roomId, userId) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'DELETE',
+                        url: _this.ConfigService.baseUrl + "rooms/" + roomId + "/users/" + userId,
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
             ApiService.prototype.getMessages = function (roomId, beforeId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -411,54 +475,6 @@ var Application;
                         type: 'POST',
                         url: _this.ConfigService.baseUrl + "user/" + userId + "/rooms/" + roomId + "/unreadItems",
                         data: JSON.stringify({ chat: messageIds }),
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
-                        }
-                    }).then(function (success) {
-                        done(JSON.parse(success.response));
-                    });
-                });
-            };
-            ApiService.prototype.getCurrentUser = function () {
-                var _this = this;
-                return new Promise(function (done, error) {
-                    WinJS.xhr({
-                        type: 'GET',
-                        url: _this.ConfigService.baseUrl + "user/",
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
-                        }
-                    }).then(function (success) {
-                        done(JSON.parse(success.response)[0]);
-                    });
-                });
-            };
-            ApiService.prototype.getOrganizations = function (userId) {
-                var _this = this;
-                return new Promise(function (done, error) {
-                    WinJS.xhr({
-                        type: 'GET',
-                        url: _this.ConfigService.baseUrl + "user/" + userId + "/orgs",
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
-                        }
-                    }).then(function (success) {
-                        done(JSON.parse(success.response));
-                    });
-                });
-            };
-            ApiService.prototype.getRepositories = function (userId) {
-                var _this = this;
-                return new Promise(function (done, error) {
-                    WinJS.xhr({
-                        type: 'GET',
-                        url: _this.ConfigService.baseUrl + "user/" + userId + "/repos",
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
@@ -1159,6 +1175,14 @@ var Application;
                 });
                 this.rooms.push(room);
             };
+            RoomsService.prototype.removeRoom = function (room) {
+                var index = this.rooms.indexOf(room);
+                if (index >= 0) {
+                    this.rooms.splice(index, 1);
+                    return true;
+                }
+                return false;
+            };
             RoomsService.prototype.receiveMessage = function (room, message) {
                 if (this.onmessagereceived) {
                     this.onmessagereceived(room.id, message);
@@ -1284,6 +1308,13 @@ var Application;
                     if (response) {
                         _this.currentRoom.unreadItems -= messageIds.length;
                     }
+                });
+            };
+            RoomsService.prototype.leaveRoom = function (room, callback) {
+                var _this = this;
+                this.ApiService.leaveRoom(room.id, this.currentUser.id).then(function () {
+                    callback();
+                    _this.removeRoom(room);
                 });
             };
             return RoomsService;
@@ -1934,6 +1965,14 @@ var Application;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
+                $scope.leave = function () {
+                    RoomsService.leaveRoom($scope.room, function () {
+                        console.log('leaving room');
+                        LocalSettingsService.remove('lastPage');
+                        LocalSettingsService.remove('lastRoom');
+                        $state.go('rooms');
+                    });
+                };
                 $scope.getMessageById = function (id) {
                     for (var i = 0; i < $scope.messages.length; i++) {
                         if ($scope.messages[i].id == id) {
@@ -2036,6 +2075,12 @@ var Application;
                     };
                     ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, username + " mentioned you", 'This is a test message, please respond', replyOptions, toastOptions);
                 }
+                WinJS.UI.processAll().done(function () {
+                    var cmdLeave = document.getElementById('cmdLeave');
+                    cmdLeave.onclick = function () {
+                        $scope.leave();
+                    };
+                });
             }
             return ChatCtrl;
         }());

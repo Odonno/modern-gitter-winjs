@@ -21,7 +21,7 @@ module Application.Services {
             // detect when we received a toast action
             this.LifecycleService.ontoast = (action, data) => {
                 if (!this.loggedIn) {
-                    $timeout(() => this.LifecycleService.ontoast(action, data), 200);                    
+                    $timeout(() => this.LifecycleService.ontoast(action, data), 200);
                 } else {
                     // execute viewRoom action
                     if (action === 'viewRoom') {
@@ -50,6 +50,16 @@ module Application.Services {
             });
 
             this.rooms.push(room);
+        }
+
+        private removeRoom(room: Models.Room): boolean {
+            // remove room from the list
+            var index = this.rooms.indexOf(room);
+            if (index >= 0) {
+                this.rooms.splice(index, 1);
+                return true;
+            }
+            return false;
         }
 
         private receiveMessage(room: Models.Room, message: Models.Message): void {
@@ -209,6 +219,13 @@ module Application.Services {
                 if (response) {
                     this.currentRoom.unreadItems -= messageIds.length;
                 }
+            });
+        }
+
+        public leaveRoom(room: Models.Room, callback: { (): void }): void {
+            this.ApiService.leaveRoom(room.id, this.currentUser.id).then(() => {
+                callback();
+                this.removeRoom(room);
             });
         }
     }

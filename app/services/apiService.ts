@@ -5,6 +5,56 @@ module Application.Services {
         constructor(private ConfigService: ConfigService, private OAuthService: OAuthService) {
         }
 
+        // User resources
+        public getCurrentUser() {
+            return new Promise<Models.User>((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: this.ConfigService.baseUrl + "user/",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response)[0]);
+                });
+            });
+        }
+
+        public getOrganizations(userId: string) {
+            return new Promise<Models.Org[]>((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/orgs",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
+
+        public getRepositories(userId: string) {
+            return new Promise<Models.Repository[]>((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/repos",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
+
+        // Room resources
         public getRooms() {
             return new Promise<Models.Room[]>((done, error) => {
                 WinJS.xhr({
@@ -93,6 +143,23 @@ module Application.Services {
             });
         }
 
+        public leaveRoom(roomId: string, userId: string) {
+            return new Promise<{}>((done, error) => {
+                WinJS.xhr({
+                    type: 'DELETE',
+                    url: this.ConfigService.baseUrl + "rooms/" + roomId + "/users/" + userId,
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
+
+        // Message resources
         public getMessages(roomId: string, beforeId?: string) {
             return new Promise<Models.Message[]>((done, error) => {
                 let query = '?limit=' + this.ConfigService.messagesLimit;
@@ -131,7 +198,7 @@ module Application.Services {
                 });
             });
         }
-        
+
         public updateMessage(roomId: string, messageId: string, text: string) {
             return new Promise<Models.Message>((done, error) => {
                 WinJS.xhr({
@@ -166,54 +233,7 @@ module Application.Services {
             });
         }
 
-        public getCurrentUser() {
-            return new Promise<Models.User>((done, error) => {
-                WinJS.xhr({
-                    type: 'GET',
-                    url: this.ConfigService.baseUrl + "user/",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + this.OAuthService.refreshToken
-                    }
-                }).then((success) => {
-                    done(JSON.parse(success.response)[0]);
-                });
-            });
-        }
-
-        public getOrganizations(userId: string) {
-            return new Promise<Models.Org[]>((done, error) => {
-                WinJS.xhr({
-                    type: 'GET',
-                    url: this.ConfigService.baseUrl + "user/" + userId + "/orgs",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + this.OAuthService.refreshToken
-                    }
-                }).then((success) => {
-                    done(JSON.parse(success.response));
-                });
-            });
-        }
-
-        public getRepositories(userId: string) {
-            return new Promise<Models.Repository[]>((done, error) => {
-                WinJS.xhr({
-                    type: 'GET',
-                    url: this.ConfigService.baseUrl + "user/" + userId + "/repos",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + this.OAuthService.refreshToken
-                    }
-                }).then((success) => {
-                    done(JSON.parse(success.response));
-                });
-            });
-        }
-
+        // Search resources
         public searchRooms(query: string, limit: number) {
             return new Promise<Models.Room[]>((done, error) => {
                 WinJS.xhr({

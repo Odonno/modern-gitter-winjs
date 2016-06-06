@@ -121,6 +121,11 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 	margin: auto;
 }
 
+/* toolbar style */
+.win-toolbar .win-toolbar-actionarea {
+    background: transparent;
+}
+
 /* error view style */
 #error-container {
     position: relative;
@@ -362,6 +367,7 @@ html.win-hoverable .win-itemcontainer .win-itembox:hover::before {
 
 /* chat view style */
 #roomDescription {
+    margin-top: -40px;
     height: 100px;
     background-color: #f2f2f2;
 }

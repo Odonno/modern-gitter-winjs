@@ -12,6 +12,7 @@ module Application.Controllers {
         editedMessage: Models.Message;
         editedText: string;
 
+        leave(): void;
         getMessageById(id: string): Models.Message;
         reply(messageId: string): void;
         quote(messageId: string): void;
@@ -40,6 +41,16 @@ module Application.Controllers {
             $scope.sendingMessage = false;
 
             // methods
+            $scope.leave = () => {
+                RoomsService.leaveRoom($scope.room, () => {
+                    console.log('leaving room');
+
+                    LocalSettingsService.remove('lastPage');
+                    LocalSettingsService.remove('lastRoom');
+                    $state.go('rooms');
+                });
+            };
+
             $scope.getMessageById = (id: string) => {
                 for (let i = 0; i < $scope.messages.length; i++) {
                     if ($scope.messages[i].id == id) {
@@ -74,14 +85,14 @@ module Application.Controllers {
                 let message = $scope.getMessageById(messageId);
                 $scope.editedText = message.text;
                 $scope.editedMessage = message;
-                
+
                 console.log('edition started');
             };
-            
+
             $scope.stopEdit = () => {
                 $scope.editedMessage = undefined;
                 $scope.editedText = '';
-                
+
                 console.log('edition stopped');
             };
 
@@ -94,10 +105,10 @@ module Application.Controllers {
                             $scope.editedMessage.editedAt = updatedMessage.editedAt;
                             $scope.editedMessage.html = updatedMessage.html;
                             $scope.editedMessage.text = updatedMessage.text;
-                            
+
                             $scope.editedMessage = undefined;
                             $scope.editedText = '';
-                            
+
                             console.log('edition completed');
                         });
                 }
@@ -110,7 +121,7 @@ module Application.Controllers {
                         message.editedAt = updatedMessage.editedAt;
                         message.html = updatedMessage.html;
                         message.text = updatedMessage.text;
-                        
+
                         console.log('message deleted');
                     });
             };
@@ -165,6 +176,14 @@ module Application.Controllers {
                 };
                 ToastNotificationService.sendImageTitleAndTextNotificationWithReply($scope.room.image, `${username} mentioned you`, 'This is a test message, please respond', replyOptions, toastOptions);
             }
+
+            WinJS.UI.processAll().done(() => {
+                // toolbar command loaded
+                var cmdLeave = document.getElementById('cmdLeave');
+                cmdLeave.onclick = () => {
+                    $scope.leave();
+                };
+            });
         }
     }
 }
