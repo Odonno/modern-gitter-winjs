@@ -19,6 +19,7 @@ module Application.Directives {
                     if (scope.room && scope.room.id === roomId) {
                         scope.messages.push(message);
 
+                        // scroll down to the new message
                         if (scope.autoScrollDown) {
                             let refreshCount = 5;
                             let timer = setInterval(() => {
@@ -28,6 +29,9 @@ module Application.Directives {
                                 }
                             }, 200);
                         }
+
+                        // add flyout on each message container
+                        refreshFlyouts();
                     }
                 };
 
@@ -49,55 +53,7 @@ module Application.Directives {
                 angularElement.bind("scroll", this._.throttle(watchScroll, 200));
 
                 // add flyout on each message container
-                this.$timeout(() => {
-                    WinJS.UI.processAll().done(() => {
-                        let menu = document.getElementById("messageMenu").winControl;
-                        let anchors = document.getElementsByClassName("message-subcontainer");
-
-                        angular.forEach(anchors, (anchor) => {
-                            // handle click on message container
-                            anchor.onclick = (e) => {
-                                // show menu commands
-                                let messageId = anchor.getAttribute('data-message-id');
-                                let canEditMessage = scope.canEdit(messageId);
-                                menu.showAt(e);
-                                
-                                // handle reply
-                                let replyMenuCommand = document.getElementById("replyMenuCommand");
-                                replyMenuCommand.onclick = () => {
-                                    scope.reply(messageId);
-                                };
-
-                                // handle quote
-                                let quoteMenuCommand = document.getElementById("quoteMenuCommand");
-                                quoteMenuCommand.onclick = () => {
-                                    scope.quote(messageId);
-                                };
-
-                                // handle edit message
-                                let editMenuCommand = document.getElementById("editMenuCommand");
-                                editMenuCommand.onclick = () => {
-                                    scope.startEdit(messageId);
-                                };
-
-                                // handle delete message
-                                let deleteMenuCommand = document.getElementById("deleteMenuCommand");
-                                deleteMenuCommand.onclick = () => {
-                                    scope.delete(messageId);
-                                };
-                                
-                                // enabled edition & deletion if possible
-                                if (!canEditMessage) {
-                                    editMenuCommand.setAttribute("disabled", "disabled");
-                                    deleteMenuCommand.setAttribute("disabled", "disabled");
-                                } else {
-                                    editMenuCommand.removeAttribute("disabled");
-                                    deleteMenuCommand.removeAttribute("disabled");
-                                }
-                            };
-                        });
-                    });
-                }, 1000);
+                refreshFlyouts();
             };
 
             // fetch previous messages
@@ -138,6 +94,9 @@ module Application.Directives {
 
                     // stop fetching messages
                     scope.fetchingPreviousMessages = false;
+
+                    // add flyout on each message container
+                    refreshFlyouts();
                 });
             };
 
@@ -208,6 +167,59 @@ module Application.Directives {
 
                 // detect unread messages
                 detectUnreadMessages();
+            };
+
+            // refresh message flyouts
+            let refreshFlyouts = () => {
+                this.$timeout(() => {
+                    WinJS.UI.processAll().done(() => {
+                        let menu = document.getElementById("messageMenu").winControl;
+                        let anchors = document.getElementsByClassName("message-subcontainer");
+
+                        angular.forEach(anchors, (anchor) => {
+                            // handle click on message container
+                            anchor.onclick = (e) => {
+                                // show menu commands
+                                let messageId = anchor.getAttribute('data-message-id');
+                                let canEditMessage = scope.canEdit(messageId);
+                                menu.showAt(e);
+
+                                // handle reply
+                                let replyMenuCommand = document.getElementById("replyMenuCommand");
+                                replyMenuCommand.onclick = () => {
+                                    scope.reply(messageId);
+                                };
+
+                                // handle quote
+                                let quoteMenuCommand = document.getElementById("quoteMenuCommand");
+                                quoteMenuCommand.onclick = () => {
+                                    scope.quote(messageId);
+                                };
+
+                                // handle edit message
+                                let editMenuCommand = document.getElementById("editMenuCommand");
+                                editMenuCommand.onclick = () => {
+                                    scope.startEdit(messageId);
+                                };
+
+                                // handle delete message
+                                let deleteMenuCommand = document.getElementById("deleteMenuCommand");
+                                deleteMenuCommand.onclick = () => {
+                                    scope.delete(messageId);
+                                };
+
+                                // enabled edition & deletion if possible
+                                if (!canEditMessage) {
+                                    editMenuCommand.setAttribute("disabled", "disabled");
+                                    deleteMenuCommand.setAttribute("disabled", "disabled");
+                                } else {
+                                    editMenuCommand.removeAttribute("disabled");
+                                    deleteMenuCommand.removeAttribute("disabled");
+                                }
+                            };
+                        });
+                    });
+                }, 1000);
             };
 
             initialize();

@@ -1494,6 +1494,7 @@ var Application;
                                         }
                                     }, 200);
                                 }
+                                refreshFlyouts();
                             }
                         };
                         _this.ApiService.getMessages(scope.room.id).then(function (messages) {
@@ -1507,43 +1508,7 @@ var Application;
                             scope.canLoadMoreMessages = true;
                         }, 1000);
                         angularElement.bind("scroll", _this._.throttle(watchScroll, 200));
-                        _this.$timeout(function () {
-                            WinJS.UI.processAll().done(function () {
-                                var menu = document.getElementById("messageMenu").winControl;
-                                var anchors = document.getElementsByClassName("message-subcontainer");
-                                angular.forEach(anchors, function (anchor) {
-                                    anchor.onclick = function (e) {
-                                        var messageId = anchor.getAttribute('data-message-id');
-                                        var canEditMessage = scope.canEdit(messageId);
-                                        menu.showAt(e);
-                                        var replyMenuCommand = document.getElementById("replyMenuCommand");
-                                        replyMenuCommand.onclick = function () {
-                                            scope.reply(messageId);
-                                        };
-                                        var quoteMenuCommand = document.getElementById("quoteMenuCommand");
-                                        quoteMenuCommand.onclick = function () {
-                                            scope.quote(messageId);
-                                        };
-                                        var editMenuCommand = document.getElementById("editMenuCommand");
-                                        editMenuCommand.onclick = function () {
-                                            scope.startEdit(messageId);
-                                        };
-                                        var deleteMenuCommand = document.getElementById("deleteMenuCommand");
-                                        deleteMenuCommand.onclick = function () {
-                                            scope.delete(messageId);
-                                        };
-                                        if (!canEditMessage) {
-                                            editMenuCommand.setAttribute("disabled", "disabled");
-                                            deleteMenuCommand.setAttribute("disabled", "disabled");
-                                        }
-                                        else {
-                                            editMenuCommand.removeAttribute("disabled");
-                                            deleteMenuCommand.removeAttribute("disabled");
-                                        }
-                                    };
-                                });
-                            });
-                        }, 1000);
+                        refreshFlyouts();
                     };
                     var fetchPreviousMessages = function () {
                         if (!scope.canLoadMoreMessages)
@@ -1566,6 +1531,7 @@ var Application;
                             }
                             _this.$location.hash('message-' + olderMessage.id);
                             scope.fetchingPreviousMessages = false;
+                            refreshFlyouts();
                         });
                     };
                     var detectUnreadMessages = function () {
@@ -1612,6 +1578,45 @@ var Application;
                             fetchPreviousMessages();
                         }
                         detectUnreadMessages();
+                    };
+                    var refreshFlyouts = function () {
+                        _this.$timeout(function () {
+                            WinJS.UI.processAll().done(function () {
+                                var menu = document.getElementById("messageMenu").winControl;
+                                var anchors = document.getElementsByClassName("message-subcontainer");
+                                angular.forEach(anchors, function (anchor) {
+                                    anchor.onclick = function (e) {
+                                        var messageId = anchor.getAttribute('data-message-id');
+                                        var canEditMessage = scope.canEdit(messageId);
+                                        menu.showAt(e);
+                                        var replyMenuCommand = document.getElementById("replyMenuCommand");
+                                        replyMenuCommand.onclick = function () {
+                                            scope.reply(messageId);
+                                        };
+                                        var quoteMenuCommand = document.getElementById("quoteMenuCommand");
+                                        quoteMenuCommand.onclick = function () {
+                                            scope.quote(messageId);
+                                        };
+                                        var editMenuCommand = document.getElementById("editMenuCommand");
+                                        editMenuCommand.onclick = function () {
+                                            scope.startEdit(messageId);
+                                        };
+                                        var deleteMenuCommand = document.getElementById("deleteMenuCommand");
+                                        deleteMenuCommand.onclick = function () {
+                                            scope.delete(messageId);
+                                        };
+                                        if (!canEditMessage) {
+                                            editMenuCommand.setAttribute("disabled", "disabled");
+                                            deleteMenuCommand.setAttribute("disabled", "disabled");
+                                        }
+                                        else {
+                                            editMenuCommand.removeAttribute("disabled");
+                                            deleteMenuCommand.removeAttribute("disabled");
+                                        }
+                                    };
+                                });
+                            });
+                        }, 1000);
                     };
                     initialize();
                 };
