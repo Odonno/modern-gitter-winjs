@@ -6,6 +6,7 @@ module Application.Controllers {
         filteredRooms: Models.Room[];
         search: string;
 
+        refresh(): void;
         selectRoom(room: Models.Room): void;
     }
 
@@ -18,6 +19,11 @@ module Application.Controllers {
             $scope.rooms = RoomsService.rooms;
 
             // methods
+            $scope.refresh = () => {
+                RoomsService.refreshRooms();
+                console.log('rooms refreshed');
+            };
+
             $scope.selectRoom = (room: Models.Room) => {
                 RoomsService.selectRoom(room);
                 $state.go('chat');
@@ -27,6 +33,21 @@ module Application.Controllers {
             $scope.$watchGroup(['rooms', 'search'], () => {
                 $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
                 $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+            });
+
+            // initialize controller
+            WinJS.UI.processAll().done(() => {
+                // toolbar command loaded
+                var searchInput = <HTMLInputElement>document.getElementById('searchInput');
+                searchInput.onkeyup = () => {
+                    $scope.search = searchInput.value;
+                    $scope.$apply();
+                };
+
+                var cmdRefresh = document.getElementById('cmdRefresh');
+                cmdRefresh.onclick = () => {
+                    $scope.refresh();
+                };
             });
         }
     }

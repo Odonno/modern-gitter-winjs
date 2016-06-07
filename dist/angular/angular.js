@@ -7140,7 +7140,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             nodeLinkFn(childLinkFn, childScope, node, $rootElement, childBoundTranscludeFn);
 
           } else if (childLinkFn) {
-            childLinkFn(scope, node.childNodes, undefined, parentBoundTranscludeFn);
+              if (node) {
+                  childLinkFn(scope, node.childNodes, undefined, parentBoundTranscludeFn);
+              }
           }
         }
       }

@@ -141,14 +141,9 @@ module Application.Services {
 
                     this.ApiService.getCurrentUser().then(user => {
                         console.log('Sucessfully logged in');
+
                         this.currentUser = user;
-
-                        this.ApiService.getRooms().then(rooms => {
-                            // import all rooms from API
-                            for (let i = 0; i < rooms.length; i++) {
-                                this.addRoom(rooms[i]);
-                            }
-
+                        this.refreshRooms(() => {
                             // app is now initialized and user logged in
                             this.loggedIn = true;
                             if (callback) {
@@ -171,6 +166,27 @@ module Application.Services {
             this.rooms = [];
             this.currentRoom = undefined;
             this.loggedIn = false;
+        }
+
+        public refreshRooms(callback?: () => void): void {
+            // unsubscribe to each room
+            for (var i = 0; i < this.rooms.length; i++) {
+                this.RealtimeApiService.unsubscribe(this.rooms[i].id);
+            }
+
+            this.currentRoom = undefined;
+            this.rooms = [];
+
+            this.ApiService.getRooms().then(rooms => {
+                // import all rooms from API
+                for (let i = 0; i < rooms.length; i++) {
+                    this.addRoom(rooms[i]);
+                }
+
+                if (callback) {
+                    callback();
+                }
+            });
         }
 
         public getRoomById(id: string): Models.Room {

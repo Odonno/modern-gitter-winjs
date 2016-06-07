@@ -1260,10 +1260,7 @@ var Application;
                         _this.ApiService.getCurrentUser().then(function (user) {
                             console.log('Sucessfully logged in');
                             _this.currentUser = user;
-                            _this.ApiService.getRooms().then(function (rooms) {
-                                for (var i = 0; i < rooms.length; i++) {
-                                    _this.addRoom(rooms[i]);
-                                }
+                            _this.refreshRooms(function () {
                                 _this.loggedIn = true;
                                 if (callback) {
                                     callback();
@@ -1281,6 +1278,22 @@ var Application;
                 this.rooms = [];
                 this.currentRoom = undefined;
                 this.loggedIn = false;
+            };
+            RoomsService.prototype.refreshRooms = function (callback) {
+                var _this = this;
+                for (var i = 0; i < this.rooms.length; i++) {
+                    this.RealtimeApiService.unsubscribe(this.rooms[i].id);
+                }
+                this.currentRoom = undefined;
+                this.rooms = [];
+                this.ApiService.getRooms().then(function (rooms) {
+                    for (var i_1 = 0; i_1 < rooms.length; i_1++) {
+                        _this.addRoom(rooms[i_1]);
+                    }
+                    if (callback) {
+                        callback();
+                    }
+                });
             };
             RoomsService.prototype.getRoomById = function (id) {
                 for (var i = 0; i < this.rooms.length; i++) {
@@ -2192,6 +2205,10 @@ var Application;
             function RoomsCtrl($scope, $filter, $state, RoomsService, LocalSettingsService, FeatureToggleService) {
                 LocalSettingsService.set('lastPage', 'rooms');
                 $scope.rooms = RoomsService.rooms;
+                $scope.refresh = function () {
+                    RoomsService.refreshRooms();
+                    console.log('rooms refreshed');
+                };
                 $scope.selectRoom = function (room) {
                     RoomsService.selectRoom(room);
                     $state.go('chat');
@@ -2199,6 +2216,17 @@ var Application;
                 $scope.$watchGroup(['rooms', 'search'], function () {
                     $scope.filteredRooms = $filter('filter')($scope.rooms, { name: $scope.search });
                     $scope.filteredRooms = $filter('orderBy')($scope.filteredRooms, ['favourite', '-unreadItems', '-lastAccessTime']);
+                });
+                WinJS.UI.processAll().done(function () {
+                    var searchInput = document.getElementById('searchInput');
+                    searchInput.onkeyup = function () {
+                        $scope.search = searchInput.value;
+                        $scope.$apply();
+                    };
+                    var cmdRefresh = document.getElementById('cmdRefresh');
+                    cmdRefresh.onclick = function () {
+                        $scope.refresh();
+                    };
                 });
             }
             return RoomsCtrl;
