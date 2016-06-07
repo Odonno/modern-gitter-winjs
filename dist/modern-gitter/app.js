@@ -382,6 +382,23 @@ var Application;
                     }
                 });
             };
+            ApiService.prototype.updateRoom = function (userId, room) {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'PUT',
+                        url: _this.ConfigService.baseUrl + "user/" + userId + "/rooms/" + room.id,
+                        data: JSON.stringify(room),
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
             ApiService.prototype.deleteRoom = function (roomId) {
                 var _this = this;
                 return new Promise(function (done, error) {
@@ -1988,6 +2005,18 @@ var Application;
                         $state.go('rooms');
                     });
                 };
+                $scope.toggleFavourite = function (callback) {
+                    if ($scope.room.favourite) {
+                        $scope.room.favourite = 0;
+                    }
+                    else {
+                        $scope.room.favourite = 1;
+                    }
+                    ApiService.updateRoom(RoomsService.currentUser.id, $scope.room)
+                        .then(function (result) {
+                        callback();
+                    });
+                };
                 $scope.getMessageById = function (id) {
                     for (var i = 0; i < $scope.messages.length; i++) {
                         if ($scope.messages[i].id == id) {
@@ -2100,6 +2129,13 @@ var Application;
                     cmdDelete.className += $scope.room.oneToOne ? ' show' : ' hide';
                     cmdDelete.onclick = function () {
                         $scope.deleteRoom();
+                    };
+                    var cmdFavourite = document.getElementById('cmdFavourite');
+                    cmdFavourite.setAttribute('aria-checked', $scope.room.favourite ? 'true' : 'false');
+                    cmdFavourite.onclick = function () {
+                        $scope.toggleFavourite(function () {
+                            cmdFavourite.setAttribute('aria-checked', $scope.room.favourite ? 'true' : 'false');
+                        });
                     };
                 });
             }

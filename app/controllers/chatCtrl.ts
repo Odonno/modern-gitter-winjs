@@ -14,6 +14,7 @@ module Application.Controllers {
 
         leaveRoom(): void;
         deleteRoom(): void;
+        toggleFavourite(callback: () => void): void;
         getMessageById(id: string): Models.Message;
         reply(messageId: string): void;
         quote(messageId: string): void;
@@ -60,6 +61,19 @@ module Application.Controllers {
                     LocalSettingsService.remove('lastRoom');
                     $state.go('rooms');
                 });
+            };
+
+            $scope.toggleFavourite = (callback: () => void) => {
+                if ($scope.room.favourite) {
+                    $scope.room.favourite = 0;
+                } else {
+                    $scope.room.favourite = 1;
+                }
+
+                ApiService.updateRoom(RoomsService.currentUser.id, $scope.room)
+                    .then(result => {
+                        callback();
+                    });
             };
 
             $scope.getMessageById = (id: string) => {
@@ -191,15 +205,23 @@ module Application.Controllers {
             WinJS.UI.processAll().done(() => {
                 // toolbar command loaded
                 var cmdLeave = document.getElementById('cmdLeave');
-                cmdLeave.className += $scope.room.oneToOne ? ' hide': ' show';
+                cmdLeave.className += $scope.room.oneToOne ? ' hide' : ' show';
                 cmdLeave.onclick = () => {
                     $scope.leaveRoom();
                 };
 
                 var cmdDelete = document.getElementById('cmdDelete');
-                cmdDelete.className += $scope.room.oneToOne ? ' show': ' hide';
+                cmdDelete.className += $scope.room.oneToOne ? ' show' : ' hide';
                 cmdDelete.onclick = () => {
                     $scope.deleteRoom();
+                };
+
+                var cmdFavourite = document.getElementById('cmdFavourite');
+                cmdFavourite.setAttribute('aria-checked', $scope.room.favourite ? 'true' : 'false');
+                cmdFavourite.onclick = () => {
+                    $scope.toggleFavourite(() => {
+                        cmdFavourite.setAttribute('aria-checked', $scope.room.favourite ? 'true' : 'false');
+                    });
                 };
             });
         }

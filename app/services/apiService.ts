@@ -127,6 +127,23 @@ module Application.Services {
             });
         }
 
+        public updateRoom(userId: string, room: Models.Room) {
+            return new Promise<{}>((done, error) => {
+                WinJS.xhr({
+                    type: 'PUT',
+                    url: this.ConfigService.baseUrl + "user/" + userId + "/rooms/" + room.id,
+                    data: JSON.stringify(room),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
+
         public deleteRoom(roomId: string) {
             return new Promise<{}>((done, error) => {
                 WinJS.xhr({
