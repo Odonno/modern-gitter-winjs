@@ -12,7 +12,8 @@ module Application.Controllers {
         editedMessage: Models.Message;
         editedText: string;
 
-        leave(): void;
+        leaveRoom(): void;
+        deleteRoom(): void;
         getMessageById(id: string): Models.Message;
         reply(messageId: string): void;
         quote(messageId: string): void;
@@ -41,9 +42,19 @@ module Application.Controllers {
             $scope.sendingMessage = false;
 
             // methods
-            $scope.leave = () => {
+            $scope.leaveRoom = () => {
                 RoomsService.leaveRoom($scope.room, () => {
                     console.log('leaving room');
+
+                    LocalSettingsService.remove('lastPage');
+                    LocalSettingsService.remove('lastRoom');
+                    $state.go('rooms');
+                });
+            };
+
+            $scope.deleteRoom = () => {
+                RoomsService.deleteRoom($scope.room, () => {
+                    console.log('deleting room');
 
                     LocalSettingsService.remove('lastPage');
                     LocalSettingsService.remove('lastRoom');
@@ -180,8 +191,15 @@ module Application.Controllers {
             WinJS.UI.processAll().done(() => {
                 // toolbar command loaded
                 var cmdLeave = document.getElementById('cmdLeave');
+                cmdLeave.className += $scope.room.oneToOne ? ' hide': ' show';
                 cmdLeave.onclick = () => {
-                    $scope.leave();
+                    $scope.leaveRoom();
+                };
+
+                var cmdDelete = document.getElementById('cmdDelete');
+                cmdDelete.className += $scope.room.oneToOne ? ' show': ' hide';
+                cmdDelete.onclick = () => {
+                    $scope.deleteRoom();
                 };
             });
         }

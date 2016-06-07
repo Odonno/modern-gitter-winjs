@@ -228,5 +228,12 @@ module Application.Services {
                 this.removeRoom(room);
             });
         }
+
+        public deleteRoom(room: Models.Room, callback: { (): void }): void {
+            this.ApiService.deleteRoom(room.id).then(() => {
+                callback();
+                this.removeRoom(room);
+            });
+        }
     }
 }

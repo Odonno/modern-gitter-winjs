@@ -1317,6 +1317,13 @@ var Application;
                     _this.removeRoom(room);
                 });
             };
+            RoomsService.prototype.deleteRoom = function (room, callback) {
+                var _this = this;
+                this.ApiService.deleteRoom(room.id).then(function () {
+                    callback();
+                    _this.removeRoom(room);
+                });
+            };
             return RoomsService;
         }());
         Services.RoomsService = RoomsService;
@@ -1965,9 +1972,17 @@ var Application;
                 $scope.messages = [];
                 $scope.textMessage = '';
                 $scope.sendingMessage = false;
-                $scope.leave = function () {
+                $scope.leaveRoom = function () {
                     RoomsService.leaveRoom($scope.room, function () {
                         console.log('leaving room');
+                        LocalSettingsService.remove('lastPage');
+                        LocalSettingsService.remove('lastRoom');
+                        $state.go('rooms');
+                    });
+                };
+                $scope.deleteRoom = function () {
+                    RoomsService.deleteRoom($scope.room, function () {
+                        console.log('deleting room');
                         LocalSettingsService.remove('lastPage');
                         LocalSettingsService.remove('lastRoom');
                         $state.go('rooms');
@@ -2077,8 +2092,14 @@ var Application;
                 }
                 WinJS.UI.processAll().done(function () {
                     var cmdLeave = document.getElementById('cmdLeave');
+                    cmdLeave.className += $scope.room.oneToOne ? ' hide' : ' show';
                     cmdLeave.onclick = function () {
-                        $scope.leave();
+                        $scope.leaveRoom();
+                    };
+                    var cmdDelete = document.getElementById('cmdDelete');
+                    cmdDelete.className += $scope.room.oneToOne ? ' show' : ' hide';
+                    cmdDelete.onclick = function () {
+                        $scope.deleteRoom();
                     };
                 });
             }
