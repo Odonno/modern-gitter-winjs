@@ -1,8 +1,8 @@
 ﻿<!-- rooms commands -->
 <div data-win-control="WinJS.UI.ToolBar">
     <!-- primary commands -->
-    <button data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdRefresh', label: 'Refresh', section: 'primary', type: 'button', icon: 'refresh' }"></button>
-    <div data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdSearch', section: 'primary', type: 'content' }">
+    <button data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdRefresh', label: 'Refresh', section: 'primary', type: 'button', icon: 'refresh', priority: 2 }"></button>
+    <div data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdSearch', section: 'primary', type: 'content', priority: 1 }">
         <!-- search input -->
         <input id="searchInput" type="text" placeholder="Search a room..." class="form-control" style="margin-top: 6px;" />
     </div>

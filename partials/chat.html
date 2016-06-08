@@ -1,5 +1,5 @@
 ﻿<!-- chat commands -->
-<div data-win-control="WinJS.UI.ToolBar">
+<div id="roomCommands" data-win-control="WinJS.UI.ToolBar">
     <!-- primary commands -->
     <button data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdFavourite', label: 'Toggle favourite', section: 'primary', type: 'toggle', icon: 'favorite' }"></button>
     <button data-win-control="WinJS.UI.Command" data-win-options="{ id: 'cmdLeave', label: 'Leave room', section: 'primary', type: 'button', icon: '&#xEA52;' }"></button>
@@ -27,6 +27,6 @@
 <!-- actions (send message) -->
 <div id="actions">
     <button id="sendFiles" class="btn btn-link btn-icon no-outline" disabled>&#xE16C;</button>
-    <textarea id="textMessage" ng-model="textMessage" ng-enter="returnLine()" no-line-return="{{ isLineReturnShouldSendChatMessage }}" placeholder="Click here to type a chat message. Supports GitHub flavoured markdown."></textarea>
+    <textarea id="textMessage" ng-model="textMessage" ng-enter="returnLine()" no-line-return="{{ isLineReturnShouldSendChatMessage }}" placeholder="Click here to type a chat message."></textarea>
     <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
 </div>
