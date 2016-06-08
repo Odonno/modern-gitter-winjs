@@ -27,6 +27,6 @@
 <!-- actions (send message) -->
 <div id="actions">
     <button id="sendFiles" class="btn btn-link btn-icon no-outline" disabled>&#xE16C;</button>
-    <textarea id="textMessage" ng-model="textMessage" ng-enter="returnLine()" placeholder="Enter your text here..."></textarea>
+    <textarea id="textMessage" ng-model="textMessage" ng-enter="returnLine()" no-line-return="{{ isLineReturnShouldSendChatMessage }}" placeholder="Enter your text here..."></textarea>
     <button id="sendMessage" ng-disabled="!textMessage" ng-click="sendMessage()" class="btn btn-link btn-icon no-outline">&#xE122;</button>
 </div>

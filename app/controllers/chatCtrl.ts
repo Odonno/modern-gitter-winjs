@@ -2,6 +2,7 @@
 
 module Application.Controllers {
     export interface IChatScope extends ng.IScope {
+        isLineReturnShouldSendChatMessage: boolean;
         room: Models.Room;
         messages: Models.Message[];
         textMessage: string;
@@ -37,6 +38,7 @@ module Application.Controllers {
             }
 
             // properties
+            $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
             $scope.room = RoomsService.currentRoom;
             $scope.messages = [];
             $scope.textMessage = '';

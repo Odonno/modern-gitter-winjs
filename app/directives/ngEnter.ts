@@ -8,7 +8,9 @@ module Application.Directives {
                     scope.$apply(() => {
                         scope.$eval(attrs['ngEnter']);
                     });
-                    event.preventDefault();
+                    if (attrs['noLineReturn'] == 'true') {
+                        event.preventDefault();
+                    }
                 }
             });
         }

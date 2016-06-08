@@ -1497,7 +1497,9 @@ var Application;
                             scope.$apply(function () {
                                 scope.$eval(attrs['ngEnter']);
                             });
-                            event.preventDefault();
+                            if (attrs['noLineReturn'] == 'true') {
+                                event.preventDefault();
+                            }
                         }
                     });
                 };
@@ -1998,6 +2000,7 @@ var Application;
                     $state.go('error', { errorType: 'noRoomSelected' });
                     return;
                 }
+                $scope.isLineReturnShouldSendChatMessage = FeatureToggleService.isLineReturnShouldSendChatMessage();
                 $scope.room = RoomsService.currentRoom;
                 $scope.messages = [];
                 $scope.textMessage = '';
