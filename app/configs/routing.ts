@@ -40,6 +40,11 @@ module Application.Configs {
                     templateUrl: 'partials/addRoom.html',
                     controller: 'AddRoomCtrl'
                 })
+                .state('addRoom.suggested', {
+                    url: '/suggested',
+                    templateUrl: 'partials/addRoom/suggested.html',
+                    controller: 'AddSuggestedRoomCtrl'
+                })
                 .state('addRoom.existing', {
                     url: '/existing',
                     templateUrl: 'partials/addRoom/existing.html',

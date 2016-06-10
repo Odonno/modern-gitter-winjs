@@ -33,6 +33,7 @@
 /// <reference path="./controllers/addOneToOneRoomCtrl.ts"/>
 /// <reference path="./controllers/addRepositoryRoomCtrl.ts"/>
 /// <reference path="./controllers/addRoomCtrl.ts"/>
+/// <reference path="./controllers/addSuggestedRoomCtrl.ts"/>
 /// <reference path="./controllers/appCtrl.ts"/>
 /// <reference path="./controllers/chatCtrl.ts"/>
 /// <reference path="./controllers/errorCtrl.ts"/>
@@ -80,6 +81,7 @@ appModule.controller('AddExistingRoomCtrl', ($scope, $state, ApiService, RoomsSe
 appModule.controller('AddOneToOneRoomCtrl', ($scope, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRepositoryRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AddRoomCtrl', ($scope, $state) => new Application.Controllers.AddRoomCtrl($scope, $state));
+appModule.controller('AddSuggestedRoomCtrl', ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) => new Application.Controllers.AddSuggestedRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService));
 appModule.controller('AppCtrl', ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) => new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService));
 appModule.controller('ChatCtrl', ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService) => new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService));
 appModule.controller('ErrorCtrl', ($scope, $state) => new Application.Controllers.ErrorCtrl($scope, $state));

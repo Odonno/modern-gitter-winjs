@@ -8,7 +8,7 @@ module Application.Controllers {
     export class AddRoomCtrl {
         constructor($scope: IAddRoomScope, $state: ng.ui.IStateService) {
             // properties
-            $scope.currentView = 'existing';
+            $scope.currentView = 'suggested';
             
             // watch event
             $scope.$watch(() => {

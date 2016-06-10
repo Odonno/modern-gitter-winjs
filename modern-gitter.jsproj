@@ -137,6 +137,7 @@
     <Content Include="partials\addRoom\existing.html" />
     <Content Include="partials\addRoom\oneToOne.html" />
     <Content Include="partials\addRoom\repository.html" />
+    <Content Include="partials\addRoom\suggested.html" />
     <Content Include="partials\chat.html" />
     <Content Include="partials\directives\message-list.html" />
     <Content Include="partials\error.html" />

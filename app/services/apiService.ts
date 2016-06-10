@@ -71,6 +71,22 @@ module Application.Services {
             });
         }
 
+        public getSuggestedRooms() {
+            return new Promise<Models.Repository[]>((done, error) => {
+                WinJS.xhr({
+                    type: 'GET',
+                    url: this.ConfigService.baseUrl + "user/me/suggestedRooms",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + this.OAuthService.refreshToken
+                    }
+                }).then((success) => {
+                    done(JSON.parse(success.response));
+                });
+            });
+        }
+
         public joinRoom(name: string) {
             return new Promise<Models.Room>((done, error) => {
                 WinJS.xhr({

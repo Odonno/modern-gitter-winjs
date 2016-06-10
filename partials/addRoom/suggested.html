@@ -1,0 +1,13 @@
+﻿<!-- list of repositories without room -->
+<div id="repositoriesListView" class="win-scrollview">
+    <div ng-repeat="repository in suggestions" class="col-xs-6 repository clickable" ng-class="{ 'selected-item': repository.id === selectedRepository.id }"
+        ng-click="selectRepository(repository)">
+        <img class="repository-image" ng-src="{{ repository.avatarUrl }}" />
+        <h5 class="win-h5 repository-name">{{ repository.uri }}</h5>
+        <em class="repository-description">{{ repository.description }}</em>
+    </div>
+</div>
+
+<button class="btn btn-primary" ng-disabled="!canJoin" ng-click="createRoom()">
+    Create room
+</button>

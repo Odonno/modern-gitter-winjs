@@ -216,6 +216,11 @@ var Application;
                     templateUrl: 'partials/addRoom.html',
                     controller: 'AddRoomCtrl'
                 })
+                    .state('addRoom.suggested', {
+                    url: '/suggested',
+                    templateUrl: 'partials/addRoom/suggested.html',
+                    controller: 'AddSuggestedRoomCtrl'
+                })
                     .state('addRoom.existing', {
                     url: '/existing',
                     templateUrl: 'partials/addRoom/existing.html',
@@ -315,6 +320,22 @@ var Application;
                     WinJS.xhr({
                         type: 'GET',
                         url: _this.ConfigService.baseUrl + "rooms",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + _this.OAuthService.refreshToken
+                        }
+                    }).then(function (success) {
+                        done(JSON.parse(success.response));
+                    });
+                });
+            };
+            ApiService.prototype.getSuggestedRooms = function () {
+                var _this = this;
+                return new Promise(function (done, error) {
+                    WinJS.xhr({
+                        type: 'GET',
+                        url: _this.ConfigService.baseUrl + "user/me/suggestedRooms",
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
@@ -1897,7 +1918,7 @@ var Application;
     (function (Controllers) {
         var AddRoomCtrl = (function () {
             function AddRoomCtrl($scope, $state) {
-                $scope.currentView = 'existing';
+                $scope.currentView = 'suggested';
                 $scope.$watch(function () {
                     return $state.current.name;
                 }, function () {
@@ -1908,6 +1929,38 @@ var Application;
             return AddRoomCtrl;
         }());
         Controllers.AddRoomCtrl = AddRoomCtrl;
+    })(Controllers = Application.Controllers || (Application.Controllers = {}));
+})(Application || (Application = {}));
+var Application;
+(function (Application) {
+    var Controllers;
+    (function (Controllers) {
+        var AddSuggestedRoomCtrl = (function () {
+            function AddSuggestedRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) {
+                $scope.selectRepository = function (repository) {
+                    $scope.selectedRepository = repository;
+                    $scope.canJoin = RoomsService.canJoin($scope.selectedRepository.uri);
+                };
+                $scope.createRoom = function () {
+                    RoomsService.createRoom($scope.selectedRepository.uri, function (room) {
+                        var toastOptions = {
+                            launch: "action=viewRoom&roomId=" + room.id,
+                            expirationTime: 5
+                        };
+                        ToastNotificationService.sendImageAndTextNotification(room.image, "The room " + room.name + " has been successfully created", toastOptions);
+                        RoomsService.selectRoom(room);
+                        $state.go('chat');
+                    });
+                };
+                ApiService.getSuggestedRooms()
+                    .then(function (repositories) {
+                    $scope.suggestions = repositories;
+                    $scope.$digest();
+                });
+            }
+            return AddSuggestedRoomCtrl;
+        }());
+        Controllers.AddSuggestedRoomCtrl = AddSuggestedRoomCtrl;
     })(Controllers = Application.Controllers || (Application.Controllers = {}));
 })(Application || (Application = {}));
 var Application;
@@ -2302,6 +2355,7 @@ appModule.controller('AddExistingRoomCtrl', function ($scope, $state, ApiService
 appModule.controller('AddOneToOneRoomCtrl', function ($scope, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddOneToOneRoomCtrl($scope, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRepositoryRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddRepositoryRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AddRoomCtrl', function ($scope, $state) { return new Application.Controllers.AddRoomCtrl($scope, $state); });
+appModule.controller('AddSuggestedRoomCtrl', function ($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService) { return new Application.Controllers.AddSuggestedRoomCtrl($scope, $filter, $state, ApiService, RoomsService, ToastNotificationService); });
 appModule.controller('AppCtrl', function ($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService) { return new Application.Controllers.AppCtrl($scope, $rootScope, $state, RoomsService, OAuthService, LocalSettingsService, BackgroundTaskService, FeatureToggleService); });
 appModule.controller('ChatCtrl', function ($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService) { return new Application.Controllers.ChatCtrl($scope, $state, ApiService, RoomsService, NavigationService, LocalSettingsService, ToastNotificationService, FeatureToggleService); });
 appModule.controller('ErrorCtrl', function ($scope, $state) { return new Application.Controllers.ErrorCtrl($scope, $state); });

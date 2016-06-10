@@ -1,8 +1,11 @@
 ﻿<div class="content">
     <h2 id="addRoomHeader" class="win-h2">Join a room</h2>
 
-    <!-- four ways to create/join a room -->
+    <!-- five ways to create/join a room -->
     <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" ng-class="{active: currentView === 'suggested'}">
+            <a class="addRoomTab" ui-sref="addRoom.suggested" aria-controls="suggested" role="tab">Suggested</a>
+        </li>
         <li role="presentation" ng-class="{active: currentView === 'existing'}">
             <a class="addRoomTab" ui-sref="addRoom.existing" aria-controls="existing" role="tab">Existing</a>
         </li>
